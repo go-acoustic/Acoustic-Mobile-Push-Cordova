@@ -1,0 +1,20 @@
+{
+    "name": "co.acoustic.mobile.push.sample",
+    "version": "3.8.0",
+    "displayName": "Sample",
+    "cordova": {
+        "platforms": [],
+        "plugins": {
+            "cordova-plugin-whitelist": {},
+            "cordova-plugin-email-composer": {
+                "ANDROID_SUPPORT_V4_VERSION": "27.+"
+            },
+            "skwas-cordova-plugin-datetimepicker": {}
+        }
+    },
+    "dependencies": {
+        "cordova-plugin-email-composer": "^0.9.2",
+        "cordova-plugin-whitelist": "1",
+        "skwas-cordova-plugin-datetimepicker": "^2.1.1"
+    }
+}

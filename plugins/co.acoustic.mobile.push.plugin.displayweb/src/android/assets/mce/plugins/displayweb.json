@@ -1,0 +1,8 @@
+{
+  "notification-actions": [
+    {
+      "type": "displayweb",
+      "class": "co.acoustic.mobile.push.sdk.plugin.displayweb.DisplayWebViewAction"
+    }
+  ]
+}

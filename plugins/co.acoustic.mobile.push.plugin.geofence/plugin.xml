@@ -1,0 +1,54 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+Copyright © 2011, 2019 Acoustic, L.P. All rights reserved.
+
+NOTICE: This file contains material that is confidential and proprietary to 
+Acoustic, L.P. and/or other developers. No license is granted under any intellectual or 
+industrial property rights of Acoustic, L.P. except as may be provided in an agreement with 
+Acoustic, L.P. Any unauthorized copying or distribution of content from this file is prohibited.
+-->
+<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0" id="co.acoustic.mobile.push.plugin.geofence"
+version="3.8.0">
+    <name>Acoustic MCE Geofence Cordova Plugin</name>
+    <author>Acoustic MCE</author>
+    <description>Allows Cordova applications to integrate with Acoustic MCE Push Services</description>
+    <keywords>mce</keywords>
+    <license>Apache 2.0 License</license>
+    <engines>
+        <engine name="cordova" version=">=3.0" />
+    </engines>
+    <js-module src="MCEGeofencePlugin.js" name="MCEGeofencePlugin">
+        <clobbers target="MCEGeofencePlugin" />
+    </js-module>
+    <platform name="ios">
+        <header-file src="src/ios/MCEGeofencePlugin.h" />
+        <source-file src="src/ios/MCEGeofencePlugin.m" />
+        <config-file target="config.xml" parent="/*">
+            <feature name="MCEGeofencePlugin" >
+                <param name="ios-package" value="MCEGeofencePlugin"/>
+            </feature>
+            <preference name="geofence" value="true" />
+        </config-file>
+    </platform>
+    <platform name="android">
+        <source-file src="src/android/acoustic-mobile-push-android-cordova-geofence-3.8.0.jar" target-dir="libs" framework="false" />
+        <source-file src="src/android/acoustic-mobile-push-android-js-geofence-3.8.0.jar" target-dir="libs" framework="false" />
+
+        <config-file target="res/xml/config.xml" parent="/widget">
+            <feature name="MCEGeofencePlugin">
+                <param name="android-package" value="co.acoustic.mobile.push.plugin.cordova.geofence.MceCordovaGeofencePlugin" />
+            </feature>
+        </config-file>
+
+        <config-file target="AndroidManifest.xml" parent="/manifest/application">
+            <!-- GeofenceBroadcastReceiver is optional. It is used to receive geofence events. It is required only if locations are enabled and geofences are used -->
+            <receiver android:name="co.acoustic.mobile.push.sdk.location.GeofenceBroadcastReceiver"  android:enabled="true" android:exported="true"/>
+            <receiver android:name="co.acoustic.mobile.push.sdk.js.geofence.JsonMceBroadcastReceiver">
+                <intent-filter>
+                    <action android:name="co.acoustic.mobile.push.sdk.NOTIFIER" />
+                </intent-filter>
+            </receiver>
+        </config-file>
+
+    </platform>
+</plugin>

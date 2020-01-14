@@ -1,0 +1,262 @@
+<!-- 
+Copyright © 2015, 2019 Acoustic, L.P. All rights reserved.
+
+NOTICE: This file contains material that is confidential and proprietary to 
+Acoustic, L.P. and/or other developers. No license is granted under any intellectual or 
+industrial property rights of Acoustic, L.P. except as may be provided in an agreement with 
+Acoustic, L.P. Any unauthorized copying or distribution of content from this file is prohibited.
+-->
+
+<!DOCTYPE html>
+<html>
+
+<head>
+    <script src="js/jquery-1.11.1.min.js"></script>
+    <script src="js/jquery.mobile-1.4.5.min.js"></script>
+    <script src="js/jquery-ui-1.11.4.min.js"></script>
+    <script src="js/fastclick.js"></script>
+
+    <meta charset="utf-8" />
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="msapplication-tap-highlight" content="no" />
+    <!-- WARNING: for iOS 7, remove the width=device-width and height=device-height attributes. See https://issues.apache.org/jira/browse/CB-4323 -->
+    <meta name="viewport" content="initial-scale=1, width=device-width, height=device-height, viewport-fit=cover">
+    <link rel="stylesheet" href="css/acoustic.css" />
+    <link rel="stylesheet" href="css/jquery.mobile.structure-1.4.5.css" />
+    <link rel="stylesheet" type="text/css" href="css/index.css" />
+</head>
+
+<body>
+    <div data-role="page" id="sample">
+
+        <div class="ui-body">
+            <center>
+                <h4><img src="css/images/logo.png"></h4>
+                <h4><img src="css/images/campaign.png"></h4>
+                <h4>Acoustic Campaign Mobile Push Sample App</h4>
+            </center>
+            <div id='pluginVersion'>Plugin Version: <span></span></div>
+            <div id='sdkVersion'>Native SDK Version: <span></span></div>
+            <a data-transition="slide" id='registrationButton' href="#registration" data-role="button" data-icon="arrow-r" data-iconpos="right">Registration Details</a>
+            <a data-transition="slide" id='inboxButton' href="#inbox" data-role="button" data-icon="arrow-r" data-iconpos="right">Inbox</a>
+            <a data-transition="slide" id='inAppButton' href="#inAppPage" data-role="button" data-icon="arrow-r" data-iconpos="right">In App</a>
+            <a data-transition="slide" id='customActionButton' href="#customActions" data-role="button" data-icon="arrow-r" data-iconpos="right">Custom Actions</a>
+            <a data-transition="slide" id='eventsButton' href="#events" data-role="button" data-icon="arrow-r" data-iconpos="right">Send Test Events</a>
+            <a data-transition="slide" id='attributesButton' href="#attributes" data-role="button" data-icon="arrow-r" data-iconpos="right">Send User Attributes</a>
+            <a data-transition="slide" id='geofenceButton' href="#geofences" data-role="button" data-icon="arrow-r" data-iconpos="right">View Geofences</a>
+            <a data-transition="slide" id='beaconButton' href="#beacons" data-role="button" data-icon="arrow-r" data-iconpos="right">View iBeacons</a>
+        </div>
+
+        <div class='copyright'>Copyright (c) 2015 Acoustic. All rights reserved.</div>
+
+        <div data-role="header">
+            <h1>Sample App</h1>
+        </div>
+
+    </div>
+
+     <div data-role="page" id="customActions">
+        <div class="ui-body spacing">
+
+            <p><b>Custom Action Type</b><br>
+            <input type="text" id='customActionType' data-mini="true" default="custom" /></p>
+            <p><button id='customActionRegister'>Register Custom Action with Type</button></p>
+            <p><button id='customActionUnregister'>Unregister Custom Action with Type</button></p>
+            <p><b>Status</b><br>
+            <div id='customActionStatus' class='noStatus'>No status yet</div></p>
+        </div>
+        <div data-role="header">
+            <a href="#sample" data-direction="reverse" data-transition="slide">Sample</a>
+            <h1>Custom Actions</h1>
+        </div>
+    </div>
+
+
+    <div data-role="page" id="beacons">
+        <div class="ui-body">
+
+            <p class='header'>iBeacon Feature</p>
+            <ul data-role="listview">
+                <li>
+                    <div class="">UUID</div>
+                    <div id='uuid'></div>
+                </li>
+                <li>
+                    <div class="">Status</div>
+                    <div class='status'></div>
+                </li>
+            </ul>
+
+            <p class='header'>iBeacon Major Regions</p>
+            <ul data-role="listview" id='beaconRegions'>
+            </ul>
+
+        </div>
+        <div data-role="header">
+            <a href="#sample" data-direction="reverse" data-transition="slide">Sample</a>
+            <h1>iBeacons</h1>
+            <div class="ui-btn-right ui-btn">
+                <a id="beacon_refresh"><img width='22' height='22' src="images/inbox/refresh.png"></a>
+            </div>
+        </div>
+    </div>
+    <div data-role="page" id="geofences">
+        <div class="ui-body">
+            <ul data-role="listview">
+                <li class="ui-grid-a">
+                    <div class="ui-block-a">Status</div>
+                    <div class="ui-block-b right status"></div>
+                </li>
+            </ul>
+        </div>
+        <div id='map' class="ui-body"></div>
+        <div data-role="header">
+            <a href="#sample" data-direction="reverse" data-transition="slide">Sample</a>
+            <h1>Geofences</h1>
+            <div class="ui-btn-right ui-btn">
+                <a id="gps_refresh"><img width='22' height='22' src="images/inbox/refresh.png"></a>
+                <a id="gps_button"><img width='22' height='22' src="images/gps.png"></a>
+            </div>
+        </div>
+    </div>
+
+    <div data-role="page" id="inbox">
+        <div id='inboxMessages' class="ui-body">
+            <div class="emptyInbox">Inbox is not yet available.</div>
+        </div>
+        <div data-role="header">
+            <a href="#sample" data-direction="reverse" data-transition="slide">Sample</a>
+            <h1>Inbox</h1>
+            <a id="inbox_refresh_button"><img width='22' height='22' src="images/inbox/refresh.png"></a>
+        </div>
+    </div>
+
+    <div data-role="page" id="inboxMessage">
+        <div id='inboxMessageContent' class="ui-body"></div>
+        <div data-role="header">
+            <div id='buttons'>
+                <a id="delete_button"><img width='22' height='22' src="images/inbox/trash.png"></a>
+                <a id="down_button"><img width='22' height='11' src="images/inbox/chevron-down.png"></a>
+                <a id="up_button"><img width='22' height='11' src="images/inbox/chevron-up.png"></a>
+            </div>
+            <a href="#inbox" data-direction="reverse" data-transition="slide">Inbox</a>
+            <h1></h1>
+        </div>
+    </div>
+
+    <div data-role="page" id="inAppPage">
+        <div class="ui-body">
+            <p class='header'>Execute InApp Actions</p>
+            <a data-transition="slide" id='inAppBannerTop' data-role="button">Top Banner Template</a>
+            <a data-transition="slide" id='inAppBannerBottom' data-role="button">Bottom Banner Template</a>
+            <a data-transition="slide" id='inAppImage' data-role="button">Image Template</a>
+            <a data-transition="slide" id='inAppVideo' data-role="button">Video Template</a>
+            <a data-transition="slide" id='inAppNext' data-role="button">Next Queued InApp</a>
+            <p class='header'>Add Canned InApp</p>
+            <a data-transition="slide" id='cannedInAppBannerTop' data-role="button">Top Banner Template</a>
+            <a data-transition="slide" id='cannedInAppBannerBottom' data-role="button">Bottom Banner Template</a>
+            <a data-transition="slide" id='cannedInAppImage' data-role="button">Image Template</a>
+            <a data-transition="slide" id='cannedInAppVideo' data-role="button">Video Template</a>
+        </div>
+        <div data-role="header">
+            <a href="#sample" data-direction="reverse" data-transition="slide">Sample</a>
+            <h1>In App</h1>
+            <a id="inapp_refresh_button"><img width='22' height='22' src="images/inbox/refresh.png"></a>
+        </div>
+    </div>
+
+    <div data-role="page" id="registration">
+        <div class="ui-body">
+            <p class='header'>Credentials</p>
+            <ul data-role="listview">
+                <li class="ui-grid-a">
+                    <div class="ui-block-a">User Id</div>
+                    <div class="ui-block-b right userId"></div>
+                </li>
+                <li class="ui-grid-a">
+                    <div class="ui-block-a">Channel Id</div>
+                    <div class="ui-block-b right channelId"></div>
+                </li>
+                <li class="ui-grid-a">
+                    <div class="ui-block-a">App Key</div>
+                    <div class="ui-block-b right appKey"></div>
+                </li>
+            </ul>
+            <a data-transition="slide" id='registration_status' data-role="button">Undefined</a>
+            <p class='footer'>User ID and Channel ID only known after registration. The registration process could take several minutes, If you have issues with registering a device make sure you have the correct certificate and appKey</p>
+        </div>
+
+        <div data-role="header">
+            <a href="#sample" data-direction="reverse" data-transition="slide">Sample</a>
+            <h1>Registration Details</h1>
+        </div>
+
+    </div>
+
+    <div data-role="page" id="events">
+        <div class="ui-body">
+            <p><b>Events</b></p>
+            <button id='send_click_queue'>Queue Notification Click Event</button>
+            <p>Click to send a test event, you should see the send status to the right of the click event.</p>
+        </div>
+
+        <div data-role="header">
+            <a href="#sample" data-direction="reverse" data-transition="slide">Sample</a>
+            <h1>Test Events</h1>
+        </div>
+    </div>
+
+    <div data-role="page" id="attributes">
+        <div class="ui-body spacing">
+            <p>
+                <b>Key Name</b>
+                <input type="text" id='attribute' data-mini="true" default="attribute" />
+            </p>
+            
+            <div id='value-container-container'>
+                <b>Value</b>
+                <fieldset data-role="controlgroup" data-type="horizontal" id='type' default='string'>
+                    <input type="radio" name="type" value="date" id="date-type"><label for="date-type">Date</label>
+                    <input type="radio" name="type" value="string" checked id="string-type"><label for="string-type">String</label>
+                    <input type="radio" name="type" value="bool" id="bool-type"><label for="bool-type">Bool</label>
+                    <input type="radio" name="type" value="number" id="number-type"><label for="number-type">Number</label>
+                </fieldset>
+                <div id='value-container'>
+                    <input type="text" id='value' data-mini="true" default="value" />
+                </div>
+                <fieldset data-role="controlgroup" data-type="horizontal" id='bool-value-container' default='true'>
+                    <input type="radio" name="bool-value" value="true" id="bool-value-true"><label for="bool-value-true">True</label>
+                    <input type="radio" name="bool-value" checked value="false" id="bool-value-false"><label for="bool-value-false">False</label>
+                </fieldset>
+           </div>
+            
+            <p>
+            <b>Operation</b>
+            <fieldset data-role="controlgroup" data-type="horizontal" id='action' default='update'>
+                <input type='radio' id="update-action" name='action' checked value='update' />
+                <label for="update-action">Update</label>
+                
+                <input type='radio' id="delete-action" name='action' value='delete' />
+                <label for="delete-action">Delete</label>
+            </fieldset>
+            </p>
+            
+            <button id='sendAttributes'>Add to Queue</button>
+            <p>
+            <b>Status</b>
+            <div id='sendAttributesStatus'>No status yet</div>
+            </p>
+        </div>
+
+        <div data-role="header">
+            <a href="#sample" data-direction="reverse" data-transition="slide">Sample</a>
+            <h1>User Attributes</h1>
+        </div>
+    </div>
+
+    <script type="text/javascript" src="cordova.js"></script>
+    <script type="text/javascript" src="js/index.js"></script>
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBCd4XNgcnazeQXGh9_MgJnaXIjvDWpEhM"></script>
+</body>
+
+</html>

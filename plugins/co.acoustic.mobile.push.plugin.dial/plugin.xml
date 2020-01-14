@@ -1,0 +1,32 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+Copyright © 2011, 2019 Acoustic, L.P. All rights reserved.
+
+NOTICE: This file contains material that is confidential and proprietary to 
+Acoustic, L.P. and/or other developers. No license is granted under any intellectual or 
+industrial property rights of Acoustic, L.P. except as may be provided in an agreement with 
+Acoustic, L.P. Any unauthorized copying or distribution of content from this file is prohibited.
+-->
+<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0" id="co.acoustic.mobile.push.plugin.gcm"
+version="3.8.0">
+    <name>Acoustic MCE Cordova Plugin for Dial</name>
+    <author>Acoustic MCE</author>
+    <description>Allows Cordova applications to integrate with Acoustic MCE Push Services</description>
+    <keywords>mce</keywords>
+    <license>Apache 2.0 License</license>
+    <engines>
+        <engine name="cordova" version=">=3.0" />
+    </engines>
+    <js-module src="MCEPluginDial.js" name="MCEPluginDial">
+        <clobbers target="MCEPluginDial" />
+    </js-module>
+
+    <platform name="android">
+
+        <config-file target="AndroidManifest.xml" parent="/manifest">
+            <!-- CALL_PHONE is optional. It is only required is the dial action is used -->
+            <uses-permission android:name="android.permission.CALL_PHONE" />
+        </config-file>
+  
+    </platform>
+</plugin>
