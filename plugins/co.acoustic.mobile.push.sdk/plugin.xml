@@ -8,7 +8,7 @@ industrial property rights of Acoustic, L.P. except as may be provided in an agr
 Acoustic, L.P. Any unauthorized copying or distribution of content from this file is prohibited.
 -->
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0" id="co.acoustic.mobile.push.sdk"
-version="3.8.0">
+version="3.8.4">
     <name>Acoustic MCE Cordova Plugin</name>
     <author>Acoustic MCE</author>
     <description>Allows Cordova applications to integrate with Acoustic MCE Push Services</description>
@@ -17,7 +17,7 @@ version="3.8.0">
     <engines>
         <engine name="cordova" version=">=3.0" />
     </engines>
-    <js-module src="MCEPlugin.js" name="MCEPlugin">
+    <js-module src="www/js/MCEPlugin.js" name="MCEPlugin">
         <clobbers target="MCEPlugin" />
     </js-module>
 
@@ -34,7 +34,7 @@ version="3.8.0">
     <preference name="AUTO_INITIALIZE" default="true" />
     <preference name="ANDROID_APPKEY" />
     <platform name="ios">
-        <framework src="src/ios/AcousticMobilePush.framework" custom="true" embed="true" />
+        <framework src="src/ios/AcousticMobilePush.xcframework" custom="true" embed="true" />
         <framework src="CoreTelephony.framework" />
         <framework src="CoreLocation.framework" />
         <framework src="libsqlite3.dylib" />
@@ -73,12 +73,13 @@ version="3.8.0">
         </config-file>
     </platform>
     <platform name="android">
+        <hook type="after_prepare" src="src/android/hooks/add_tools_namespace.js" />
 
         <framework src="com.google.android.gms:play-services-base:+" />
         <framework src="com.google.android.gms:play-services-auth:+" />
 
         <edit-config file="AndroidManifest.xml" target="/manifest/application" mode="overwrite">
-            <application android:allowBackup="false" android:hardwareAccelerated="true" android:icon="@mipmap/ic_launcher" android:label="@string/app_name" android:name="co.acoustic.mobile.push.sdk.js.MceJsonApplication" android:supportsRtl="true" />
+            <application tools:replace="android:name" android:hardwareAccelerated="true" android:icon="@mipmap/ic_launcher" android:label="@string/app_name" android:name="co.acoustic.mobile.push.sdk.js.MceJsonApplication" android:supportsRtl="true" />
         </edit-config>
 
         <config-file target="AndroidManifest.xml" parent="/manifest">
@@ -174,10 +175,21 @@ version="3.8.0">
             </feature>
         </config-file>
         <source-file src="src/android/gson-2.2.4.jar" target-dir="libs" framework="false" />
-        
-        <source-file src="src/android/acoustic-mobile-push-android-sdk-3.8.0.jar" target-dir="libs" framework="false" />
-        <source-file src="src/android/acoustic-mobile-push-android-js-3.8.0.jar" target-dir="libs" framework="false" />
-        <source-file src="src/android/acoustic-mobile-push-android-cordova-3.8.0.jar" target-dir="libs" framework="false" />
+        <framework src="src/android/build-extras.gradle" custom="true" type="gradleReference" />
+
+        <lib-file src="src/android/acoustic-mobile-push-android-sdk-3.8.3.aar" />
+        <source-file src="src/android/src/co/acoustic/mobile/push/plugin/cordova/CordovaJsonCallback.java" target-dir="java/co/acoustic/mobile/push/plugin/cordova" />
+        <source-file src="src/android/src/co/acoustic/mobile/push/plugin/cordova/MceCordovaPlugin.java" target-dir="java/co/acoustic/mobile/push/plugin/cordova" />
+        <source-file src="src/android/src/co/acoustic/mobile/push/sdk/js/format" target-dir="java/co/acoustic/mobile/push/sdk/js" />
+        <source-file src="src/android/src/co/acoustic/mobile/push/sdk/js/JsonCallback.java" target-dir="java/co/acoustic/mobile/push/sdk/js" />
+        <source-file src="src/android/src/co/acoustic/mobile/push/sdk/js/JsonCallbacksRegistry.java" target-dir="java/co/acoustic/mobile/push/sdk/js" />
+        <source-file src="src/android/src/co/acoustic/mobile/push/sdk/js/JsonDbAdapter.java" target-dir="java/co/acoustic/mobile/push/sdk/js" />
+        <source-file src="src/android/src/co/acoustic/mobile/push/sdk/js/JsonMceBroadcastReceiver.java" target-dir="java/co/acoustic/mobile/push/sdk/js" />
+        <source-file src="src/android/src/co/acoustic/mobile/push/sdk/js/JsonNotificationAction.java" target-dir="java/co/acoustic/mobile/push/sdk/js" />
+        <source-file src="src/android/src/co/acoustic/mobile/push/sdk/js/MceJsonApi.java" target-dir="java/co/acoustic/mobile/push/sdk/js" />
+        <source-file src="src/android/src/co/acoustic/mobile/push/sdk/js/MceJsonApplication.java" target-dir="java/co/acoustic/mobile/push/sdk/js" />
+        <source-file src="src/android/src/co/acoustic/mobile/push/sdk/js/MceJsonSdk.java" target-dir="java/co/acoustic/mobile/push/sdk/js" />
+        <source-file src="src/android/src/co/acoustic/mobile/push/sdk/js/Provider.java" target-dir="java/co/acoustic/mobile/push/sdk/js" />
         
     </platform>
 </plugin>

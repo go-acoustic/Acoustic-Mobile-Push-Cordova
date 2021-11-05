@@ -8,7 +8,7 @@ industrial property rights of Acoustic, L.P. except as may be provided in an agr
 Acoustic, L.P. Any unauthorized copying or distribution of content from this file is prohibited.
 -->
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0" id="co.acoustic.mobile.push.plugin.location"
-version="3.8.0">
+version="3.8.4">
     <name>Acoustic MCE Location Cordova Plugin</name>
     <author>Acoustic MCE</author>
     <description>Allows Cordova applications to integrate with Acoustic MCE Push Services</description>
@@ -17,7 +17,7 @@ version="3.8.0">
     <engines>
         <engine name="cordova" version=">=3.0" />
     </engines>
-    <js-module src="MCELocationPlugin.js" name="MCELocationPlugin">
+    <js-module src="www/js/MCELocationPlugin.js" name="MCELocationPlugin">
         <clobbers target="MCELocationPlugin" />
     </js-module>
     <preference name="SYNC_RADIUS" default="100000" />
@@ -59,11 +59,12 @@ version="3.8.0">
     <platform name="android">
     
         <framework src="com.google.android.gms:play-services-location:+" />
-        <source-file src="src/android/acoustic-mobile-push-android-cordova-location-3.8.0.jar" target-dir="libs" framework="false" />
-        <source-file src="src/android/acoustic-mobile-push-android-js-location-3.8.0.jar" target-dir="libs" framework="false" />
+        <framework src="src/android/build-extras.gradle" custom="true" type="gradleReference" />
+        <source-file src="src/android/src/co/acoustic/mobile/push/plugin/cordova/location" target-dir="java/co/acoustic/mobile/push/plugin/cordova" />
+        <source-file src="src/android/src/co/acoustic/mobile/push/sdk/js/location" target-dir="java/co/acoustic/mobile/push/sdk/js" />
         
         <edit-config file="AndroidManifest.xml" target="/manifest/application/activity" mode="overwrite">
-            <activity android:configChanges="orientation|keyboardHidden|keyboard|screenSize|locale" android:label="@string/activity_name" android:launchMode="singleTop" android:name="co.acoustic.mobile.push.plugin.cordova.location.MceJsonActivity" android:theme="@android:style/Theme.DeviceDefault.NoActionBar" android:windowSoftInputMode="adjustResize" />
+            <activity android:configChanges="orientation|keyboardHidden|keyboard|screenSize|locale" android:label="@string/activity_name" android:launchMode="singleTop" android:name="co.acoustic.mobile.push.plugin.cordova.location.MceJsonActivity" android:theme="@style/Theme.AppCompat.NoActionBar" android:windowSoftInputMode="adjustResize" />
         </edit-config>
 
         <config-file target="AndroidManifest.xml" parent="/manifest/application">
@@ -104,6 +105,7 @@ version="3.8.0">
             <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
             <!-- ACCESS_COARSE_LOCATION is optional. It is only required if location services needs to use network location -->
             <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+            <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
         </config-file>
         
     </platform>

@@ -9,8 +9,9 @@
  */
 
 #import <UIKit/UIKit.h>
+#import <WebKit/WebKit.h>
 
-@interface WebViewController : UIViewController <UIWebViewDelegate>
+@interface WebViewController : UIViewController <WKNavigationDelegate>
 -(instancetype)initWithURL:(NSURL*)url;
 @property NSDictionary * payload;
 @end

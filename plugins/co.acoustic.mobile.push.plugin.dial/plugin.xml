@@ -7,8 +7,8 @@ Acoustic, L.P. and/or other developers. No license is granted under any intellec
 industrial property rights of Acoustic, L.P. except as may be provided in an agreement with 
 Acoustic, L.P. Any unauthorized copying or distribution of content from this file is prohibited.
 -->
-<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0" id="co.acoustic.mobile.push.plugin.gcm"
-version="3.8.0">
+<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0" id="co.acoustic.mobile.push.plugin.dial"
+version="3.8.4">
     <name>Acoustic MCE Cordova Plugin for Dial</name>
     <author>Acoustic MCE</author>
     <description>Allows Cordova applications to integrate with Acoustic MCE Push Services</description>
@@ -17,7 +17,7 @@ version="3.8.0">
     <engines>
         <engine name="cordova" version=">=3.0" />
     </engines>
-    <js-module src="MCEPluginDial.js" name="MCEPluginDial">
+    <js-module src="www/js/MCEPluginDial.js" name="MCEPluginDial">
         <clobbers target="MCEPluginDial" />
     </js-module>
 

@@ -12,6 +12,8 @@
 #import <AcousticMobilePush/AcousticMobilePush.h>
 #import <Cordova/CDVPlugin.h>
 
-@interface MCESnoozePlugin : CDVPlugin
+@interface SnoozeActionPlugin : NSObject <MCEActionProtocol>
+@property(class, nonatomic, readonly) SnoozeActionPlugin * sharedInstance NS_SWIFT_NAME(shared);
 -(void)performAction:(NSDictionary*)action payload:(NSDictionary*)payload;
++(void)registerPlugin;
 @end

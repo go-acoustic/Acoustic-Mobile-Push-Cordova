@@ -403,7 +403,7 @@
     
     if(![self executeCategory:@{@"payload":userInfo}])
     {
-        [[MCESdk sharedInstance] presentOrPerformNotification: userInfo];
+        [[MCESdk sharedInstance] performNotificationAction: userInfo];
     }
 }
 
@@ -422,7 +422,7 @@
 - (void)application:(UIApplication *)application didReceiveLocalNotification:(UILocalNotification *)notification
 {
     NSLog(@"This is where dynamic categories get delivered on iOS 7 or iOS 8 when choice isn't made");
-    [[MCESdk sharedInstance] presentOrPerformNotification: notification.userInfo];
+    [[MCESdk sharedInstance] performNotificationAction: notification.userInfo];
 }
 
 // This is where dynamic categories get delivered on iOS 8+ when a choice is made

@@ -8,7 +8,7 @@ industrial property rights of Acoustic, L.P. except as may be provided in an agr
 Acoustic, L.P. Any unauthorized copying or distribution of content from this file is prohibited.
 -->
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0" id="co.acoustic.mobile.push.plugin.fcm"
-version="3.8.0">
+version="3.8.4">
     <name>Acoustic MCE Cordova Plugin for FCM</name>
     <author>Acoustic MCE</author>
     <description>Allows Cordova applications to integrate with Acoustic MCE Push Services</description>
@@ -17,13 +17,14 @@ version="3.8.0">
     <engines>
         <engine name="cordova" version=">=3.0" />
     </engines>
-    <js-module src="MCEPluginFcm.js" name="MCEPluginFcm">
+    <js-module src="www/js/MCEPluginFcm.js" name="MCEPluginFcm">
         <clobbers target="MCEPluginFcm" />
     </js-module>
     
     <platform name="android">
         <framework src="com.google.firebase:firebase-core:+" />
         <framework src="com.google.firebase:firebase-messaging:+" />
+        <framework src="com.google.firebase:firebase-iid:+" />
 		
 		<framework src="src/android/FCMPlugin.gradle" custom="true" type="gradleReference"/>
 		

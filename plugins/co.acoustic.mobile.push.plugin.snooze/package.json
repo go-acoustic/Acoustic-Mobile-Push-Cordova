@@ -1,6 +1,6 @@
 {
-    "name": "Snooze-Action-for-co.acoustic.mobilepush-MCE-Cordova-Plugin",
-    "version": "3.8.0",
+    "name": "co.acoustic.mobile.push.plugin.snooze",
+    "version": "3.8.4",
     "description": "Snooze Action for Acoustic MCE Cordova Plugin",
     "cordova": {
         "id": "co.acoustic.mobile.push.snooze",
@@ -9,8 +9,13 @@
             "android"
         ]
     },
-    "dependencies": {},
-    "devDependencies": {},
+    "peerDependencies": {
+        "co.acoustic.mobile.push.sdk": "file:../co.acoustic.mobile.push.sdk"
+    },
+    "devDependencies": {
+        "@types/cordova": "^0.0.34",
+        "typescript": "^4.4.3"
+    },
     "repository": {
         "type": "git",
         "url": "git+https://github.com/Acoustic-Mobile-Push/Cordova.git"
@@ -21,10 +26,9 @@
         "cordova-ios",
         "cordova-android"
     ],
-    "engines": [{
-        "name": "cordova",
-        "version": ">=3.0"
-    }],
+    "engines": {
+        "cordova": ">=3.0"
+    },
     "author": "Acoustic MCE",
     "license": "Apache 2.0 License",
     "bugs": {

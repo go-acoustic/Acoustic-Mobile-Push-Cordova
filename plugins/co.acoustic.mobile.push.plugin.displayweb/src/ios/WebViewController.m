@@ -40,17 +40,17 @@
         webFrame.origin.y += webVerticalOffset;
         webFrame.size.height -= webVerticalOffset;
         
-        UIWebView * webView = [[UIWebView alloc] initWithFrame:webFrame];
+        WKWebView * webView = [[WKWebView alloc] initWithFrame:webFrame];
         [webView loadRequest: [NSURLRequest requestWithURL: url]];
         [self.view addSubview:webView];
-        webView.delegate=self;
+        webView.navigationDelegate = self;
         
         self.view.backgroundColor = [UIColor whiteColor];
     }
     return self;
 }
 
-- (BOOL)webView:(UIWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)request navigationType:(UIWebViewNavigationType)navigationType
+- (BOOL)webView:(WKWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)request navigationType:(WKNavigationType)navigationType
 {
     NSLog(@"url: %@", request.URL);
     if([request.URL.scheme isEqual:@"action"])

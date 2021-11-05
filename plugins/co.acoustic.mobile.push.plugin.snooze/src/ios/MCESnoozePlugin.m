@@ -1,5 +1,5 @@
 /*
- * Copyright © 2011, 2019 Acoustic, L.P. All rights reserved.
+ * Copyright © 2015, 2019 Acoustic, L.P. All rights reserved.
  *
  * NOTICE: This file contains material that is confidential and proprietary to
  * Acoustic, L.P. and/or other developers. No license is granted under any intellectual or
@@ -9,52 +9,55 @@
  */
 
 #import "MCESnoozePlugin.h"
+@import UserNotifications;
+@import AcousticMobilePush;
 
-@implementation MCESnoozePlugin
+@interface SnoozeActionPlugin ()
+@property MCENotificationPayload * notificationPayload;
+@end
 
--(void)performAction:(NSDictionary*)action payload:(NSDictionary*)payload
+@implementation SnoozeActionPlugin
+
++ (instancetype)sharedInstance
 {
-    NSInteger minutes = [[action valueForKey:@"value"] integerValue];
-    NSLog(@"Snooze for %ld minutes", (long)minutes);
-    UILocalNotification * notification = [[UILocalNotification alloc] init];
-    
-    notification.userInfo = payload;
-    if(payload[@"aps"][@"category"])
-    {
-        notification.category = payload[@"aps"][@"category"];
-    }
-
-    if(payload[@"aps"][@"sound"])
-    {
-        notification.soundName = payload[@"aps"][@"sound"];
-    }
-    
-    if(payload[@"aps"][@"badge"])
-    {
-        notification.applicationIconBadgeNumber = [payload[@"aps"][@"badge"] integerValue];
-    }
-    
-    if([payload[@"aps"][@"alert"] isKindOfClass:[NSDictionary class]] && payload[@"aps"][@"alert"][@"action-loc-key"])
-    {
-        notification.alertAction = payload[@"aps"][@"alert"][@"action-loc-key"];
-        notification.hasAction = true;
-    }
-    else
-    {
-        notification.hasAction = false;
-    }
-    
-    NSString * alertBody = [[MCESdk sharedInstance] extractAlert:payload[@"aps"]];
-    notification.alertBody = alertBody;
-
-    notification.fireDate = [NSDate dateWithTimeIntervalSinceNow:minutes*60];
-    [[UIApplication sharedApplication] scheduleLocalNotification: notification];
+    static id sharedInstance = nil;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        sharedInstance = [[self alloc] init];
+    });
+    return sharedInstance;
 }
 
-- (void)pluginInitialize
+-(void)performAction:(NSDictionary*)action payload:(NSDictionary*)payload {
+    NSNumber * value = action[@"value"];
+    if(![value respondsToSelector:@selector(isEqualToNumber:)]) {
+        NSLog(@"Snooze value is not numeric");
+        return;
+    }
+            
+    NSLog(@"Snooze for %f minutes", [value doubleValue]);
+
+    self.notificationPayload = [[MCENotificationPayload alloc] initWithPayload: payload];
+    [self.notificationPayload addNotificationCategoryWithCompletionHandler:^{
+        UNMutableNotificationContent * content = SnoozeActionPlugin.sharedInstance.notificationPayload.notificationContent;
+        UNTimeIntervalNotificationTrigger * trigger = [UNTimeIntervalNotificationTrigger triggerWithTimeInterval:[value doubleValue] * 60 repeats:false];
+        UNNotificationRequest * request = [UNNotificationRequest requestWithIdentifier:[[NSUUID UUID] UUIDString] content:content trigger:trigger];
+        [UNUserNotificationCenter.currentNotificationCenter addNotificationRequest:request withCompletionHandler:^(NSError * _Nullable error) {
+            
+            if(error) {
+                NSLog(@"Could not add notification request");
+            } else {
+                NSLog(@"Will resend notification %@ with content %@ at %@", request, content, [trigger nextTriggerDate]);
+            }
+        }];
+
+    }];
+}
+
++(void)registerPlugin
 {
     MCEActionRegistry * registry = [MCEActionRegistry sharedInstance];
-    [registry registerTarget: self withSelector:@selector(performAction:payload:) forAction: @"snooze"];
+    [registry registerTarget: [self sharedInstance] withSelector:@selector(performAction:payload:) forAction: @"snooze"];
 }
 
 @end

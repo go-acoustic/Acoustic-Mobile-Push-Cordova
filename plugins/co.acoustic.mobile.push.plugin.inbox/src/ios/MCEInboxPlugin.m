@@ -12,6 +12,7 @@
 #import <AcousticMobilePush/AcousticMobilePush.h>
 #import <Cordova/CDVCommandDelegate.h>
 #import <AcousticMobilePush/MCEInboxDatabase.h>
+#import <AcousticMobilePush/MCEInboxQueueManager.h>
 
 @implementation MCEInboxPlugin
 
@@ -22,7 +23,8 @@
     MCEInboxMessage *inboxMessage = [[MCEInboxDatabase sharedInstance] inboxMessageWithInboxMessageId:inboxMessageId];
     NSDictionary * payload = @{@"mce":@{@"attribution":inboxMessage.attribution}};
     NSDictionary * attributes = @{@"richContentId": inboxMessage.richContentId, @"inboxMessageId": inboxMessage.inboxMessageId} ;
-    [[MCEActionRegistry sharedInstance] performAction:action forPayload:payload source: InboxSource attributes:attributes];
+
+    [[MCEActionRegistry sharedInstance] performAction:action forPayload:payload source:InboxSource attributes:attributes userText:nil];
 }
 
 -(void)setInboxMessagesUpdateCallback: (CDVInvokedUrlCommand*)command

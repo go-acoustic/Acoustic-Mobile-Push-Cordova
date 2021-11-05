@@ -8,7 +8,7 @@ industrial property rights of Acoustic, L.P. except as may be provided in an agr
 Acoustic, L.P. Any unauthorized copying or distribution of content from this file is prohibited.
 -->
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0" id="co.acoustic.mobile.push.plugin.geofence"
-version="3.8.0">
+version="3.8.4">
     <name>Acoustic MCE Geofence Cordova Plugin</name>
     <author>Acoustic MCE</author>
     <description>Allows Cordova applications to integrate with Acoustic MCE Push Services</description>
@@ -17,7 +17,7 @@ version="3.8.0">
     <engines>
         <engine name="cordova" version=">=3.0" />
     </engines>
-    <js-module src="MCEGeofencePlugin.js" name="MCEGeofencePlugin">
+    <js-module src="www/js/MCEGeofencePlugin.js" name="MCEGeofencePlugin">
         <clobbers target="MCEGeofencePlugin" />
     </js-module>
     <platform name="ios">
@@ -31,8 +31,9 @@ version="3.8.0">
         </config-file>
     </platform>
     <platform name="android">
-        <source-file src="src/android/acoustic-mobile-push-android-cordova-geofence-3.8.0.jar" target-dir="libs" framework="false" />
-        <source-file src="src/android/acoustic-mobile-push-android-js-geofence-3.8.0.jar" target-dir="libs" framework="false" />
+        <framework src="src/android/build-extras.gradle" custom="true" type="gradleReference" />
+        <source-file src="src/android/src/co/acoustic/mobile/push/plugin/cordova/geofence" target-dir="java/co/acoustic/mobile/push/plugin/cordova" />
+        <source-file src="src/android/src/co/acoustic/mobile/push/sdk/js/geofence" target-dir="java/co/acoustic/mobile/push/sdk/js" />
 
         <config-file target="res/xml/config.xml" parent="/widget">
             <feature name="MCEGeofencePlugin">

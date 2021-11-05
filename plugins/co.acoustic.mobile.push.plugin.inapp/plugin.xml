@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!-- 
 Copyright © 2015, 2019 Acoustic, L.P. All rights reserved.
 
@@ -8,7 +8,7 @@ industrial property rights of Acoustic, L.P. except as may be provided in an agr
 Acoustic, L.P. Any unauthorized copying or distribution of content from this file is prohibited.
 -->
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0" id="co.acoustic.mobile.push.plugin.inapp"
-version="3.8.0">
+version="3.8.4">
     <name>InApp Action for Acoustic MCE Cordova Plugin</name>
     <author>Acoustic MCE</author>
     <description>InApp Action for Acoustic MCE Push Services</description>
@@ -21,23 +21,23 @@ version="3.8.0">
         <engine name="cordova" version=">=3.0" />
     </engines>
 
-    <js-module src="MCEInAppPlugin.js" name="MCEInAppPlugin">
+    <js-module src="www/js/MCEInAppPlugin.js" name="MCEInAppPlugin">
         <clobbers target="MCEInAppPlugin" />
     </js-module>
   
-    <js-module src="js/MCEInAppBanner.js" name="MCEInAppBanner">
+    <js-module src="www/js/MCEInAppBanner.js" name="MCEInAppBanner">
         <clobbers target="MCEInAppBanner" />
     </js-module>
 
-    <js-module src="js/MCEInAppMedia.js" name="MCEInAppMedia">
+    <js-module src="www/js/MCEInAppMedia.js" name="MCEInAppMedia">
         <clobbers target="MCEInAppMedia" />
     </js-module>
 
-    <js-module src="js/MCEInAppVideo.js" name="MCEInAppVideo">
+    <js-module src="www/js/MCEInAppVideo.js" name="MCEInAppVideo">
         <clobbers target="MCEInAppVideo" />
     </js-module>
 
-    <js-module src="js/MCEInAppImage.js" name="MCEInAppImage">
+    <js-module src="www/js/MCEInAppImage.js" name="MCEInAppImage">
         <clobbers target="MCEInAppImage" />
     </js-module>
   
@@ -51,16 +51,16 @@ version="3.8.0">
         <source-file src="src/ios/MCEInAppPlugin.m" />
     </platform>
     <platform name="android">     
-    
         <config-file target="res/xml/config.xml" parent="/widget">
             <feature name="MCEInAppPlugin">
                 <param name="android-package" value="co.acoustic.mobile.push.plugin.cordova.inapp.MceCordovaInAppPlugin" />
             </feature>
         </config-file>
    
-        <source-file src="src/android/acoustic-mobile-push-android-cordova-inapp-3.8.0.jar" target-dir="libs" framework="false" />
-        <source-file src="src/android/acoustic-mobile-push-android-js-inapp-3.8.0.jar" target-dir="libs" framework="false" />
-        <source-file src="src/android/acoustic-mobile-push-android-sdk-plugin-inapp-3.8.0.jar" target-dir="libs" framework="false" />
+        <framework src="src/android/build-extras.gradle" custom="true" type="gradleReference" />
+        <source-file src="src/android/src/co/acoustic/mobile/push/plugin/cordova/inapp" target-dir="java/co/acoustic/mobile/push/plugin/cordova" />
+        <source-file src="src/android/src/co/acoustic/mobile/push/sdk/js/inapp" target-dir="java/co/acoustic/mobile/push/sdk/js" />
+        <lib-file src="src/android/acoustic-mobile-push-android-sdk-plugin-inapp-3.8.3.aar" />
         
         <config-file target="AndroidManifest.xml" parent="/manifest/application">
             <receiver android:name="co.acoustic.mobile.push.sdk.js.inapp.JsonMceBroadcastReceiver">
@@ -68,6 +68,8 @@ version="3.8.0">
                 <action android:name="co.acoustic.mobile.push.sdk.NOTIFIER" />
               </intent-filter>
             </receiver>
+
+        
         </config-file>
 
     </platform>
