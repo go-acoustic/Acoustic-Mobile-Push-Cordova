@@ -85,6 +85,15 @@
     [[MCEActionRegistry sharedInstance] performAction:action forPayload:nil source: InAppSource];
 }
 
+- (void) sendMessageOpenedEvent: (CDVInvokedUrlCommand*)command
+{
+    NSString * inAppMessageId = [command argumentAtIndex:0];
+    MCEInAppMessage * inAppMessage = [MCEInAppManager.sharedInstance inAppMessageById: inAppMessageId];
+    if (inAppMessage != nil && inAppMessage.attribution != nil) {
+        [[MCEEventService sharedInstance] recordViewForInAppMessage:inAppMessage attribution:inAppMessage.attribution mailingId:inAppMessage.mailingId];
+    }
+}
+
 - (void)pluginInitialize
 {
     self.inAppCallbacks = [NSMutableDictionary dictionary];

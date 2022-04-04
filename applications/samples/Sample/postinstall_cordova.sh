@@ -1,21 +1,24 @@
 echo "Building plugins"
 cd ../../../plugins
-sh build.sh
+sh build.sh > /dev/null
+cd ../applications/samples/Sample
+
+echo "Building tests"
+cd ../../../plugins
+sh build_tests.sh > /dev/null
 cd ../applications/samples/Sample
 
 echo "Adding android platform"
 echo ""
 cordova platform add android@10
-cp google-services.json platforms/android/app/
 
 echo "Adding ios platform"
 echo ""
 cordova platform add ios
-cp google-services.json platforms/ios/app
 
 echo "Adding Core Acoustic SDK plugin"
 echo ""
-cordova plugin add file:../../../plugins/co.acoustic.mobile.push.sdk --variable CUSTOM_ACTIONS="openInboxMessage sendEmail" --variable ANDROID_APPKEY="gcnslVYNku" --variable IOS_DEV_APPKEY="ap2zqZUqe1" --variable IOS_PROD_APPKEY="ap2zqZUqe1" --variable SERVER_URL=https://mobile-sdk-lib-us-0.brilliantcollector.com --variable LOGLEVEL=verbose --variable MCE_CAN_SYNC_OVERRIDE=true --force
+cordova plugin add file:../../../plugins/co.acoustic.mobile.push.sdk --variable CUSTOM_ACTIONS="openInboxMessage sendEmail" --variable ANDROID_APPKEY="YOUR ANDROID APPKEY HERE" --variable IOS_DEV_APPKEY="YOUR iOS APPKEY HERE" --variable IOS_PROD_APPKEY="YOUR iOS APPKEY HERE" --variable SERVER_URL=https://mobile-sdk-lib-us-0.brilliantcollector.com --variable LOGLEVEL=verbose --variable MCE_CAN_SYNC_OVERRIDE=true --force
 
 echo "Adding FCM plugin"
 echo ""
@@ -37,7 +40,7 @@ echo "Adding Inbox plugin"
 echo ""
 cordova plugin add file:../../../plugins/co.acoustic.mobile.push.plugin.inbox
 
-echo "Adding display web, dial & snooseplugin"
+echo "Adding display web, dial & snooze plugin"
 echo ""
 cordova plugin add file:../../../plugins/co.acoustic.mobile.push.plugin.displayweb
 cordova plugin add file:../../../plugins/co.acoustic.mobile.push.plugin.dial
@@ -45,5 +48,6 @@ cordova plugin add file:../../../plugins/co.acoustic.mobile.push.plugin.snooze
 
 echo "Adding display geofence"
 echo ""
-
 cordova plugin add file:../../../plugins/co.acoustic.mobile.push.plugin.geofence
+
+

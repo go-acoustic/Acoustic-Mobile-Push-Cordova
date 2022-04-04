@@ -21,4 +21,5 @@
 - (void) executeInAppRule:(CDVInvokedUrlCommand*)command;
 - (void) addInAppMessage: (CDVInvokedUrlCommand*)command;
 - (void) syncInAppMessages: (CDVInvokedUrlCommand*)command;
+- (void) sendMessageOpenedEvent: (CDVInvokedUrlCommand*)command;
 @end

@@ -1,10 +1,15 @@
 {
-  "scripts": {
-    "preinstall": "./preinstall_cordova.sh",
-    "postinstall": "./postinstall_cordova.sh"
-  },
-  "cordova": {
-    "plugins": {},
-    "platforms": []
+    "scripts": {
+      "preinstall": "./preinstall_cordova.sh",
+      "postinstall": "./postinstall_cordova.sh"
+    },
+    "cordova": {
+      "plugins": {
+        "cordova-plugin-test-framework": {}
+      },
+      "platforms": []
+    },
+    "devDependencies": {
+      "cordova-plugin-test-framework": "^1.1.6"
+    }
   }
-}

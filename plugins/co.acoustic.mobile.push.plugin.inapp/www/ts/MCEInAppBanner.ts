@@ -22,6 +22,14 @@ namespace MCEInAppBanner {
             inAppMessage: InAppMessage
         ) {
             MCEPlugin.safeAreaInsets(async function (insets) {
+                cordova.exec(
+                    null,
+                    null,
+                    "MCEInAppPlugin",
+                    "sendMessageOpenedEvent",
+                    [inAppMessage.inAppMessageId]
+                );
+                
                 var close: string = await MCEPlugin.bestImage(
                     "images/inApp/cancel.png"
                 );

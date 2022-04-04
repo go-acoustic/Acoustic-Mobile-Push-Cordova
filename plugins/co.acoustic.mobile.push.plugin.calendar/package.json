@@ -1,6 +1,6 @@
 {
     "name": "co-acoustic-mobile-push-plugin-calendar",
-    "version": "3.8.4",
+    "version": "3.8.5",
     "description": "Calendar Action for Acoustic MCE Push Services",
     "cordova": {
         "id": "co.acoustic.mobile.push.calendar",

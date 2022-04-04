@@ -30,6 +30,14 @@ namespace MCEInAppMedia {
         completion: VoidFunction
     ) {
         MCEPlugin.safeAreaInsets(async function (insets) {
+            cordova.exec(
+                null,
+                null,
+                "MCEInAppPlugin",
+                "sendMessageOpenedEvent",
+                [inAppMessage.inAppMessageId]
+            );
+
             var close = await MCEPlugin.bestImage("images/inApp/dismiss.png");
             var handle = await MCEPlugin.bestImage("images/inApp/handle.png");
 
