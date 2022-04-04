@@ -7,8 +7,7 @@ Acoustic, L.P. and/or other developers. No license is granted under any intellec
 industrial property rights of Acoustic, L.P. except as may be provided in an agreement with 
 Acoustic, L.P. Any unauthorized copying or distribution of content from this file is prohibited.
 -->
-<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0" id="co.acoustic.mobile.push.sdk"
-version="3.8.4">
+<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0" id="co.acoustic.mobile.push.sdk" version="3.8.5">
     <name>Acoustic MCE Cordova Plugin</name>
     <author>Acoustic MCE</author>
     <description>Allows Cordova applications to integrate with Acoustic MCE Push Services</description>
@@ -45,7 +44,7 @@ version="3.8.4">
         <header-file src="src/ios/MCEEventCallbackQueue.h" />
         <source-file src="src/ios/MCEEventCallbackQueue.m" />
         <config-file target="config.xml" parent="/*">
-            <feature name="MCEPlugin" >
+            <feature name="MCEPlugin">
                 <param name="ios-package" value="MCEPlugin"/>
             </feature>
             <preference name="baseUrl" value="$SERVER_URL" />
@@ -74,16 +73,17 @@ version="3.8.4">
     </platform>
     <platform name="android">
         <hook type="after_prepare" src="src/android/hooks/add_tools_namespace.js" />
+        <hook type="after_prepare" src="src/android/hooks/after_prepare.js" />
 
         <framework src="com.google.android.gms:play-services-base:+" />
         <framework src="com.google.android.gms:play-services-auth:+" />
 
-        <edit-config file="AndroidManifest.xml" target="/manifest/application" mode="overwrite">
-            <application tools:replace="android:name" android:hardwareAccelerated="true" android:icon="@mipmap/ic_launcher" android:label="@string/app_name" android:name="co.acoustic.mobile.push.sdk.js.MceJsonApplication" android:supportsRtl="true" />
-        </edit-config>
+        <config-file target="config.xml" parent="/*">
+            <preference name="AndroidXEnabled" value="true" />
+        </config-file>
 
         <config-file target="AndroidManifest.xml" parent="/manifest">
-            
+
             <!-- INTERNET is required for calling the MCE server -->
             <uses-permission android:name="android.permission.INTERNET" />
             <!-- WAKE_LOC is required for running scheduled tasks -->
@@ -92,16 +92,24 @@ version="3.8.4">
             <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
             <!-- VIBRATE is required for notification configuration -->
             <uses-permission android:name="android.permission.VIBRATE" />
+            <queries>
+                <intent>
+                    <action android:name="android.intent.action.DIAL" />
+                </intent>
+                <intent>
+                    <action android:name="android.intent.action.VIEW"/>
+                    <data android:scheme="https"/>
+                </intent>
+            </queries>
         </config-file>
-        
-        <config-file target="AndroidManifest.xml" parent="/manifest/application">
 
-            <!-- MCE API26 properties -->            
+        <config-file target="AndroidManifest.xml" parent="/manifest/application">
+            <!-- MCE API26 properties -->
             <meta-data android:name="channelName" android:value="$CHANNEL_NAME" />
             <meta-data android:name="channelDescription" android:value="$CHANNEL_DESCRIPTION" />
             <meta-data android:name="channelId" android:value="$CHANNEL_ID" />
 
-            <!-- MCE properties -->            
+            <!-- MCE properties -->
             <meta-data android:name="autoInitialize" android:value="$AUTO_INITIALIZE" />
             <meta-data android:name="autoReinitialize" android:value="$AUTO_REINITIALIZE" />
             <meta-data android:name="mceAppKey" android:value="@string/appkey" />
@@ -113,13 +121,13 @@ version="3.8.4">
             <meta-data android:name="com.google.android.gms.version" android:value="@integer/google_play_services_version" />
 
             <receiver android:name="co.acoustic.mobile.push.sdk.js.JsonMceBroadcastReceiver">
-              <intent-filter>
-                <action android:name="co.acoustic.mobile.push.sdk.NOTIFIER" />
-              </intent-filter>
+                <intent-filter>
+                    <action android:name="co.acoustic.mobile.push.sdk.NOTIFIER" />
+                </intent-filter>
             </receiver>
 
             <!-- AlarmReceiver is required for SDK scheduled tasks and device status updates -->
-            <receiver android:name="co.acoustic.mobile.push.sdk.wi.AlarmReceiver" >
+            <receiver android:name="co.acoustic.mobile.push.sdk.wi.AlarmReceiver">
                 <intent-filter>
                     <action android:name="android.intent.action.BOOT_COMPLETED" />
                 </intent-filter>
@@ -138,16 +146,10 @@ version="3.8.4">
 
             <!-- NotifActionReceiver is required for notification handling -->
             <receiver android:name="co.acoustic.mobile.push.sdk.notification.NotifActionReceiver" />
-            
+
             <!-- The provider is needed for the SDK database -->
-            <provider
-                android:name="co.acoustic.mobile.push.sdk.db.Provider"
-                android:authorities="$PACKAGE_NAME.MCE_PROVIDER"
-                android:exported="false" />
-            <provider
-                android:name="co.acoustic.mobile.push.sdk.js.Provider"
-                android:authorities="$PACKAGE_NAME.MCE_JSON_PROVIDER"
-                android:exported="false" />
+            <provider android:name="co.acoustic.mobile.push.sdk.db.Provider" android:authorities="$PACKAGE_NAME.MCE_PROVIDER" android:exported="false" />
+            <provider android:name="co.acoustic.mobile.push.sdk.js.Provider" android:authorities="$PACKAGE_NAME.MCE_JSON_PROVIDER" android:exported="false" />
 
             <service android:name="co.acoustic.mobile.push.sdk.session.SessionTrackingIntentService"/>
 
@@ -164,11 +166,23 @@ version="3.8.4">
             <service android:name="co.acoustic.mobile.push.sdk.plugin.inbox.InboxUpdateService" />
             <!-- MdeJobService is used for launching a job while the app is in the foreground. This is only used in Android O and above -->
             <service android:name="co.acoustic.mobile.push.sdk.job.MceJobService" android:permission="android.permission.BIND_JOB_SERVICE"/>
-	
+
+        </config-file>
+
+        <config-file target="AndroidManifest.xml" parent="/manifest">
+
+            <!-- INTERNET is required for calling the MCE server -->
+            <uses-permission android:name="android.permission.INTERNET" />
+            <!-- WAKE_LOC is required for running scheduled tasks -->
+            <uses-permission android:name="android.permission.WAKE_LOCK" />
+            <!-- RECEIVE_BOOT_COMPLETED is required for performing SDK task on device startup -->
+            <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+            <!-- VIBRATE is required for notification configuration -->
+            <uses-permission android:name="android.permission.VIBRATE" />
         </config-file>
         <config-file target="res/values/strings.xml" parent="/*">
             <string name="appkey">$ANDROID_APPKEY</string>
-        </config-file>     
+        </config-file>
         <config-file target="res/xml/config.xml" parent="/widget">
             <feature name="MCEPlugin">
                 <param name="android-package" value="co.acoustic.mobile.push.plugin.cordova.MceCordovaPlugin" />
@@ -177,7 +191,7 @@ version="3.8.4">
         <source-file src="src/android/gson-2.2.4.jar" target-dir="libs" framework="false" />
         <framework src="src/android/build-extras.gradle" custom="true" type="gradleReference" />
 
-        <lib-file src="src/android/acoustic-mobile-push-android-sdk-3.8.3.aar" />
+        <lib-file src="src/android/acoustic-mobile-push-android-sdk-3.8.5.aar" />
         <source-file src="src/android/src/co/acoustic/mobile/push/plugin/cordova/CordovaJsonCallback.java" target-dir="java/co/acoustic/mobile/push/plugin/cordova" />
         <source-file src="src/android/src/co/acoustic/mobile/push/plugin/cordova/MceCordovaPlugin.java" target-dir="java/co/acoustic/mobile/push/plugin/cordova" />
         <source-file src="src/android/src/co/acoustic/mobile/push/sdk/js/format" target-dir="java/co/acoustic/mobile/push/sdk/js" />
@@ -190,6 +204,6 @@ version="3.8.4">
         <source-file src="src/android/src/co/acoustic/mobile/push/sdk/js/MceJsonApplication.java" target-dir="java/co/acoustic/mobile/push/sdk/js" />
         <source-file src="src/android/src/co/acoustic/mobile/push/sdk/js/MceJsonSdk.java" target-dir="java/co/acoustic/mobile/push/sdk/js" />
         <source-file src="src/android/src/co/acoustic/mobile/push/sdk/js/Provider.java" target-dir="java/co/acoustic/mobile/push/sdk/js" />
-        
+
     </platform>
 </plugin>

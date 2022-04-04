@@ -1,6 +1,3 @@
 node_modules
-plugins/**/*.js
-plugins/**/*.d.ts
-!plugins/**/hooks/*.js
-!plugins/**/index.d.ts
-*/**/.DS_Store
+.DS_Store
+google-services.json

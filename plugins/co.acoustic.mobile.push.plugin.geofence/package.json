@@ -1,6 +1,6 @@
 {
     "name": "co.acoustic.mobile.push.plugin.geofence",
-    "version": "3.8.4",
+    "version": "3.8.5",
     "description": "Allows Cordova applications to integrate with Acoustic MCE Push Services",
     "cordova": {
         "id": "co.acoustic.mobile.push.geofence",

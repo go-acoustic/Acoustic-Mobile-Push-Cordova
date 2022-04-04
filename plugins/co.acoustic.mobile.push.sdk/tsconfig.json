@@ -5,9 +5,9 @@
     "outDir": "./www/js",
     "lib": ["DOM", "ES2016"],
     "declaration": true,
-    "declarationDir": "./types",
     "allowJs": false,
     "target": "es5"
   },
-  "include": ["./www/ts/**/*"]
+  "include": ["./www/ts/**/*"],
+  "exclude": ["./tests/**/*"]
 }

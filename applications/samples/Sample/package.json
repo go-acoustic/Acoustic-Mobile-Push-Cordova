@@ -4,7 +4,56 @@
     "postinstall": "./postinstall_cordova.sh"
   },
   "cordova": {
-    "plugins": {},
+    "plugins": {
+      "cordova-plugin-test-framework": {},
+      "co.acoustic.mobile.push.sdk-tests": {},
+      "co.acoustic.mobile.push.sdk": {
+        "CUSTOM_ACTIONS": "openInboxMessage sendEmail",
+        "ANDROID_APPKEY": "gcnslVYNku",
+        "IOS_DEV_APPKEY": "apEHsIkt27",
+        "IOS_PROD_APPKEY": "apEHsIkt27",
+        "SERVER_URL": "https://mobile-sdk-lib-us-0.brilliantcollector.com",
+        "LOGLEVEL": "verbose",
+        "MCE_CAN_SYNC_OVERRIDE": "true",
+        "CHANNEL_NAME": "MCE SDK Notification Channel",
+        "CHANNEL_DESCRIPTION": "This is the notification channel for the MCE SDK sample application",
+        "CHANNEL_ID": "mce_sample_channel",
+        "INVALIDATE_EXISTING_USER": "false",
+        "AUTO_REINITIALIZE": "true",
+        "AUTO_INITIALIZE": "true"
+      },
+      "co.acoustic.mobile.push.plugin.fcm": {},
+      "co.acoustic.mobile.push.plugin.location": {
+        "SYNC_RADIUS": "10000",
+        "SYNC_INTERVAL": "60",
+        "AUTO_INITIALIZE_LOCATION": "true"
+      },
+      "co.acoustic.mobile.push.plugin.beacon": {
+        "UUID": "21A9A7F4-0DD8-46B7-9D4D-379F3C4AF77D"
+      },
+      "co.acoustic.mobile.push.plugin.inapp": {},
+      "co.acoustic.mobile.push.plugin.inbox": {},
+      "co.acoustic.mobile.push.plugin.displayweb": {},
+      "co.acoustic.mobile.push.plugin.dial": {},
+      "co.acoustic.mobile.push.plugin.snooze": {},
+      "co.acoustic.mobile.push.plugin.geofence": {}
+    },
     "platforms": []
+  },
+  "devDependencies": {
+    "co.acoustic.mobile.push.plugin.beacon": "file:../../../plugins/co.acoustic.mobile.push.plugin.beacon",
+    "co.acoustic.mobile.push.plugin.dial": "file:../../../plugins/co.acoustic.mobile.push.plugin.dial",
+    "co.acoustic.mobile.push.plugin.displayweb": "file:../../../plugins/co.acoustic.mobile.push.plugin.displayweb",
+    "co.acoustic.mobile.push.plugin.fcm": "file:../../../plugins/co.acoustic.mobile.push.plugin.fcm",
+    "co.acoustic.mobile.push.plugin.geofence": "file:../../../plugins/co.acoustic.mobile.push.plugin.geofence",
+    "co.acoustic.mobile.push.plugin.inapp": "file:../../../plugins/co.acoustic.mobile.push.plugin.inapp",
+    "co.acoustic.mobile.push.plugin.inbox": "file:../../../plugins/co.acoustic.mobile.push.plugin.inbox",
+    "co.acoustic.mobile.push.plugin.location": "file:../../../plugins/co.acoustic.mobile.push.plugin.location",
+    "co.acoustic.mobile.push.plugin.snooze": "file:../../../plugins/co.acoustic.mobile.push.plugin.snooze",
+    "co.acoustic.mobile.push.sdk": "file:../../../plugins/co.acoustic.mobile.push.sdk",
+    "co.acoustic.mobile.push.sdk-tests": "file:../../../plugins/co.acoustic.mobile.push.sdk/tests",
+    "cordova-android": "^10.1.1",
+    "cordova-ios": "^6.2.0",
+    "cordova-plugin-test-framework": "^1.1.6"
   }
 }

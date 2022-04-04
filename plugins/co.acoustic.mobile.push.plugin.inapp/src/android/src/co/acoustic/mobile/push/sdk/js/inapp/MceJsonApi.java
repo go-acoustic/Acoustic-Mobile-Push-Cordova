@@ -70,6 +70,9 @@ public class MceJsonApi {
                 deleteInAppMessage(context, parameters);
             } else if (Methods.Initialize.NAME.equals(action)) {
                 initialize();
+            } else if (Methods.SendMessageOpenedEvent.NAME.equals(action)) {
+                // Not implemented on Android
+                return true;
             } else {
                 return false;
             }
@@ -271,6 +274,10 @@ public class MceJsonApi {
 
         public static interface Initialize {
             public static final String NAME = "initialize";
+        }
+
+        public static interface SendMessageOpenedEvent {
+            public static final String NAME = "sendMessageOpenedEvent";
         }
     }
 }
