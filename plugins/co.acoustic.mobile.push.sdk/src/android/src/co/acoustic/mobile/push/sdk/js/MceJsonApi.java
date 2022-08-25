@@ -169,13 +169,8 @@ public class MceJsonApi {
         boolean state = parameters.getBoolean(Methods.SetActionCallback.STATE_INDEX);
         String type = parameters.getString(Methods.SetActionCallback.TYPE_INDEX);
         
-        if(state) {
-            Logger.d(TAG, "Callbacks Registration: Action registration: " + type + " setting to new action callback: " + callback );
-            MceNotificationActionRegistry.registerNotificationAction(context, type, new JsonNotificationAction(callback));
-        } else {
-            Logger.d(TAG, "Callbacks Registration: Action registration: " + type + " setting to background handler");
-            MceNotificationActionRegistry.registerNotificationAction(context, type, new DelayedNotificationAction());
-        }
+        Logger.d(TAG, "Callbacks Registration: Action registration: " + type + " setting to new action callback: " + callback );
+        MceNotificationActionRegistry.registerNotificationAction(context, type, new JsonNotificationAction(callback));
     }
 
     public static void getRegistrationDetails(Context context, JsonCallback callback) throws JSONException {

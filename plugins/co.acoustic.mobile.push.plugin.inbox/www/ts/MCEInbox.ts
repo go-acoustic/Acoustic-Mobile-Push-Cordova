@@ -27,7 +27,7 @@ namespace MCEInbox {
         inboxRegistry[name] = handlers;
     };
 
-    export const openInboxMessage = function (inboxMessage: InboxMessage) {
+    export const inboxMessageOpened = function (inboxMessage: InboxMessage) {
         MCEPlugin.queueAddEvent({
             type: "inbox",
             name: "messageOpened",
@@ -100,7 +100,7 @@ namespace MCEInbox {
                 MCEInboxPlugin.fetchInboxMessageId(
                     inboxMessageId,
                     function (inboxMessage) {
-                        MCEInbox.openInboxMessage(inboxMessage);
+                        MCEInbox.inboxMessageOpened(inboxMessage);
                     }
                 );
             }
@@ -113,7 +113,7 @@ namespace MCEInbox {
             var messageIndex = MCEInbox.findMessageIndex(inboxMessageId);
             if (messageIndex > 0) messageIndex--;
 
-            MCEInbox.openInboxMessage(inboxMessages[messageIndex]);
+            MCEInbox.inboxMessageOpened(inboxMessages[messageIndex]);
         });
         $("#down_button").click(function () {
             var inboxMessageId = $("#inboxMessageContent").attr(
@@ -122,7 +122,7 @@ namespace MCEInbox {
             var messageIndex = MCEInbox.findMessageIndex(inboxMessageId);
             if (messageIndex < inboxMessages.length - 1) messageIndex++;
 
-            MCEInbox.openInboxMessage(inboxMessages[messageIndex]);
+            MCEInbox.inboxMessageOpened(inboxMessages[messageIndex]);
         });
         $("#delete_button").click(function () {
             var inboxMessageId = $("#inboxMessageContent").attr(
@@ -172,11 +172,11 @@ namespace MCEInbox {
             MCEInboxPlugin.fetchInboxMessageId(
                 action["inboxMessageId"],
                 function (inboxMessage) {
-                    MCEInbox.openInboxMessage(inboxMessage);
+                    MCEInbox.inboxMessageOpened(inboxMessage);
                 }
             );
         },
-        "openInboxMessage");
+        "inboxMessageOpened");
 
         // Before starting sync, setup the handler for the sync callback
         MCEInboxPlugin.setInboxMessagesUpdateCallback(function (

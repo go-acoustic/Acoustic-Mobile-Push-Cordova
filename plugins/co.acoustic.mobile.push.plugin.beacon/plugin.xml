@@ -8,7 +8,7 @@ industrial property rights of Acoustic, L.P. except as may be provided in an agr
 Acoustic, L.P. Any unauthorized copying or distribution of content from this file is prohibited.
 -->
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0" id="co.acoustic.mobile.push.plugin.beacon"
-version="3.8.5">
+version="3.8.6">
     <name>Acoustic MCE iBeacon Cordova Plugin</name>
     <author>Acoustic MCE</author>
     <description>Allows Cordova applications to integrate with Acoustic MCE Push Services</description>
@@ -46,6 +46,7 @@ version="3.8.5">
         <config-file target="AndroidManifest.xml" parent="/manifest">
             <!-- BLUETOOTH is optional. It is only required if iBeacons are supported -->
             <uses-permission android:name="android.permission.BLUETOOTH" />
+            <uses-permission android:name="android.permission.BLUETOOTH_SCAN" />
             <!-- BLUETOOTH_ADMIN is optional. It is only required if iBeacons are supported -->
             <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
         </config-file>
@@ -56,7 +57,7 @@ version="3.8.5">
             <service android:name="co.acoustic.mobile.push.sdk.beacons.MceBluetoothScanner" />
             <!-- BeaconsVerifier is optional. It is used to verify bluetooth scan. It is required only if iBeacons is used -->
             <service android:name="co.acoustic.mobile.push.sdk.beacons.BeaconsVerifier" />
-            <receiver android:name="co.acoustic.mobile.push.sdk.js.beacon.JsonMceBroadcastReceiver">
+            <receiver android:exported="false" android:name="co.acoustic.mobile.push.sdk.js.beacon.JsonMceBroadcastReceiver">
                 <intent-filter>
                     <action android:name="co.acoustic.mobile.push.sdk.NOTIFIER" />
                 </intent-filter>

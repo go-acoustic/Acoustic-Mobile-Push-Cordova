@@ -62,7 +62,7 @@ public class Provider extends ContentProvider {
 
     @Override
     public String getType(Uri uri) {
-        return ("vnd.ibm.mce.cursor.dir/"+JsonDbAdapter.CALLBACKS_TABLE);
+        return ("vnd.acoustic.mce.cursor.dir/"+JsonDbAdapter.CALLBACKS_TABLE);
     }
 
     @Override

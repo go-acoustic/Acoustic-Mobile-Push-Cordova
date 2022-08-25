@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<widget android-packageName="co.acoustic.mobile.push.samples.android" id="co.acoustic.mobile.push.sample" ios-CFBundleIdentifier="INSERT.BUNDLE.ID.HERE" version="3.8.5" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+<widget android-packageName="co.acoustic.mobile.push.samples.android" id="co.acoustic.mobile.push.sample" ios-CFBundleIdentifier="INSERT.BUNDLE.ID.HERE" version="3.8.6" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
     <name>Sample</name>
     <description>
         A sample Apache Cordova application that responds to the deviceready event.
@@ -19,9 +19,9 @@
         <allow-intent href="market:*" />
         <hook src="scripts/copy_build_extra.js" type="after_prepare" />
         <preference name="AndroidXEnabled" value="true" />
-        <preference name="android-compileSdkVersion" value="30" />
-        <preference name="android-targetSdkVersion" value="30" />
-        <preference name="android-minSdkVersion" value="19" />
+        <preference name="android-compileSdkVersion" value="31" />
+        <preference name="android-targetSdkVersion" value="31" />
+        <preference name="android-minSdkVersion" value="21" />
     </platform>
     <platform name="ios">
         <preference name="AllowInlineMediaPlayback" value="true"/>

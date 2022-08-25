@@ -707,12 +707,7 @@ function setupAttributesPage() {
                     value = 0;
                 }
             } else if (valueType == "date") {
-                value = Date.parse(value);
-                if (isNaN(value)) {
-                    value = new Date();
-                } else {
-                    value = new Date(value);
-                }
+                value = convertDateToAcousticDate(value);
             }
         }
         var attribute = $("#attribute").val();
@@ -721,6 +716,7 @@ function setupAttributesPage() {
         var json = {};
         json[attribute] = value;
 
+        console.log("!!!!",valueType, value, attribute, action, json)
         if (action == "update") {
             MCEPlugin.queueUpdateUserAttributes(json);
             $("#sendAttributesStatus")
@@ -760,7 +756,8 @@ function updateValueType() {
             if (isNaN(value)) {
                 value = new Date();
             }
-            $("#value").val(value.toISOString());
+
+            $("#value").val()
         } else if (valueType == "number") {
             var value = parseFloat($("#value").val());
             if (isNaN(value)) {
@@ -939,4 +936,12 @@ function setupRegistrationPage() {
     MCEPlugin.getAppKey(function (appKey) {
         $(".appKey").html(appKey);
     });
+}
+
+function convertDateToAcousticDate(date) {
+    var raw = (!isNaN(Date.parse(date))) ? new Date(date) : new Date();
+    console.log("RAW", raw, raw.getFullYear(), raw.getMonth(), raw.getDate()); 
+    return (raw.getFullYear() 
+         + "-" + ((raw.getMonth() + 1) < 10 ? ("0" + (raw.getMonth() + 1)) : raw.getMonth())
+         + "-" + ((raw.getDate() < 10) ? ("0" + raw.getDate()) : raw.getDate()));
 }

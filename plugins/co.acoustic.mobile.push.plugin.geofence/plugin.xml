@@ -8,7 +8,7 @@ industrial property rights of Acoustic, L.P. except as may be provided in an agr
 Acoustic, L.P. Any unauthorized copying or distribution of content from this file is prohibited.
 -->
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0" id="co.acoustic.mobile.push.plugin.geofence"
-version="3.8.5">
+version="3.8.6">
     <name>Acoustic MCE Geofence Cordova Plugin</name>
     <author>Acoustic MCE</author>
     <description>Allows Cordova applications to integrate with Acoustic MCE Push Services</description>
@@ -43,8 +43,8 @@ version="3.8.5">
 
         <config-file target="AndroidManifest.xml" parent="/manifest/application">
             <!-- GeofenceBroadcastReceiver is optional. It is used to receive geofence events. It is required only if locations are enabled and geofences are used -->
-            <receiver android:name="co.acoustic.mobile.push.sdk.location.GeofenceBroadcastReceiver"  android:enabled="true" android:exported="true"/>
-            <receiver android:name="co.acoustic.mobile.push.sdk.js.geofence.JsonMceBroadcastReceiver">
+            <receiver android:name="co.acoustic.mobile.push.sdk.location.GeofenceBroadcastReceiver" android:enabled="true"/>
+            <receiver android:exported="false" android:name="co.acoustic.mobile.push.sdk.js.geofence.JsonMceBroadcastReceiver">
                 <intent-filter>
                     <action android:name="co.acoustic.mobile.push.sdk.NOTIFIER" />
                 </intent-filter>

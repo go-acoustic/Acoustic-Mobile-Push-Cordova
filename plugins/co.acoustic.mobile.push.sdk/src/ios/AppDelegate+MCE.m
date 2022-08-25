@@ -11,6 +11,7 @@
 #import "AppDelegate+MCE.h"
 #import <objc/runtime.h>
 #import <Cordova/CDVConfigParser.h>
+#import "MCEManualConfiguration.h"
 #import <AcousticMobilePush/AcousticMobilePush.h>
 #import "MCEEventCallbackQueue.h"
 
@@ -206,40 +207,6 @@
     NSLog(@"Couldn't deliver action %@ with payload %@", action, payload);
 }
 
--(NSDictionary*)loadSettings
-{
-    CDVConfigParser* delegate = [[CDVConfigParser alloc] init];
-    
-    // read from config.xml in the app bundle
-    NSString* path = [[NSBundle mainBundle] pathForResource:@"config" ofType:@"xml"];
-    
-    if (![[NSFileManager defaultManager] fileExistsAtPath:path]) {
-        NSAssert(NO, @"ERROR: config.xml does not exist. Please run cordova-ios/bin/cordova_plist_to_config_xml path/to/project.");
-        return nil;
-    }
-    
-    NSURL* url = [NSURL fileURLWithPath:path];
-    
-    NSXMLParser * configParser = [[NSXMLParser alloc] initWithContentsOfURL:url];
-    if (configParser == nil) {
-        NSLog(@"Failed to initialize XML parser.");
-        return nil;
-    }
-    [configParser setDelegate:((id < NSXMLParserDelegate >)delegate)];
-    [configParser parse];
-    
-    objc_setAssociatedObject(self, @"settings", delegate.settings, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-    
-    return delegate.settings;
-}
-- (id)settingForKey:(NSString*)key
-{
-    NSDictionary * settings = objc_getAssociatedObject(self, @"settings");
-    if(!settings)
-        settings = [self loadSettings];
-    return [settings objectForKey:[key lowercaseString]];
-}
-
 - (AppDelegate *)swizzled_init
 {
     NSLog(@"swizzled_init");
@@ -260,57 +227,7 @@
     [center addObserver:self selector:@selector(deleteUserAttributeFailure:) name:DeleteUserAttributesError object:nil];
     [center addObserver:self selector:@selector(deleteUserAttributeSuccess:) name:DeleteUserAttributesSuccess object:nil];
     
-    NSString * devAppKey = [self settingForKey:@"devAppKey"];
-    NSString * prodAppKey = [self settingForKey:@"prodAppKey"];
-    NSString * loglevel = [self settingForKey:@"loglevel"];
-    
-    NSString * autoReinitializeString = [self settingForKey:@"autoReinitialize"];
-    NSNumber * autoReinitialize = ([autoReinitializeString caseInsensitiveCompare: @"true"] == NSOrderedSame || [autoReinitializeString caseInsensitiveCompare: @"yes"] == NSOrderedSame) ? @YES : @NO;
-    
-    NSString * baseUrl = [self settingForKey:@"baseUrl"];
-    
-    NSString * autoInitializeString = [self settingForKey:@"autoInitialize"];
-    NSNumber * autoInitialize = ([autoInitializeString caseInsensitiveCompare: @"true"] == NSOrderedSame || [autoInitializeString caseInsensitiveCompare: @"yes"] == NSOrderedSame) ? @YES : @NO;
-    
-    NSString * invalidateExistingUserString = [self settingForKey:@"invalidateExistingUser"];
-    NSNumber * invalidateExistingUser = ([invalidateExistingUserString caseInsensitiveCompare: @"true"] == NSOrderedSame || [invalidateExistingUserString caseInsensitiveCompare: @"yes"] == NSOrderedSame) ? @YES : @NO;
-    
-    NSMutableDictionary * config = [@{@"invalidateExistingUser":invalidateExistingUser, @"autoReinitialize": autoReinitialize, @"loglevel":loglevel,@"baseUrl":baseUrl, @"appKey":@{ @"prod":prodAppKey, @"dev":devAppKey}, @"autoInitialize":autoInitialize, @"location": [NSMutableDictionary dictionary] } mutableCopy];
-    
-    if([self settingForKey:@"geofence"] && [[self settingForKey:@"geofence"] caseInsensitiveCompare: @"true"] == NSOrderedSame)
-    {
-        config[@"location"][@"geofence"] = [NSMutableDictionary dictionary];
-    }
-    
-    
-    NSString * autoInitializeLocation = [self settingForKey:@"autoInitializeLocation"];
-    NSNumber * geofenceSyncInterval = (NSNumber*)[self settingForKey:@"locationSyncInterval"];
-    NSNumber * geofenceSyncRadius = (NSNumber*)[self settingForKey:@"locationSyncRadius"];
-    if(geofenceSyncRadius && geofenceSyncInterval)
-    {
-        config[@"location"][@"sync"] = [NSMutableDictionary dictionary];
-        config[@"location"][@"sync"][@"syncRadius"] = geofenceSyncRadius;
-        config[@"location"][@"sync"][@"syncInterval"] = geofenceSyncInterval;
-    }
-    
-    if(autoInitializeLocation && [autoInitializeLocation caseInsensitiveCompare: @"true"] == NSOrderedSame) {
-        config[@"location"][@"autoInitialize"] = @YES;
-    } else {
-        config[@"location"][@"autoInitialize"] = @NO;
-    }
-    
-    if([self settingForKey:@"geofence"] && [[self settingForKey:@"ibeacon"] caseInsensitiveCompare: @"true"] == NSOrderedSame)
-    {
-        config[@"location"][@"ibeacon"] = [NSMutableDictionary dictionary];
-        
-        NSString * beaconUUID = (NSString*)[self settingForKey:@"beaconUUID"];
-        if(beaconUUID)
-        {
-            config[@"location"][@"ibeacon"][@"UUID"] = beaconUUID;
-        }
-    }
-    
-    [[MCESdk sharedInstance] handleApplicationLaunchWithConfig: config];
+    [[MCESdk sharedInstance] handleApplicationLaunchWithConfig: MCEManualConfiguration.xmlSettings];
     // This actually calls the original init method over in AppDelegate. Equivilent to calling super
     // on an overrided method, this is not recursive, although it appears that way. neat huh?
     return [self swizzled_init];

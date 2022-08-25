@@ -2,7 +2,7 @@
     "notification-actions": [
       {
         "type": "openInboxMessage",
-        "class": "co.acoustic.mobile.push.sdk.plugin.inbox.InboxMessageAction",
+        "class": "co.acoustic.mobile.push.sdk.js.inbox.JsonNotificationAction",
         "initOptions": {
           "templates": {
             "html": "co.acoustic.mobile.push.sdk.plugin.inbox.HtmlRichContent"
@@ -12,9 +12,10 @@
         }
       }
     ],
-  
+
     "message-processors": [{
         "name": "messages",
         "class": "co.acoustic.mobile.push.sdk.plugin.inbox.InboxMessageProcessor"
     }]
   }
+

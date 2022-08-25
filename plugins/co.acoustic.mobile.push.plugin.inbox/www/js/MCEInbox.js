@@ -19,7 +19,7 @@ var MCEInbox;
     MCEInbox.setInboxRegistry = function (name, handlers) {
         inboxRegistry[name] = handlers;
     };
-    MCEInbox.openInboxMessage = function (inboxMessage) {
+    MCEInbox.inboxMessageOpened = function (inboxMessage) {
         MCEPlugin.queueAddEvent({
             type: "inbox",
             name: "messageOpened",
@@ -76,7 +76,7 @@ var MCEInbox;
                 .parents("[inboxMessageId]")
                 .attr("inboxMessageId");
             MCEInboxPlugin_1.default.fetchInboxMessageId(inboxMessageId, function (inboxMessage) {
-                MCEInbox.openInboxMessage(inboxMessage);
+                MCEInbox.inboxMessageOpened(inboxMessage);
             });
         });
         $("#up_button").click(function () {
@@ -84,14 +84,14 @@ var MCEInbox;
             var messageIndex = MCEInbox.findMessageIndex(inboxMessageId);
             if (messageIndex > 0)
                 messageIndex--;
-            MCEInbox.openInboxMessage(inboxMessages[messageIndex]);
+            MCEInbox.inboxMessageOpened(inboxMessages[messageIndex]);
         });
         $("#down_button").click(function () {
             var inboxMessageId = $("#inboxMessageContent").attr("inboxMessageId");
             var messageIndex = MCEInbox.findMessageIndex(inboxMessageId);
             if (messageIndex < inboxMessages.length - 1)
                 messageIndex++;
-            MCEInbox.openInboxMessage(inboxMessages[messageIndex]);
+            MCEInbox.inboxMessageOpened(inboxMessages[messageIndex]);
         });
         $("#delete_button").click(function () {
             var inboxMessageId = $("#inboxMessageContent").attr("inboxMessageId");
@@ -122,9 +122,9 @@ var MCEInbox;
         });
         MCEPlugin.setRegisteredActionCallback(function (action, payload) {
             MCEInboxPlugin_1.default.fetchInboxMessageId(action["inboxMessageId"], function (inboxMessage) {
-                MCEInbox.openInboxMessage(inboxMessage);
+                MCEInbox.inboxMessageOpened(inboxMessage);
             });
-        }, "openInboxMessage");
+        }, "inboxMessageOpened");
         // Before starting sync, setup the handler for the sync callback
         MCEInboxPlugin_1.default.setInboxMessagesUpdateCallback(function (newInboxMessages) {
             inboxMessages = newInboxMessages;

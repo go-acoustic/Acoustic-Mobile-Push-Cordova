@@ -7,7 +7,7 @@ Acoustic, L.P. and/or other developers. No license is granted under any intellec
 industrial property rights of Acoustic, L.P. except as may be provided in an agreement with 
 Acoustic, L.P. Any unauthorized copying or distribution of content from this file is prohibited.
 -->
-<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0" id="co.acoustic.mobile.push.plugin.fcm" version="3.8.5">
+<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0" id="co.acoustic.mobile.push.plugin.fcm" version="3.8.6">
     <name>Acoustic MCE Cordova Plugin for FCM</name>
     <author>Acoustic MCE</author>
     <description>Allows Cordova applications to integrate with Acoustic MCE Push Services</description>

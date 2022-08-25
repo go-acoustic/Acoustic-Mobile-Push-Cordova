@@ -20,5 +20,6 @@ cordova plugin rm co.acoustic.mobile.push.plugin.displayweb
 cordova plugin rm co.acoustic.mobile.push.plugin.dial
 cordova plugin rm co.acoustic.mobile.push.plugin.snooze
 cordova plugin rm co.acoustic.mobile.push.plugin.geofence
+cordova plugin rm co.acoustic.mobile.push.plugin.ios-notification-service
 
 

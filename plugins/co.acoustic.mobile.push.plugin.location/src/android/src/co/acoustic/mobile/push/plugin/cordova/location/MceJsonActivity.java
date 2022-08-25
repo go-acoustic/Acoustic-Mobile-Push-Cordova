@@ -63,6 +63,15 @@ public class MceJsonActivity extends CordovaActivity implements ActivityCompat.O
                 Logger.i(TAG, "Location permission was NOT granted.");
             }
         }
+        else if (requestCode == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED)
+        {
+            ActivityCompat.requestPermissions(
+                this,
+                new String[]{
+                    android.Manifest.permission.ACCESS_BACKGROUND_LOCATION
+                },
+                0);
+        }
         else
         {
             super.onRequestPermissionsResult(requestCode, permissions, grantResults);

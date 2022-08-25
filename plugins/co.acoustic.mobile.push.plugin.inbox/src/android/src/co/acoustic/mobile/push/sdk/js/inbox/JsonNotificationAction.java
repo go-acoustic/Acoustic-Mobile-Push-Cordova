@@ -16,6 +16,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
+import co.acoustic.mobile.push.sdk.plugin.inbox.InboxEvents;
 import co.acoustic.mobile.push.sdk.plugin.inbox.InboxMessageAction;
 import co.acoustic.mobile.push.sdk.api.MceApplication;
 import co.acoustic.mobile.push.sdk.api.MceSdk;
@@ -25,6 +26,7 @@ import co.acoustic.mobile.push.sdk.util.Logger;
 import org.json.JSONException;
 import org.json.JSONObject;
 import co.acoustic.mobile.push.sdk.js.MceJsonApi;
+import co.acoustic.mobile.push.sdk.notification.ActionImpl;
 
 import java.util.Map;
 
@@ -83,6 +85,9 @@ public class JsonNotificationAction implements MceNotificationAction {
                 context.startActivity(actionIntent);
             }
 
+            if (fromNotification) {
+                InboxEvents.sendInboxNotificationOpenedEvent(context, new ActionImpl(type, name, payload), attribution, mailingId);
+            }
         } catch(JSONException jsone) {
             Logger.e(TAG, "Failed to construct action JSON", jsone);
         }
@@ -100,7 +105,7 @@ public class JsonNotificationAction implements MceNotificationAction {
 
     @Override
     public boolean shouldDisplayNotification(final Context context, NotificationDetails notificationDetails, final Bundle sourceBundle) {
-        if(notificationDetails.getAction().getType().equals("openInboxMessage"))
+        if(notificationDetails.getAction().getType().equals("inboxMessageOpened"))
         {
             InboxMessageAction inboxMessageAction = new InboxMessageAction();
             return inboxMessageAction.shouldDisplayNotification(context, notificationDetails, sourceBundle);

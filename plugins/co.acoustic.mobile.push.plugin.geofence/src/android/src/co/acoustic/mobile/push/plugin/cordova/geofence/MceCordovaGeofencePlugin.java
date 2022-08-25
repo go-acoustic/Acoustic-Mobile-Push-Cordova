@@ -33,6 +33,7 @@ import org.json.JSONException;
 
 public class MceCordovaGeofencePlugin extends CordovaPlugin {
     private static final int REQUEST_LOCATION = 0;
+    private static final int REQUEST_LOCATION_THEN_BACKGROUND = 1;
 
     final static String TAG = "MceCordovaGeofencePlugin";
 
@@ -44,7 +45,9 @@ public class MceCordovaGeofencePlugin extends CordovaPlugin {
                 if (ContextCompat.checkSelfPermission(
                         cordova.getActivity(),
                         android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                    ActivityCompat.requestPermissions(
+                    
+                    if (android.os.Build.VERSION.SDK_INT < 29) {
+                        ActivityCompat.requestPermissions(
                             cordova.getActivity(),
                             new String[]{
                                     android.Manifest.permission.ACCESS_FINE_LOCATION,
@@ -52,13 +55,32 @@ public class MceCordovaGeofencePlugin extends CordovaPlugin {
                             },
                             REQUEST_LOCATION);
 
-                    if (android.os.Build.VERSION.SDK_INT >= 29) {
+                    } else if (android.os.Build.VERSION.SDK_INT == 29) {
                         ActivityCompat.requestPermissions(
-                                cordova.getActivity(),
-                                new String[]{
-                                        android.Manifest.permission.ACCESS_BACKGROUND_LOCATION,
-                                },
-                                REQUEST_LOCATION);
+                            cordova.getActivity(),
+                            new String[]{
+                                android.Manifest.permission.ACCESS_FINE_LOCATION,
+                                android.Manifest.permission.ACCESS_COARSE_LOCATION,
+                                android.Manifest.permission.ACCESS_BACKGROUND_LOCATION
+                            },
+                            REQUEST_LOCATION);
+                    } else if (android.os.Build.VERSION.SDK_INT == 30) {
+                        ActivityCompat.requestPermissions(
+                            cordova.getActivity(),
+                            new String[]{
+                                android.Manifest.permission.ACCESS_FINE_LOCATION,
+                                android.Manifest.permission.ACCESS_COARSE_LOCATION
+                            },
+                            REQUEST_LOCATION_THEN_BACKGROUND);
+                    } else {
+                        ActivityCompat.requestPermissions(
+                            cordova.getActivity(),
+                            new String[]{
+                                android.Manifest.permission.ACCESS_FINE_LOCATION,
+                                android.Manifest.permission.ACCESS_COARSE_LOCATION,
+                                android.Manifest.permission.BLUETOOTH_SCAN
+                            },
+                            REQUEST_LOCATION_THEN_BACKGROUND);
                     }
                 } else {
                     LocationManager.enableLocationSupport(cordova.getContext());

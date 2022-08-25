@@ -1,6 +1,6 @@
 # Mobile Customer Engagement - Cordova Plugin
 
-This repository contains the Cordova Plugin and sample apps for IBM Mobile Customer Engagement.
+This repository contains the Cordova Plugin and sample apps for Acoustic Mobile Customer Engagement.
 
 ## Building the plugins
 Plugins are structured like so:

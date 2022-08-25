@@ -20,7 +20,7 @@ import org.json.JSONObject;
 public class RegistrationDetailsJson {
 
    public static enum Key {
-        userId, channelId, registrationId, ibmRegistered, providerRegistered, providerName
+        userId, channelId, registrationId, acousticRegistered, providerRegistered, providerName
     }
 
     public static JSONObject toJson(RegistrationDetails registrationDetails) throws JSONException {
@@ -39,7 +39,7 @@ public class RegistrationDetailsJson {
 
     public static JSONObject toIsRegisteredResponse(Context context, RegistrationDetails registrationDetails) throws JSONException {
         JSONObject isRegisteredResponse = new JSONObject();
-        isRegisteredResponse.put(Key.ibmRegistered.name(), registrationDetails.getChannelId() != null);
+        isRegisteredResponse.put(Key.acousticRegistered.name(), registrationDetails.getChannelId() != null);
         isRegisteredResponse.put(Key.providerRegistered.name(), registrationDetails.getPushToken() != null);
         isRegisteredResponse.put(Key.providerName.name(), MessagingManager.getServiceName(context));
         return isRegisteredResponse;
