@@ -1,6 +1,6 @@
 {
     "name": "co.acoustic.mobile.push.plugin.snooze",
-    "version": "3.8.6",
+    "version": "3.8.7",
     "description": "Snooze Action for Acoustic MCE Cordova Plugin",
     "cordova": {
         "id": "co.acoustic.mobile.push.snooze",

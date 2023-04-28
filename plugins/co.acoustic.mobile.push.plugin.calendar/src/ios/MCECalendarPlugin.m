@@ -33,48 +33,48 @@
         }
         EKEvent * event = [EKEvent eventWithEventStore: store];
         event.calendar=store.defaultCalendarForNewEvents;
-        if(action[@"title"])
+        if(action[@"value"][@"title"])
         {
-            event.title=action[@"title"];
+            event.title=action[@"value"][@"title"];
         }
         else
         {
             NSLog(@"No title, could not add to calendar");
             return;
         }
-        if(action[@"timeZone"])
+        if(action[@"value"][@"timeZone"])
         {
-            event.timeZone=[NSTimeZone timeZoneWithAbbreviation: action[@"timeZone"]];
+            event.timeZone=[NSTimeZone timeZoneWithAbbreviation: action[@"value"][@"timeZone"]];
         }
-        if(action[@"startDate"])
+        if(action[@"value"][@"startDate"])
         {
-            event.startDate = [MCEApiUtil iso8601ToDate: action[@"startDate"]];
+            event.startDate = [MCEApiUtil iso8601ToDate: action[@"value"][@"startDate"]];
         }
         else
         {
             NSLog(@"No startDate, could not add to calendar");
         }
-        if(action[@"endDate"])
+        if(action[@"value"][@"endDate"])
         {
-            event.endDate = [MCEApiUtil iso8601ToDate: action[@"endDate"]];
+            event.endDate = [MCEApiUtil iso8601ToDate: action[@"value"][@"endDate"]];
         }
         else
         {
             NSLog(@"No endDate, could not add to calendar");
         }
-        if(action[@"description"])
+        if(action[@"value"][@"description"])
         {
-            event.notes=action[@"description"];
+            event.notes=action[@"value"][@"description"];
         }
-        
-        if([action[@"interactive"] boolValue])
+
+        if([action[@"value"][@"interactive"] boolValue])
         {
             dispatch_async(dispatch_get_main_queue(), ^(){
                 EKEventEditViewController *controller = [[EKEventEditViewController alloc] init];
                 controller.event = event;
                 controller.eventStore = store;
                 controller.editViewDelegate = self;
-                
+
                 UIWindow * window = [[UIApplication sharedApplication] keyWindow];
                 [window.rootViewController presentViewController:controller animated:TRUE completion:nil];
             });
@@ -92,7 +92,7 @@
                 NSLog(@"Could not save to calendar");
             }
         }
-        
+
     }];
 }
 
@@ -108,7 +108,7 @@
         case EKEventEditViewActionDeleted:
             NSLog(@"Event was deleted from calendar");
             break;
-            
+
         default:
             break;
     }

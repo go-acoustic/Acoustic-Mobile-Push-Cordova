@@ -13,7 +13,9 @@ Acoustic MCE InApp Cordova Plugin
 */
 var MCEInAppPlugin;
 (function (MCEInAppPlugin) {
-    cordova.exec(null, null, "MCEInAppPlugin", "initialize", []);
+    if (window.cordova.platformId !== 'ios') {
+        cordova.exec(null, null, "MCEInAppPlugin", "initialize", []);
+    }
     var error = function (message) { return console.log(message); };
     /**
   Allows Cordova InApp Plugin to delete an existing InAppMessage

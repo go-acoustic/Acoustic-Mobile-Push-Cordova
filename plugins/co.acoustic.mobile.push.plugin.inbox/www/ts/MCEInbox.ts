@@ -8,7 +8,7 @@
  * prohibited.
  */
 
-import { StringObject } from "../../../co.acoustic.mobile.push.sdk";
+import { StringObject } from "co.acoustic.mobile.push.sdk/www/js/MCEPluginTypes";
 import MCEInboxPlugin from "./MCEInboxPlugin";
 import {
     InboxMessage,
@@ -27,7 +27,7 @@ namespace MCEInbox {
         inboxRegistry[name] = handlers;
     };
 
-    export const inboxMessageOpened = function (inboxMessage: InboxMessage) {
+    export const openInboxMessage = function (inboxMessage: InboxMessage) {
         MCEPlugin.queueAddEvent({
             type: "inbox",
             name: "messageOpened",
@@ -44,6 +44,8 @@ namespace MCEInbox {
             inboxMessage["inboxMessageId"]
         );
         MCEInboxPlugin.readMessageId(inboxMessage["inboxMessageId"]);
+        var messageElem = $("#inboxMessages div[inboxMessageId=" + inboxMessage["inboxMessageId"] + "] .titleOrSubject");
+        messageElem.addClass('old');
         inboxMessage["expirationDate"] =
             new Date(inboxMessage["expirationDate"]).getTime() / 1000;
         inboxMessage["sendDate"] =
@@ -100,7 +102,7 @@ namespace MCEInbox {
                 MCEInboxPlugin.fetchInboxMessageId(
                     inboxMessageId,
                     function (inboxMessage) {
-                        MCEInbox.inboxMessageOpened(inboxMessage);
+                        MCEInbox.openInboxMessage(inboxMessage);
                     }
                 );
             }
@@ -113,7 +115,7 @@ namespace MCEInbox {
             var messageIndex = MCEInbox.findMessageIndex(inboxMessageId);
             if (messageIndex > 0) messageIndex--;
 
-            MCEInbox.inboxMessageOpened(inboxMessages[messageIndex]);
+            MCEInbox.openInboxMessage(inboxMessages[messageIndex]);
         });
         $("#down_button").click(function () {
             var inboxMessageId = $("#inboxMessageContent").attr(
@@ -122,7 +124,7 @@ namespace MCEInbox {
             var messageIndex = MCEInbox.findMessageIndex(inboxMessageId);
             if (messageIndex < inboxMessages.length - 1) messageIndex++;
 
-            MCEInbox.inboxMessageOpened(inboxMessages[messageIndex]);
+            MCEInbox.openInboxMessage(inboxMessages[messageIndex]);
         });
         $("#delete_button").click(function () {
             var inboxMessageId = $("#inboxMessageContent").attr(
@@ -172,11 +174,11 @@ namespace MCEInbox {
             MCEInboxPlugin.fetchInboxMessageId(
                 action["inboxMessageId"],
                 function (inboxMessage) {
-                    MCEInbox.inboxMessageOpened(inboxMessage);
+                    MCEInbox.openInboxMessage(inboxMessage);
                 }
             );
         },
-        "inboxMessageOpened");
+        "openInboxMessage");
 
         // Before starting sync, setup the handler for the sync callback
         MCEInboxPlugin.setInboxMessagesUpdateCallback(function (

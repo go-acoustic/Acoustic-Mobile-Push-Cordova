@@ -15,8 +15,9 @@ import { InAppTemplateCallback } from "./MCEInAppPluginTypes";
 Acoustic MCE InApp Cordova Plugin
 */
 namespace MCEInAppPlugin {
-    cordova.exec(null, null, "MCEInAppPlugin", "initialize", []);
-
+    if (window.cordova.platformId !== 'ios') {
+        cordova.exec(null, null, "MCEInAppPlugin", "initialize", []);
+    }
     const error = (message: string) => console.log(message);
 
     /**

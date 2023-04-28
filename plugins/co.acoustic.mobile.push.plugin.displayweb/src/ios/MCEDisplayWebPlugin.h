@@ -14,4 +14,5 @@
 
 @interface MCEDisplayWebPlugin : CDVPlugin
 -(void)performAction:(NSDictionary*)action payload:(NSDictionary*)payload;
++(void)registerPlugin;
 @end

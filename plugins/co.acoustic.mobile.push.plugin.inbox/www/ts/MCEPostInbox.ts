@@ -8,7 +8,7 @@
  * prohibited.
  */
 
-import { StringObject } from "../../../co.acoustic.mobile.push.sdk";
+import { StringObject } from "co.acoustic.mobile.push.sdk/www/ts/MCEPluginTypes";
 import MCEInbox from "./MCEInbox";
 import MCEInboxPlugin from "./MCEInboxPlugin";
 import { InboxMessage } from "./MCEInboxPluginTypes";
@@ -82,7 +82,7 @@ function view(richContent: InboxMessage) {
         header += "<img class='headerImage' src='" + c["headerImage"] + "'>";
         titleStyle = " style='left: 59px'";
     }
-    header += "<div class='title'" + titleStyle + ">" + c["header"] + "</div>";
+    header += "<div class='title" + (richContent["isRead"] ? " old" : "") + " titleOrSubject'" + titleStyle + ">" + c["header"] + "</div>";
     header +=
         "<div class='subtitle'" + titleStyle + ">" + c["subHeader"] + "</div>";
     header += "</div>";

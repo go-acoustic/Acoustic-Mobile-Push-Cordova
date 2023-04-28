@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Copyright © 2011, 2019 Acoustic, L.P. All rights reserved.
+
+NOTICE: This file contains material that is confidential and proprietary to
+Acoustic, L.P. and/or other developers. No license is granted under any intellectual or
+industrial property rights of Acoustic, L.P. except as may be provided in an agreement with
+Acoustic, L.P. Any unauthorized copying or distribution of content from this file is prohibited.
+-->
+<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0" id="co.acoustic.mobile.push.plugin.action-menu"
+    version="3.8.7">
+    <name>Action Menu for Acoustic MCE Cordova Plugin</name>
+    <author>Acoustic MCE</author>
+    <description>Display Action Menu for Acoustic MCE Push Services</description>
+    <keywords>mce</keywords>
+    <license>Apache 2.0 License</license>
+    <engines>
+        <engine name="cordova" version=">=3.0" />
+    </engines>
+    <js-module src="www/js/MCEActionMenuPlugin.js" name="MCEActionMenuPlugin">
+        <clobbers target="MCEActionMenuPlugin" />
+    </js-module>
+    <platform name="ios">
+        <config-file target="config.xml" parent="/*">
+            <feature name="MCEActionMenuPlugin" >
+                <param name="ios-package" value="MCEActionMenuPlugin"/>
+            </feature>
+        </config-file>
+        <header-file src="src/ios/MCEActionMenuPlugin.h" />
+        <source-file src="src/ios/MCEActionMenuPlugin.m" />
+    </platform>
+</plugin>

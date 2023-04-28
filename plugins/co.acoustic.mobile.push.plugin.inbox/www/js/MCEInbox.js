@@ -19,7 +19,7 @@ var MCEInbox;
     MCEInbox.setInboxRegistry = function (name, handlers) {
         inboxRegistry[name] = handlers;
     };
-    MCEInbox.inboxMessageOpened = function (inboxMessage) {
+    MCEInbox.openInboxMessage = function (inboxMessage) {
         MCEPlugin.queueAddEvent({
             type: "inbox",
             name: "messageOpened",
@@ -33,6 +33,8 @@ var MCEInbox;
         });
         $("#inboxMessageContent").attr("inboxMessageId", inboxMessage["inboxMessageId"]);
         MCEInboxPlugin_1.default.readMessageId(inboxMessage["inboxMessageId"]);
+        var messageElem = $("#inboxMessages div[inboxMessageId=" + inboxMessage["inboxMessageId"] + "] .titleOrSubject");
+        messageElem.addClass('old');
         inboxMessage["expirationDate"] =
             new Date(inboxMessage["expirationDate"]).getTime() / 1000;
         inboxMessage["sendDate"] =
@@ -76,7 +78,7 @@ var MCEInbox;
                 .parents("[inboxMessageId]")
                 .attr("inboxMessageId");
             MCEInboxPlugin_1.default.fetchInboxMessageId(inboxMessageId, function (inboxMessage) {
-                MCEInbox.inboxMessageOpened(inboxMessage);
+                MCEInbox.openInboxMessage(inboxMessage);
             });
         });
         $("#up_button").click(function () {
@@ -84,14 +86,14 @@ var MCEInbox;
             var messageIndex = MCEInbox.findMessageIndex(inboxMessageId);
             if (messageIndex > 0)
                 messageIndex--;
-            MCEInbox.inboxMessageOpened(inboxMessages[messageIndex]);
+            MCEInbox.openInboxMessage(inboxMessages[messageIndex]);
         });
         $("#down_button").click(function () {
             var inboxMessageId = $("#inboxMessageContent").attr("inboxMessageId");
             var messageIndex = MCEInbox.findMessageIndex(inboxMessageId);
             if (messageIndex < inboxMessages.length - 1)
                 messageIndex++;
-            MCEInbox.inboxMessageOpened(inboxMessages[messageIndex]);
+            MCEInbox.openInboxMessage(inboxMessages[messageIndex]);
         });
         $("#delete_button").click(function () {
             var inboxMessageId = $("#inboxMessageContent").attr("inboxMessageId");
@@ -122,9 +124,9 @@ var MCEInbox;
         });
         MCEPlugin.setRegisteredActionCallback(function (action, payload) {
             MCEInboxPlugin_1.default.fetchInboxMessageId(action["inboxMessageId"], function (inboxMessage) {
-                MCEInbox.inboxMessageOpened(inboxMessage);
+                MCEInbox.openInboxMessage(inboxMessage);
             });
-        }, "inboxMessageOpened");
+        }, "openInboxMessage");
         // Before starting sync, setup the handler for the sync callback
         MCEInboxPlugin_1.default.setInboxMessagesUpdateCallback(function (newInboxMessages) {
             inboxMessages = newInboxMessages;

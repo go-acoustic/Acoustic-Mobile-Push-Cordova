@@ -18,6 +18,6 @@
 #down_button { float: right; padding: 10px;}
 #delete_button { float: right; padding: 10px;}
 #inboxMessages .emptyInbox { margin: 0; position: absolute; top: 40%; -ms-transform: translateY(-60%); transform: translateY(-60%); text-align: center; width: 100%;}
-
+#inboxMessages .messagePreview div.old { font-weight: inherit; }
 
 

@@ -1,6 +1,6 @@
 {
   "name": "co.acoustic.mobile.push.sdk",
-  "version": "3.8.6",
+  "version": "3.8.7",
   "description": "Allows Cordova applications to integrate with Acoustic MCE Push Services",
   "cordova": {
     "id": "co.acoustic.mobile.push",

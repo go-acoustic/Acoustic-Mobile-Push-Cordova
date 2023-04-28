@@ -1,6 +1,6 @@
 {
   "name": "co.acoustic.mobile.push.plugin.inapp",
-  "version": "3.8.6",
+  "version": "3.8.7",
   "description": "InApp Action for Acoustic MCE Push Services",
   "cordova": {
     "id": "co.acoustic.mobile.push.inapp",

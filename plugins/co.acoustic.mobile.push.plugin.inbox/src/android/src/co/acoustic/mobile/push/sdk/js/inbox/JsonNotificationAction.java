@@ -105,7 +105,7 @@ public class JsonNotificationAction implements MceNotificationAction {
 
     @Override
     public boolean shouldDisplayNotification(final Context context, NotificationDetails notificationDetails, final Bundle sourceBundle) {
-        if(notificationDetails.getAction().getType().equals("inboxMessageOpened"))
+        if(notificationDetails.getAction().getType().equals("openInboxMessage"))
         {
             InboxMessageAction inboxMessageAction = new InboxMessageAction();
             return inboxMessageAction.shouldDisplayNotification(context, notificationDetails, sourceBundle);

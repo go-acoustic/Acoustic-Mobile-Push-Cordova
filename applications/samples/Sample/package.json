@@ -7,12 +7,12 @@
     "plugins": {
       "cordova-plugin-test-framework": {},
       "co.acoustic.mobile.push.sdk": {
-        "CUSTOM_ACTIONS": "inboxMessageOpened sendEmail",
-        "ANDROID_APPKEY": "gcnslVYNku",
-        "IOS_DEV_APPKEY": "apEHsIkt27",
-        "IOS_PROD_APPKEY": "apEHsIkt27",
-        "SERVER_URL": "https://mobile-sdk-lib-us-0.brilliantcollector.com",
-        "LOGLEVEL": "verbose",
+        "CUSTOM_ACTIONS": "openInboxMessage sendEmail",
+        "ANDROID_APPKEY": "",
+        "IOS_DEV_APPKEY": "",
+        "IOS_PROD_APPKEY": "",
+        "SERVER_URL": "https://mobile-sdk-lib-xx-y.brilliantcollector.com",
+        "LOGLEVEL": "error",
         "MCE_CAN_SYNC_OVERRIDE": "true",
         "CHANNEL_NAME": "MCE SDK Notification Channel",
         "CHANNEL_DESCRIPTION": "This is the notification channel for the MCE SDK sample application",
@@ -35,8 +35,11 @@
       "co.acoustic.mobile.push.plugin.displayweb": {},
       "co.acoustic.mobile.push.plugin.dial": {},
       "co.acoustic.mobile.push.plugin.snooze": {},
+      "co.acoustic.mobile.push.plugin.calendar": {},
       "co.acoustic.mobile.push.plugin.geofence": {},
       "co.acoustic.mobile.push.plugin.ios-notification-service": {},
+      "co.acoustic.mobile.push.plugin.action-menu": {},
+      "co.acoustic.mobile.push.plugin.passbook": {},
       "co.acoustic.mobile.push.sdk-tests": {}
     },
     "platforms": [
@@ -45,6 +48,8 @@
     ]
   },
   "devDependencies": {
+    "co-acoustic-mobile-push-plugin-calendar": "file:../../../plugins/co.acoustic.mobile.push.plugin.calendar",
+    "co.acoustic.mobile.push.plugin.action-menu": "file:../../../plugins/co.acoustic.mobile.push.plugin.action-menu",
     "co.acoustic.mobile.push.plugin.beacon": "file:../../../plugins/co.acoustic.mobile.push.plugin.beacon",
     "co.acoustic.mobile.push.plugin.dial": "file:../../../plugins/co.acoustic.mobile.push.plugin.dial",
     "co.acoustic.mobile.push.plugin.displayweb": "file:../../../plugins/co.acoustic.mobile.push.plugin.displayweb",
@@ -54,11 +59,12 @@
     "co.acoustic.mobile.push.plugin.inbox": "file:../../../plugins/co.acoustic.mobile.push.plugin.inbox",
     "co.acoustic.mobile.push.plugin.ios-notification-service": "file:../../../plugins/co.acoustic.mobile.push.plugin.ios-notification-service",
     "co.acoustic.mobile.push.plugin.location": "file:../../../plugins/co.acoustic.mobile.push.plugin.location",
+    "co.acoustic.mobile.push.plugin.passbook": "file:../../../plugins/co.acoustic.mobile.push.plugin.passbook",
     "co.acoustic.mobile.push.plugin.snooze": "file:../../../plugins/co.acoustic.mobile.push.plugin.snooze",
     "co.acoustic.mobile.push.sdk": "file:../../../plugins/co.acoustic.mobile.push.sdk",
     "co.acoustic.mobile.push.sdk-tests": "file:../../../plugins/co.acoustic.mobile.push.sdk/tests",
     "cordova-android": "^10.1.2",
-    "cordova-ios": "^6.2.0",
+    "cordova-ios": "^6.3.0",
     "cordova-plugin-test-framework": "^1.1.6"
   }
 }

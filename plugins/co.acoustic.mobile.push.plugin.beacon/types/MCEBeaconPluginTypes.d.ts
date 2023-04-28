@@ -6,7 +6,7 @@ export interface BeaconMajor {
 @callback BeaconRegionsCallback
 @param {Array.<BeaconMajor>} beacons List of current beacon regions.
 */
-export declare type BeaconRegionsCallback = (beacons: BeaconMajor[]) => void;
+export type BeaconRegionsCallback = (beacons: BeaconMajor[]) => void;
 export interface Beacon {
     /** Major of beacon region */
     major: number;
@@ -19,14 +19,14 @@ export interface Beacon {
 @callback BeaconCallback
 @param {Beacon} beacon Beacon region entered or left.
 */
-export declare type BeaconCallback = (beacon: Beacon) => void;
+export type BeaconCallback = (beacon: Beacon) => void;
 /**
 @callback BeaconEnabledCallback
 @param {boolean} status True if iBeacons are enabled, false otherwise.
 */
-export declare type BeaconEnabledCallback = (status: boolean) => void;
+export type BeaconEnabledCallback = (status: boolean) => void;
 /**
 @callback BeaconUUIDCallback
 @param {string} status iBeacon global UUID setup.
 */
-export declare type BeaconUUIDCallback = (status: string) => void;
+export type BeaconUUIDCallback = (status: string) => void;

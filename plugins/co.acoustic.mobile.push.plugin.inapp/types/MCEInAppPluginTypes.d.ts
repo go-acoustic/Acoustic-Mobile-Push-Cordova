@@ -21,4 +21,4 @@ export interface InAppMessage {
   @callback InAppTemplateCallback
   @param inAppMessage {InAppMessage} An InApp message to be displayed.
   */
-export declare type InAppTemplateCallback = (inAppMessage: InAppMessage) => void;
+export type InAppTemplateCallback = (inAppMessage: InAppMessage) => void;

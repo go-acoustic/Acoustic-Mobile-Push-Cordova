@@ -10,3 +10,5 @@ cd co.acoustic.mobile.push.plugin.displayweb && npm install && tsc ; cd ..
 cd co.acoustic.mobile.push.plugin.dial && npm install && tsc ; cd ..
 cd co.acoustic.mobile.push.plugin.calendar && npm install && tsc ; cd ..
 cd co.acoustic.mobile.push.plugin.beacon && npm install && tsc ; cd ..
+cd co.acoustic.mobile.push.plugin.action-menu && npm install && tsc ; cd ..
+cd co.acoustic.mobile.push.plugin.passbook && npm install && tsc; cd ..

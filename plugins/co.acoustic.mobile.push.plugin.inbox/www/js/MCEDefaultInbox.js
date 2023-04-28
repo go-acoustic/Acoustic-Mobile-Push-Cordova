@@ -31,7 +31,7 @@ MCEInbox_1.default.setInboxRegistry("default", {
             "</div>" +
             "<div class='subject " +
             (inboxMessage["isRead"] ? "old" : "new") +
-            "'>" +
+            " titleOrSubject'>" +
             inboxMessage["content"]["messagePreview"]["subject"] +
             "</div>" +
             "</div>" +

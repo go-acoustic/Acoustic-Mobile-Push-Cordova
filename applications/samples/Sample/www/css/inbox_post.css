@@ -56,12 +56,22 @@
     height: 20px;
 }
 
-.postInboxMessage .contentImage {
+#inboxMessage .postInboxMessage .contentImage {
     margin-top: 5px;
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center;
     width: 100%;
+    height: auto;
+}
+
+#inboxMessages .postPreview .contentImage {
+    display: block;
+    margin: 5px auto;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    width: 50%;
     height: 100px;
 }
 

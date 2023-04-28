@@ -69,7 +69,7 @@ function view(richContent) {
         header += "<img class='headerImage' src='" + c["headerImage"] + "'>";
         titleStyle = " style='left: 59px'";
     }
-    header += "<div class='title'" + titleStyle + ">" + c["header"] + "</div>";
+    header += "<div class='title" + (richContent["isRead"] ? " old" : "") + " titleOrSubject'" + titleStyle + ">" + c["header"] + "</div>";
     header +=
         "<div class='subtitle'" + titleStyle + ">" + c["subHeader"] + "</div>";
     header += "</div>";

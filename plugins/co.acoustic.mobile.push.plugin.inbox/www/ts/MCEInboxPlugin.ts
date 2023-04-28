@@ -8,7 +8,7 @@
  * prohibited.
  */
 
-import { StringObject } from "../../../co.acoustic.mobile.push.sdk";
+import { StringObject } from "co.acoustic.mobile.push.sdk/www/js/MCEPluginTypes";
 import { InboxListCallback, InboxMessageCallback } from "./MCEInboxPluginTypes";
 
 /**

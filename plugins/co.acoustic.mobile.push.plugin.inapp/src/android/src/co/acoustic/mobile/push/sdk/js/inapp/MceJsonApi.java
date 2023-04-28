@@ -11,7 +11,6 @@
 package co.acoustic.mobile.push.sdk.js.inapp;
 
 import co.acoustic.mobile.push.sdk.api.message.MessageSync;
-import co.acoustic.mobile.push.sdk.plugin.inbox.InboxMessagesClient;
 import co.acoustic.mobile.push.sdk.plugin.inapp.InAppPlugin;
 import co.acoustic.mobile.push.sdk.js.JsonCallback;
 import co.acoustic.mobile.push.sdk.plugin.inapp.InAppEvents;
@@ -32,7 +31,6 @@ import co.acoustic.mobile.push.sdk.util.Logger;
 import co.acoustic.mobile.push.sdk.api.event.Event;
 import co.acoustic.mobile.push.sdk.notification.MceNotificationActionImpl;
 import co.acoustic.mobile.push.sdk.plugin.inapp.InAppManager;
-import co.acoustic.mobile.push.sdk.plugin.inbox.RichContent;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -170,21 +168,6 @@ public class MceJsonApi {
                 }
             }
         });
-//        InboxMessagesClient.loadInboxMessages(context, new OperationCallback<List<RichContent>>() {
-//            @Override
-//            public void onSuccess(List<RichContent> newRichContents, OperationResult result) {
-//                if(callback != null) {
-//                    callback.success(true);
-//                }
-//            }
-//
-//            @Override
-//            public void onFailure(List<RichContent> richContents, OperationResult result) {
-//                if(callback != null) {
-//                    callback.failure("", true);
-//                }
-//            }
-//        });
     }
 
     public static void executeInAppAction(final Context context, JSONArray parameters) throws JSONException {

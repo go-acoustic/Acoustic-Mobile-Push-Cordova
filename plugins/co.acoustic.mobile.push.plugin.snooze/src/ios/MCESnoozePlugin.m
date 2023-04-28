@@ -29,11 +29,11 @@
 }
 
 -(void)performAction:(NSDictionary*)action payload:(NSDictionary*)payload {
-    NSNumber * value = action[@"value"];
+    NSNumber * value = action[@"value"][@"time"];
     if(![value respondsToSelector:@selector(isEqualToNumber:)]) {
-        NSLog(@"Snooze value is not numeric");
-        return;
-    }
+            NSLog(@"Snooze value is not numeric or is equal to zero");
+            return;
+        }
             
     NSLog(@"Snooze for %f minutes", [value doubleValue]);
 
@@ -43,7 +43,7 @@
         UNTimeIntervalNotificationTrigger * trigger = [UNTimeIntervalNotificationTrigger triggerWithTimeInterval:[value doubleValue] * 60 repeats:false];
         UNNotificationRequest * request = [UNNotificationRequest requestWithIdentifier:[[NSUUID UUID] UUIDString] content:content trigger:trigger];
         [UNUserNotificationCenter.currentNotificationCenter addNotificationRequest:request withCompletionHandler:^(NSError * _Nullable error) {
-            
+
             if(error) {
                 NSLog(@"Could not add notification request");
             } else {

@@ -45,7 +45,7 @@ namespace MCEPlugin {
   @param {SdkVersionCallback} callback The callback that handles the response
   */
     export const getPluginVersion = function (callback: SdkVersionCallback) {
-        callback("3.8.6");
+        callback("3.8.7");
     };
 
     /**
@@ -513,7 +513,7 @@ namespace MCEPlugin {
     export const append = function (src: string, addition: string) {
         var parts = src.split(".");
         var extension = parts.pop();
-        if (["gif", "png", "jpg", "jpeg"].includes(extension)) {
+        if (["gif", "png", "jpg", "jpeg"].indexOf(extension) !== -1) {
             parts[parts.length - 1] = parts[parts.length - 1] + addition;
             parts.push(extension);
             return parts.join(".");

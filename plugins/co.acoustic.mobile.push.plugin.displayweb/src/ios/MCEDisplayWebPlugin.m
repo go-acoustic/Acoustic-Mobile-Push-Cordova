@@ -13,18 +13,28 @@
 
 @implementation MCEDisplayWebPlugin
 
++ (instancetype)sharedInstance
+{
+    static id sharedInstance = nil;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        sharedInstance = [[self alloc] init];
+    });
+    return sharedInstance;
+}
+
 -(void)performAction:(NSDictionary*)action payload:(NSDictionary*)payload
 {
-    WebViewController * viewController = [[WebViewController alloc] initWithURL:[NSURL URLWithString:action[@"value"]]];
+    WebViewController * viewController = [[WebViewController alloc] initWithURL:[NSURL URLWithString:action[@"value"][@"url"]]];
     viewController.payload=payload;
     UIWindow * window = [[UIApplication sharedApplication] keyWindow];
     [window.rootViewController presentViewController:viewController animated:TRUE completion:nil];
 }
 
-- (void)pluginInitialize
++(void)registerPlugin
 {
     MCEActionRegistry * registry = [MCEActionRegistry sharedInstance];
-    [registry registerTarget: self withSelector:@selector(performAction:payload:) forAction: @"displayWebView"];
+    [registry registerTarget: [self sharedInstance] withSelector:@selector(performAction:payload:) forAction: @"displayWebView"];
 }
 
 @end

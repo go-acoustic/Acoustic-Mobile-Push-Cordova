@@ -36,7 +36,7 @@ var MCEPlugin;
   @param {SdkVersionCallback} callback The callback that handles the response
   */
     MCEPlugin.getPluginVersion = function (callback) {
-        callback("3.8.6");
+        callback("3.8.7");
     };
     /**
   Allow Cordova developer to know when registration occurs.
@@ -315,7 +315,7 @@ var MCEPlugin;
     MCEPlugin.append = function (src, addition) {
         var parts = src.split(".");
         var extension = parts.pop();
-        if (["gif", "png", "jpg", "jpeg"].includes(extension)) {
+        if (["gif", "png", "jpg", "jpeg"].indexOf(extension) !== -1) {
             parts[parts.length - 1] = parts[parts.length - 1] + addition;
             parts.push(extension);
             return parts.join(".");

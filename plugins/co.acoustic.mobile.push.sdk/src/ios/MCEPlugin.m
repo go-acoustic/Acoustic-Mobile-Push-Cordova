@@ -424,16 +424,18 @@
 
 -(NSDictionary *)checkForDateAttribute:(CDVInvokedUrlCommand*)command {
     NSMutableDictionary * attributes = [[command argumentAtIndex:0] mutableCopy];
+    NSMutableDictionary * updatedAttributes = [[command argumentAtIndex:0] mutableCopy];
     for (NSString * key in attributes) {
         NSDictionary * value = attributes[key];
         if(value && [value isKindOfClass:NSDictionary.class]) {
             NSNumber * mceDate = value[@"mcedate"];
             if(mceDate && [mceDate respondsToSelector:@selector(integerValue)]) {
-                attributes[key] = [NSDate dateWithTimeIntervalSince1970:[mceDate integerValue] / 1000];
+            // Converts time from milliseconds to seconds
+                updatedAttributes[key] = [NSDate dateWithTimeIntervalSince1970:[mceDate integerValue] / 1000];
             }
         }
     }
-    return attributes;
+    return updatedAttributes;
 }
 
 
