@@ -13,7 +13,9 @@ Acoustic MCE Inbox Cordova Plugin
 */
 var MCEInboxPlugin;
 (function (MCEInboxPlugin) {
-    cordova.exec(null, null, "MCEInboxPlugin", "initialize", []);
+    if (window.cordova.platformId !== 'ios') {
+        cordova.exec(null, null, "MCEInboxPlugin", "initialize", []);
+    }
     /**
     Allow Cordova Inbox Plugin to respond to changes in the inbox list.
     @param {InboxListCallback} callback The callback that handles the response

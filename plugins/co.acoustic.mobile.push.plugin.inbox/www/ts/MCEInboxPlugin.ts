@@ -15,7 +15,9 @@ import { InboxListCallback, InboxMessageCallback } from "./MCEInboxPluginTypes";
 Acoustic MCE Inbox Cordova Plugin
 */
 namespace MCEInboxPlugin {
-    cordova.exec(null, null, "MCEInboxPlugin", "initialize", []);
+        if (window.cordova.platformId !== 'ios') {
+            cordova.exec(null, null, "MCEInboxPlugin", "initialize", []);
+        }
 
     /**
     Allow Cordova Inbox Plugin to respond to changes in the inbox list.
