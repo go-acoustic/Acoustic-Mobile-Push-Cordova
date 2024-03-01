@@ -35,5 +35,5 @@
         "type": "git",
         "url": "git+https://github.com/Acoustic-Mobile-Push/Cordova.git"
     },
-    "version": "3.8.9"
+    "version": "3.8.10"
 }
