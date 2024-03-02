@@ -19,11 +19,12 @@
         <allow-intent href="market:*" />
         <hook src="scripts/copy_build_extra.js" type="after_prepare" />
         <preference name="AndroidXEnabled" value="true" />
-        <preference name="android-compileSdkVersion" value="31" />
-        <preference name="android-targetSdkVersion" value="31" />
+        <preference name="android-compileSdkVersion" value="34" />
+        <preference name="android-targetSdkVersion" value="34" />
         <preference name="android-minSdkVersion" value="21" />
     </platform>
     <platform name="ios">
+        <preference name="deployment-target" value="13.0" />
         <preference name="AllowInlineMediaPlayback" value="true"/>
         <preference name="EnableViewportScale" value="true" />
         <splash src="res/screen/ios/Default@2x~iphone~anyany.png" />

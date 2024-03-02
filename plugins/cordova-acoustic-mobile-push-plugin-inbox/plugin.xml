@@ -1,0 +1,67 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+Copyright (C) 2024 Acoustic, L.P. All rights reserved.
+
+NOTICE: This file contains material that is confidential and proprietary to 
+Acoustic, L.P. and/or other developers. No license is granted under any intellectual or 
+industrial property rights of Acoustic, L.P. except as may be provided in an agreement with 
+Acoustic, L.P. Any unauthorized copying or distribution of content from this file is prohibited.
+-->
+<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0" id="cordova-acoustic-mobile-push-plugin-inbox"
+version="3.8.7">
+    <name>Inbox Action for Acoustic MCE Cordova Plugin</name>
+    <author>Acoustic MCE</author>
+    <description>Inbox Action for Acoustic MCE Push Services</description>
+    <keywords>mce</keywords>
+    <license>Apache 2.0 License</license>
+    
+    <engines>
+        <engine name="cordova" version=">=3.0" />
+    </engines>
+    
+    <js-module src="www/js/MCEInboxPlugin.js" name="MCEInboxPlugin">
+        <clobbers target="MCEInboxPlugin" />
+    </js-module>
+        
+    <js-module src="www/js/MCEInbox.js" name="MCEInbox">
+        <clobbers target="MCEInbox" />
+    </js-module>
+
+    <js-module src="www/js/MCEDefaultInbox.js" name="MCEDefaultInbox">
+        <clobbers target="MCEDefaultInbox" />
+    </js-module>
+
+    <js-module src="www/js/MCEPostInbox.js" name="MCEPostInbox">
+        <clobbers target="MCEPostInbox" />
+    </js-module>
+    
+    <js-module src="www/js/jquery.inview.js" name="jquery-inview">
+        <clobbers target="jquery-inview" />
+    </js-module>
+  
+    <hook type="after_plugin_install" src="scripts/after_plugin_install.js" />
+
+    <platform name="ios">
+        <config-file target="config.xml" parent="/*">
+            <feature name="MCEInboxPlugin" >
+                <param name="ios-package" value="MCEInboxPlugin"/>
+            </feature>
+        </config-file>    
+        <header-file src="src/ios/MCEInboxPlugin.h" />
+        <source-file src="src/ios/MCEInboxPlugin.m" />
+    </platform>
+    
+    <platform name="android">
+        <config-file target="res/xml/config.xml" parent="/widget">
+            <feature name="MCEInboxPlugin">
+                <param name="android-package" value="co.acoustic.mobile.push.plugin.cordova.inbox.MceCordovaInboxPlugin" />
+            </feature>
+        </config-file>
+
+        <framework src="src/android/build-extras.gradle" custom="true" type="gradleReference" />
+        <source-file src="src/android/src/co/acoustic/mobile/push/plugin/cordova/inbox" target-dir="java/co/acoustic/mobile/push/plugin/cordova" />
+        <source-file src="src/android/src/co/acoustic/mobile/push/sdk/js/inbox" target-dir="java/co/acoustic/mobile/push/sdk/js" />
+        <source-file src="src/android/assets/mce/plugins/inbox.json" target-dir="assets/mce/plugins" framework="false" />
+
+    </platform>
+</plugin>

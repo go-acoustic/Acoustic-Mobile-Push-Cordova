@@ -1,0 +1,28 @@
+repositories{    
+  jcenter()
+  flatDir {
+    dirs 'libs'
+  }
+  google()
+  mavenCentral()
+  maven {
+    url "https://plugins.gradle.org/m2/"
+  }
+  maven {
+    url "https://maven.google.com"
+    name 'Google'
+  }
+  maven { url "https://s01.oss.sonatype.org/content/repositories/staging" }
+}
+
+dependencies {
+  implementation('androidx.appcompat:appcompat:1.6.0')
+  implementation "io.github.acoustic-analytics:acoustic-mobile-push-android-sdk:+"
+}
+
+android {
+  packagingOptions {
+    exclude 'META-INF/NOTICE'
+    exclude 'META-INF/LICENSE'
+  }
+}

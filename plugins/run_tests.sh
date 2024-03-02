@@ -15,8 +15,8 @@ else
 fi
 
 cordova-paramedic  --platform "$2" \
-  --plugin './co.acoustic.mobile.push.sdk --variable CUSTOM_ACTIONS="openInboxMessage sendEmail" --variable ANDROID_APPKEY="gcnslVYNku" --variable IOS_DEV_APPKEY="ap2zqZUqe1" --variable IOS_PROD_APPKEY="ap2zqZUqe1" --variable SERVER_URL=https://mobile-sdk-lib-us-0.brilliantcollector.com --variable LOGLEVEL=verbose --variable MCE_CAN_SYNC_OVERRIDE=true' \
-  --plugin './co.acoustic.mobile.push.plugin.fcm' \
+  --plugin './cordova-acoustic-mobile-push-sdk --variable CUSTOM_ACTIONS="openInboxMessage sendEmail" --variable ANDROID_APPKEY="gcnslVYNku" --variable IOS_DEV_APPKEY="ap2zqZUqe1" --variable IOS_PROD_APPKEY="ap2zqZUqe1" --variable SERVER_URL=https://mobile-sdk-lib-us-0.brilliantcollector.com --variable LOGLEVEL=verbose --variable MCE_CAN_SYNC_OVERRIDE=true' \
+  --plugin './cordova-acoustic-mobile-push-plugin-fcm' \
   --target "$device" \
   --appName "co.acoustic.mobile.push.samples.android"
 
