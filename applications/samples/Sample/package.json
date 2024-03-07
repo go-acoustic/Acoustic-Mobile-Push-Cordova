@@ -41,7 +41,6 @@
     ]
   },
   "devDependencies": {
-    "co-acoustic-mobile-push-plugin-calendar": "file:../../../plugins/cordova-acoustic-mobile-push-plugin-calendar",
     "cordova-acoustic-mobile-push-plugin-action-menu": "file:../../../plugins/cordova-acoustic-mobile-push-plugin-action-menu",
     "cordova-acoustic-mobile-push-plugin-beacon": "file:../../../plugins/cordova-acoustic-mobile-push-plugin-beacon",
     "cordova-acoustic-mobile-push-plugin-calendar": "file:../../../plugins/cordova-acoustic-mobile-push-plugin-calendar",

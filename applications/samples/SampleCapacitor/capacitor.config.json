@@ -1,0 +1,8 @@
+{
+  "appId": "co.acoustic.mobile.push.sample",
+  "appName": "Sample",
+  "webDir": "www",
+  "server": {
+    "androidScheme": "https"
+  }
+}

@@ -8,7 +8,7 @@ industrial property rights of Acoustic, L.P. except as may be provided in an agr
 Acoustic, L.P. Any unauthorized copying or distribution of content from this file is prohibited.
 -->
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0" id="cordova-acoustic-mobile-push-plugin-action-menu"
-    version="3.8.7">
+    version="3.9.1">
     <name>Action Menu for Acoustic MCE Cordova Plugin</name>
     <author>Acoustic MCE</author>
     <description>Display Action Menu for Acoustic MCE Push Services</description>
@@ -28,5 +28,13 @@ Acoustic, L.P. Any unauthorized copying or distribution of content from this fil
         </config-file>
         <header-file src="src/ios/MCEActionMenuPlugin.h" />
         <source-file src="src/ios/MCEActionMenuPlugin.m" />
+        <podspec>
+            <config>
+                <source url="https://github.com/CocoaPods/Specs.git"/>
+            </config>
+            <pods use-frameworks="true">
+                <pod name="AcousticMobilePushNotificationDebug" />
+            </pods>
+        </podspec>
     </platform>
 </plugin>

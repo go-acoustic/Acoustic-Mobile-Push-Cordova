@@ -1,0 +1,299 @@
+/*
+ * Copyright © 2015, 2019 Acoustic, L.P. All rights reserved.
+ *
+ * NOTICE: This file contains material that is confidential and proprietary to
+ * Acoustic, L.P. and/or other developers. No license is granted under any intellectual or
+ * industrial property rights of Acoustic, L.P. except as may be provided in an agreement with
+ * Acoustic, L.P. Any unauthorized copying or distribution of content from this file is
+ * prohibited.
+ */
+
+/* Dark mode */
+@media (prefers-color-scheme: dark) {
+    .ui-page-theme-a a, html .ui-bar-a a, html .ui-body-a a, html body .ui-group-theme-a a {
+        color: white;
+    }
+
+    .ui-header .ui-btn {
+        color: #1BF7A8 !important;
+    }
+
+    .ui-header .ui-btn-left:before {
+        color: #1BF7A8 !important;
+    }
+
+    .ui-page, .ui-body-inherit, .ui-body {
+        background-color: black !important;
+        color: white !important;
+    }
+
+    input[type=text], .ui-input-text {
+        background-color: #333 !important;
+        outline-color: #666 !important;
+        border-color: #666 !important;
+    }
+    
+    .ui-page-theme-a .ui-btn, html .ui-bar-a .ui-btn, html .ui-body-a .ui-btn, html body .ui-group-theme-a .ui-btn, html head + body .ui-btn.ui-btn-a, .ui-page-theme-a .ui-btn:visited, html .ui-bar-a .ui-btn:visited, html .ui-body-a .ui-btn:visited, html body .ui-group-theme-a .ui-btn:visited, html head + body .ui-btn.ui-btn-a:visited {
+        background-color: #333;
+        color: white;
+        border-color: #666;
+    }
+    
+    div.copyright {
+        background-color: #333 !important;
+        color: white !important;
+        border-color: #666 !important;
+    }
+    
+    .ui-listview * {
+        background-color: #333333 !important;
+    }
+    
+    .ui-bar-a, .ui-page-theme-a .ui-bar-inherit, html .ui-bar-a .ui-bar-inherit, html .ui-body-a .ui-bar-inherit, html body .ui-group-theme-a .ui-bar-inherit {
+        background-color: #333 !important;
+        color: white !important;
+        border: none !important;
+        border-bottom: #666 1px solid !important;
+    }
+}
+
+.ui-controlgroup-horizontal .ui-controlgroup-controls {
+    border-radius: 7px;
+}
+
+#value-container .ui-input-text {
+    margin: 0;
+}
+
+#events p {
+    margin: 20px;
+}
+
+.ui-mini .ui-input-text input, .ui-mini .ui-input-search input, .ui-input-text.ui-mini input, .ui-input-search.ui-mini input, .ui-mini textarea.ui-input-text, textarea.ui-mini
+{
+    background: transparent;
+}
+
+.spacing p button {
+    border-radius: 7px !important;
+    border: 1px solid gray;
+}
+
+.spacing p .ui-input-text {
+    margin: 10px 0;
+}
+
+.ui-page-theme-a .ui-btn, html .ui-bar-a .ui-btn, html .ui-body-a .ui-btn, html body .ui-group-theme-a .ui-btn, html head + body .ui-btn.ui-btn-a, .ui-page-theme-a .ui-btn:visited, html .ui-bar-a .ui-btn:visited, html .ui-body-a .ui-btn:visited, html body .ui-group-theme-a .ui-btn:visited, html head + body .ui-btn.ui-btn-a:visited {
+    border-radius: 0;
+}
+
+.spacing {
+	padding: 20px;
+}
+
+.ui-header .ui-btn {
+    bottom: 0;
+    position: absolute;
+    color: #047970;
+    font-size: 16px;
+    font-weight: normal;
+    line-height: 16px;
+    background: rgba(0,0,0,0) !important;
+    border-color: rgba(0,0,0,0) !important;
+    height: 44px;
+    line-height: 44px;
+    top: auto;
+}
+
+.ui-bar-inherit .ui-btn-right {
+    right: 5px !important;
+}
+
+.ui-bar-inherit .ui-btn-left {
+    left: 5px;
+}
+
+.ui-header .ui-btn-left:before {
+    color: #047970;
+    content: "⟨";
+    font-weight:bold;
+    font-size: 20px;
+    position: absolute;
+    display: block;
+    left:1px;
+    width: 22px;
+
+}
+
+
+.footer {
+    margin: 10px 20px;
+    font-size: smaller;
+    color: gray;
+}
+
+.header {
+    text-transform: uppercase;
+    color: gray;
+    margin: 30px 0 5px 20px;
+    font-size: smaller;
+}
+
+.noStatus {
+    color: #808080;
+}
+
+.ui-shadow {
+    -webkit-box-shadow: none;
+    -moz-box-shadow: none;
+    box-shadow: none;
+}
+
+.warningStatus {
+    color: #DAA520;
+}
+
+.successStatus {
+    color: #228B22;
+}
+
+.errorStatus {
+    color: #B22222;
+}
+
+.queuedStatus {
+    color: #DAA520;
+}
+
+.rowhead {
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.ui-header {
+    height: 44px;
+}
+
+#pluginVersion {
+    text-align: center;
+}
+
+#sdkVersion {
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+#geofences .ui-header {
+    position: relative;
+}
+
+#gps_button {
+    padding: 5px !important;
+}
+
+#gps_refresh {
+    padding: 5px !important;
+}
+
+#geofences li {
+    border: none !important;
+}
+
+.status.delayed {
+    color: gray;
+}
+
+.status.enabled {
+    color: green;
+}
+
+.status.disabled {
+    color: red;
+}
+
+#map {
+    left: 0px;
+    right: 0px;
+    bottom: 0px;
+    top: 90px;
+}
+
+* {
+    text-shadow: none !important;
+}
+
+.ui-body {
+    position: absolute;
+    top: 46px;
+    left: 0;
+    right: 0;
+    padding-bottom: 40px;
+    margin-top: constant(safe-area-inset-top) !important;
+    margin-top: env(safe-area-inset-top) !important;
+}
+
+.ui-bar-inherit {
+    top: 0;
+    padding-top: constant(safe-area-inset-top) !important;
+    padding-top: env(safe-area-inset-top) !important;
+    position: fixed;
+    left: 0;
+    right: 0;
+}
+
+div.copyright {
+    border-top:#dddddd solid 1px;
+    background-color: white;
+    color: black;
+    position: fixed;
+    left: 0px;
+    bottom: 0px;
+    right: 0px;
+    height: 30px;
+    padding: 10px;
+    font-size: smaller;
+    text-align: center;
+    padding-bottom: constant(safe-area-inset-bottom) !important;
+    padding-bottom: env(safe-area-inset-bottom) !important;
+}
+
+#apiKey {
+    font-size: smaller;
+}
+
+div.acoustic {
+    background-image: url(images/logo-light.png);
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: 168px 32px;
+    height: 32px;
+    margin: 15px;
+}
+
+div.campaign {
+    background-image: url(images/campaign-light.png);
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: 148px 32px;
+    height: 32px;
+}
+
+.right,
+.right input {
+    text-align: right;
+}
+
+.right div {
+    margin: 0;
+    border: 0 !important;
+}
+
+.right input {
+    padding: 0;
+    padding-right: 10px;
+}
+
+
+
+
+

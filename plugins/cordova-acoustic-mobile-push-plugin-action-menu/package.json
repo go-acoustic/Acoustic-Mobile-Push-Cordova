@@ -1,7 +1,7 @@
 {
     "author": "Acoustic, L.P.",
     "bugs": {
-        "url": "https://github.com/Acoustic-Mobile-Push/Cordova/issues"
+        "url": "https://github.com/go-acoustic/Acoustic-Mobile-Push-Cordova/issues"
     },
     "description": "Displays the Action Menu for Acoustic MCE Push Services",
     "devDependencies": {
@@ -11,11 +11,15 @@
     "engines": {
         "cordova": ">=3.0"
     },
-    "homepage": "https://github.com/Acoustic-Mobile-Push/Cordova#readme",
+    "homepage": "https://github.com/go-acoustic/Acoustic-Mobile-Push-Cordova#readme",
     "keywords": [
+        "Acoustic",
+        "Campaign",
         "mce",
         "ecosystem:cordova",
-        "cordova-ios"
+        "cordova",
+        "cordova-ios",
+        "cordova-android"
     ],
     "license": "See license in license/license.txt",
     "name": "cordova-acoustic-mobile-push-plugin-action-menu",
@@ -24,11 +28,12 @@
     },
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/Acoustic-Mobile-Push/Cordova.git"
+        "url": "git+https://github.com/go-acoustic/Acoustic-Mobile-Push-Cordova.git",
+        "directory": "plugins/cordova-acoustic-mobile-push-plugin-action-menu"
     },
     "scripts": {
         "preinstall": "npm run tsc",
         "tsc": "tsc"
     },
-    "version": "3.8.11"
+    "version": "3.9.1"
 }

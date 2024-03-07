@@ -1,0 +1,11 @@
+platforms:
+  android:
+    manifest:
+      - file: AndroidManifest.xml
+        target: manifest/application
+        inject:
+          <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+  ios:
+    targets:
+      App:
+        version: 16.4

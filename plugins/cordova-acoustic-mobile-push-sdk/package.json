@@ -1,13 +1,13 @@
 {
     "author": "Acoustic, L.P.",
     "bugs": {
-        "url": "https://github.com/Acoustic-Mobile-Push/Cordova/issues"
+        "url": "https://github.com/go-acoustic/Acoustic-Mobile-Push-Cordova/issues"
     },
     "cordova": {
         "id": "co.acoustic.mobile.push",
         "platforms": [
             "ios",
-            "android@10"
+            "android"
         ]
     },
     "description": "Allows Cordova applications to integrate with Acoustic MCE Push Services",
@@ -19,10 +19,13 @@
     "engines": {
         "cordova": ">=3.0"
     },
-    "homepage": "https://github.com/Acoustic-Mobile-Push/Cordova#readme",
+    "homepage": "https://github.com/go-acoustic/Acoustic-Mobile-Push-Cordova#readme",
     "keywords": [
+        "Acoustic",
+        "Campaign",
         "mce",
         "ecosystem:cordova",
+        "cordova",
         "cordova-ios",
         "cordova-android"
     ],
@@ -33,11 +36,12 @@
     },
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/Acoustic-Mobile-Push/Cordova.git"
+        "url": "git+https://github.com/go-acoustic/Acoustic-Mobile-Push-Cordova.git",
+        "directory": "plugins/cordova-acoustic-mobile-push-sdk"
     },
     "scripts": {
         "preinstall": "npm run tsc",
         "tsc": "tsc"
     },
-    "version": "3.8.11"
+    "version": "3.9.1"
 }
