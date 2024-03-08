@@ -18,7 +18,7 @@ var MCEInAppImage;
     document.addEventListener("deviceready", function () {
         MCEInAppPlugin_1.default.registerInAppTemplate(function (inAppMessage) {
             MCEInAppMedia_1.default.show(inAppMessage, function () {
-                $(".mediaInApp").append("<img class='image' src='" + inAppMessage["content"]["image"] + "' />");
+                $(".mediaInApp").append("<img class='image' src='".concat(inAppMessage["content"]["image"], "' />"));
                 $(".mediaInApp .image").click(function () {
                     MCEInAppPlugin_1.default.executeInAppAction(inAppMessage["content"]["action"]);
                     MCEInAppPlugin_1.default.deleteInAppMessage(inAppMessage["inAppMessageId"]);

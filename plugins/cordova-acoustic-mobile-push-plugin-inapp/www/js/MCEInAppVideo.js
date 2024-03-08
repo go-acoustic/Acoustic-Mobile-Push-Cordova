@@ -37,7 +37,7 @@ var MCEInAppVideo;
                 })
                     .on("timeupdate", function () {
                     var video = this;
-                    progress.attr("value", "" + video.currentTime / video.duration);
+                    progress.attr("value", "".concat(video.currentTime / video.duration));
                 })
                     .on("ended", function () {
                     if (MCEInAppMedia_1.default.autoDismiss)
