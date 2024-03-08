@@ -30,18 +30,18 @@
         "cordova-android"
     ],
     "license": "See license in license/license.txt",
-    "name": "cordova-acoustic-mobile-push-sdk",
+    "name": "cordova-acoustic-mobile-push-sdk-beta",
     "peerDependencies": {
         "jquery": "^3.6.0"
     },
     "repository": {
+        "directory": "plugins/cordova-acoustic-mobile-push-sdk",
         "type": "git",
-        "url": "git+https://github.com/go-acoustic/Acoustic-Mobile-Push-Cordova.git",
-        "directory": "plugins/cordova-acoustic-mobile-push-sdk"
+        "url": "git+https://github.com/go-acoustic/Acoustic-Mobile-Push-Cordova.git#beta"
     },
     "scripts": {
         "preinstall": "npm run tsc",
         "tsc": "tsc"
     },
-    "version": "3.9.1"
+    "version": "3.9.2"
 }

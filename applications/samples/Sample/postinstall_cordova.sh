@@ -18,7 +18,7 @@ cordova platform add ios
 
 echo "Adding Core Acoustic SDK plugin"
 echo ""
-cordova plugin add file:../../../plugins/cordova-acoustic-mobile-push-sdk --variable CUSTOM_ACTIONS="openInboxMessage sendEmail" --variable ANDROID_APPKEY="YOUR ANDROID APPKEY HERE" --variable IOS_DEV_APPKEY="YOUR iOS APPKEY HERE" --variable IOS_PROD_APPKEY="YOUR iOS APPKEY HERE" --variable SERVER_URL=https://mobile-sdk-lib-xx-y.brilliantcollector.com --variable LOGLEVEL=error --variable MCE_CAN_SYNC_OVERRIDE=true --force
+cordova plugin add cordova-acoustic-mobile-push-sdk-beta --variable CUSTOM_ACTIONS="openInboxMessage sendEmail" --variable ANDROID_APPKEY="YOUR ANDROID APPKEY HERE" --variable IOS_DEV_APPKEY="YOUR iOS APPKEY HERE" --variable IOS_PROD_APPKEY="YOUR iOS APPKEY HERE" --variable SERVER_URL=https://mobile-sdk-lib-xx-y.brilliantcollector.com --variable LOGLEVEL=error --variable MCE_CAN_SYNC_OVERRIDE=true --force
 
 echo "Adding FCM plugin"
 echo ""

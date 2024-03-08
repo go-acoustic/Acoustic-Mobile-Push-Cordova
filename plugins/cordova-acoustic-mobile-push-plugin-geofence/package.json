@@ -29,18 +29,18 @@
         "cordova-android"
     ],
     "license": "See license in license/license.txt",
-    "name": "cordova-acoustic-mobile-push-plugin-geofence",
+    "name": "cordova-acoustic-mobile-push-plugin-geofence-beta",
     "peerDependencies": {
-        "cordova-acoustic-mobile-push-sdk": "file:../cordova-acoustic-mobile-push-sdk"
+        "cordova-acoustic-mobile-push-sdk-beta": "3.9.2"
     },
     "repository": {
+        "directory": "plugins/cordova-acoustic-mobile-push-plugin-geofence",
         "type": "git",
-        "url": "git+https://github.com/go-acoustic/Acoustic-Mobile-Push-Cordova.git",
-        "directory": "plugins/cordova-acoustic-mobile-push-plugin-geofence"
+        "url": "git+https://github.com/go-acoustic/Acoustic-Mobile-Push-Cordova.git#beta"
     },
     "scripts": {
         "preinstall": "npm run tsc",
         "tsc": "tsc"
     },
-    "version": "3.9.1"
+    "version": "3.9.2"
 }
