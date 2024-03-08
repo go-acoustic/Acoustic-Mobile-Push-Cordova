@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<widget android-packageName="co.acoustic.mobile.push.samples.android" id="co.acoustic.mobile.push.sample" ios-CFBundleIdentifier="INSERT.BUNDLE.ID.HERE" version="3.9.7" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+<widget android-packageName="co.acoustic.mobile.push.samples.android" id="co.acoustic.mobile.push.sample" ios-CFBundleIdentifier="INSERT.BUNDLE.ID.HERE" version="3.9.8" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
     <name>Sample</name>
     <description>
         A sample Apache Cordova application that responds to the deviceready event.
