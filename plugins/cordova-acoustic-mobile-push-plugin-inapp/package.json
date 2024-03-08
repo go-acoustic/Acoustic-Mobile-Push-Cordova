@@ -32,7 +32,7 @@
     "license": "See license in license/license.txt",
     "name": "cordova-acoustic-mobile-push-plugin-inapp-beta",
     "peerDependencies": {
-        "cordova-acoustic-mobile-push-sdk-beta": "3.9.13",
+        "cordova-acoustic-mobile-push-sdk-beta": "3.9.14",
         "jquery": "^3.6.0"
     },
     "repository": {
@@ -44,5 +44,5 @@
         "preinstall": "npm run tsc",
         "tsc": "tsc"
     },
-    "version": "3.9.13"
+    "version": "3.9.14"
 }
