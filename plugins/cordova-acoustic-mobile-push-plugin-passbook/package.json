@@ -24,7 +24,7 @@
     "license": "See license in license/license.txt",
     "name": "cordova-acoustic-mobile-push-plugin-passbook-beta",
     "peerDependencies": {
-        "cordova-acoustic-mobile-push-sdk-beta": "3.9.6"
+        "cordova-acoustic-mobile-push-sdk-beta": "3.9.7"
     },
     "repository": {
         "directory": "plugins/cordova-acoustic-mobile-push-plugin-passbook",
@@ -35,5 +35,5 @@
         "preinstall": "npm run tsc",
         "tsc": "tsc"
     },
-    "version": "3.9.6"
+    "version": "3.9.7"
 }
