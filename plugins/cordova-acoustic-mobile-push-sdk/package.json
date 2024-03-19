@@ -39,9 +39,5 @@
         "type": "git",
         "url": "https://github.com/aipoweredmarketer/ca-mce-cordova-sdk"
     },
-    "scripts": {
-        "preinstall": "npm run tsc",
-        "tsc": "tsc"
-    },
     "version": "3.9.16"
 }

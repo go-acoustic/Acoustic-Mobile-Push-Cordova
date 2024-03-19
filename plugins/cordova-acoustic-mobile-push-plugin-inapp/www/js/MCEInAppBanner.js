@@ -57,9 +57,9 @@ var MCEInAppBanner;
     document.addEventListener("deviceready", function () {
         MCEInAppPlugin_1.default.registerInAppTemplate(function (inAppMessage) {
             MCEPlugin.safeAreaInsets(function (insets) {
-                var _a, _b;
                 return __awaiter(this, void 0, void 0, function () {
                     var close, icon, styles, closeElement, iconElement, textElement, duration;
+                    var _a, _b;
                     return __generator(this, function (_c) {
                         switch (_c.label) {
                             case 0:
