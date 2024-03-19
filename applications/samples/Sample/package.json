@@ -13,19 +13,12 @@
         "IOS_PROD_APPKEY": "",
         "SERVER_URL": "https://mobile-sdk-lib-xx-y.brilliantcollector.com",
         "LOGLEVEL": "error",
-        "MCE_CAN_SYNC_OVERRIDE": "true",
-        "CHANNEL_NAME": "MCE SDK Notification Channel",
-        "CHANNEL_DESCRIPTION": "This is the notification channel for the MCE SDK sample application",
-        "CHANNEL_ID": "mce_sample_channel",
-        "INVALIDATE_EXISTING_USER": "false",
-        "AUTO_REINITIALIZE": "true",
-        "AUTO_INITIALIZE": "true"
+        "MCE_CAN_SYNC_OVERRIDE": "true"
       },
       "cordova-acoustic-mobile-push-plugin-fcm": {},
       "cordova-acoustic-mobile-push-plugin-location": {
         "SYNC_RADIUS": "10000",
-        "SYNC_INTERVAL": "60",
-        "AUTO_INITIALIZE_LOCATION": "true"
+        "SYNC_INTERVAL": "60"
       },
       "cordova-acoustic-mobile-push-plugin-beacon": {
         "UUID": "21A9A7F4-0DD8-46B7-9D4D-379F3C4AF77D"
