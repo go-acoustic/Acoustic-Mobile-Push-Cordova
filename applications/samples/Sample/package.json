@@ -5,7 +5,6 @@
   },
   "cordova": {
     "plugins": {
-      "cordova-plugin-test-framework": {},
       "cordova-acoustic-mobile-push-sdk": {
         "CUSTOM_ACTIONS": "openInboxMessage sendEmail",
         "ANDROID_APPKEY": "",
@@ -13,12 +12,19 @@
         "IOS_PROD_APPKEY": "",
         "SERVER_URL": "https://mobile-sdk-lib-xx-y.brilliantcollector.com",
         "LOGLEVEL": "error",
-        "MCE_CAN_SYNC_OVERRIDE": "true"
+        "MCE_CAN_SYNC_OVERRIDE": "true",
+        "CHANNEL_NAME": "MCE SDK Notification Channel",
+        "CHANNEL_DESCRIPTION": "This is the notification channel for the MCE SDK sample application",
+        "CHANNEL_ID": "mce_sample_channel",
+        "INVALIDATE_EXISTING_USER": "false",
+        "AUTO_REINITIALIZE": "true",
+        "AUTO_INITIALIZE": "true"
       },
       "cordova-acoustic-mobile-push-plugin-fcm": {},
       "cordova-acoustic-mobile-push-plugin-location": {
         "SYNC_RADIUS": "10000",
-        "SYNC_INTERVAL": "60"
+        "SYNC_INTERVAL": "60",
+        "AUTO_INITIALIZE_LOCATION": "true"
       },
       "cordova-acoustic-mobile-push-plugin-beacon": {
         "UUID": "21A9A7F4-0DD8-46B7-9D4D-379F3C4AF77D"
@@ -32,8 +38,7 @@
       "cordova-acoustic-mobile-push-plugin-geofence": {},
       "cordova-acoustic-mobile-push-plugin-ios-notification-service": {},
       "cordova-acoustic-mobile-push-plugin-action-menu": {},
-      "cordova-acoustic-mobile-push-plugin-passbook": {},
-      "cordova-acoustic-mobile-push-sdk-tests": {}
+      "cordova-acoustic-mobile-push-plugin-passbook": {}
     },
     "platforms": [
       "android",
@@ -41,23 +46,21 @@
     ]
   },
   "devDependencies": {
-    "cordova-acoustic-mobile-push-plugin-action-menu": "file:../../../plugins/cordova-acoustic-mobile-push-plugin-action-menu",
-    "cordova-acoustic-mobile-push-plugin-beacon": "file:../../../plugins/cordova-acoustic-mobile-push-plugin-beacon",
-    "cordova-acoustic-mobile-push-plugin-calendar": "file:../../../plugins/cordova-acoustic-mobile-push-plugin-calendar",
-    "cordova-acoustic-mobile-push-plugin-dial": "file:../../../plugins/cordova-acoustic-mobile-push-plugin-dial",
-    "cordova-acoustic-mobile-push-plugin-displayweb": "file:../../../plugins/cordova-acoustic-mobile-push-plugin-displayweb",
-    "cordova-acoustic-mobile-push-plugin-fcm": "file:../../../plugins/cordova-acoustic-mobile-push-plugin-fcm",
-    "cordova-acoustic-mobile-push-plugin-geofence": "file:../../../plugins/cordova-acoustic-mobile-push-plugin-geofence",
-    "cordova-acoustic-mobile-push-plugin-inapp": "file:../../../plugins/cordova-acoustic-mobile-push-plugin-inapp",
-    "cordova-acoustic-mobile-push-plugin-inbox": "file:../../../plugins/cordova-acoustic-mobile-push-plugin-inbox",
-    "cordova-acoustic-mobile-push-plugin-ios-notification-service": "file:../../../plugins/cordova-acoustic-mobile-push-plugin-ios-notification-service",
-    "cordova-acoustic-mobile-push-plugin-location": "file:../../../plugins/cordova-acoustic-mobile-push-plugin-location",
-    "cordova-acoustic-mobile-push-plugin-passbook": "file:../../../plugins/cordova-acoustic-mobile-push-plugin-passbook",
-    "cordova-acoustic-mobile-push-plugin-snooze": "file:../../../plugins/cordova-acoustic-mobile-push-plugin-snooze",
-    "cordova-acoustic-mobile-push-sdk": "file:../../../plugins/cordova-acoustic-mobile-push-sdk",
-    "cordova-acoustic-mobile-push-sdk-tests": "file:../../../plugins/cordova-acoustic-mobile-push-sdk/tests",
+    "cordova-acoustic-mobile-push-plugin-action-menu-beta": "^3.9.17",
+    "cordova-acoustic-mobile-push-plugin-beacon-beta": "^3.9.17",
+    "cordova-acoustic-mobile-push-plugin-calendar-beta": "^3.9.17",
+    "cordova-acoustic-mobile-push-plugin-dial-beta": "^3.9.17",
+    "cordova-acoustic-mobile-push-plugin-displayweb-beta": "^3.9.17",
+    "cordova-acoustic-mobile-push-plugin-fcm-beta": "^3.9.17",
+    "cordova-acoustic-mobile-push-plugin-geofence-beta": "^3.9.17",
+    "cordova-acoustic-mobile-push-plugin-inapp-beta": "^3.9.17",
+    "cordova-acoustic-mobile-push-plugin-inbox-beta": "^3.9.17",
+    "cordova-acoustic-mobile-push-plugin-ios-notification-service-beta": "^3.9.17",
+    "cordova-acoustic-mobile-push-plugin-location-beta": "^3.9.17",
+    "cordova-acoustic-mobile-push-plugin-passbook-beta": "^3.9.17",
+    "cordova-acoustic-mobile-push-plugin-snooze-beta": "^3.9.17",
+    "cordova-acoustic-mobile-push-sdk-beta": "^3.9.17",
     "cordova-android": "^12.0.1",
-    "cordova-ios": "^7.0.1",
-    "cordova-plugin-test-framework": "^1.1.6"
+    "cordova-ios": "^7.0.1"
   }
 }

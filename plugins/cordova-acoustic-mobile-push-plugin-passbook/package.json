@@ -24,12 +24,12 @@
     "license": "See license in license/license.txt",
     "name": "cordova-acoustic-mobile-push-plugin-passbook-beta",
     "peerDependencies": {
-        "cordova-acoustic-mobile-push-sdk-beta": "3.9.17"
+        "cordova-acoustic-mobile-push-sdk-beta": "3.9.20"
     },
     "repository": {
         "directory": "plugins/cordova-acoustic-mobile-push-plugin-passbook",
         "type": "git",
         "url": "https://github.com/aipoweredmarketer/ca-mce-cordova-sdk"
     },
-    "version": "3.9.17"
+    "version": "3.9.20"
 }
