@@ -31,12 +31,12 @@
     "license": "See license in license/license.txt",
     "name": "cordova-acoustic-mobile-push-plugin-snooze-beta",
     "peerDependencies": {
-        "cordova-acoustic-mobile-push-sdk-beta": "3.9.20"
+        "cordova-acoustic-mobile-push-sdk-beta": "3.9.21"
     },
     "repository": {
         "directory": "plugins/cordova-acoustic-mobile-push-plugin-snooze",
         "type": "git",
         "url": "https://github.com/aipoweredmarketer/ca-mce-cordova-sdk"
     },
-    "version": "3.9.20"
+    "version": "3.9.21"
 }
