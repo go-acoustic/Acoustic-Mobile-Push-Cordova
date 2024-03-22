@@ -8,7 +8,7 @@ industrial property rights of Acoustic, L.P. except as may be provided in an agr
 Acoustic, L.P. Any unauthorized copying or distribution of content from this file is prohibited.
 -->
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0" id="cordova-acoustic-mobile-push-plugin-location"
-version="3.9.21">
+version="3.9.22">
     <name>Acoustic MCE Location Cordova Plugin</name>
     <author>Acoustic MCE</author>
     <description>Allows Cordova applications to integrate with Acoustic MCE Push Services</description>
