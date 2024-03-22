@@ -7,7 +7,7 @@ Acoustic, L.P. and/or other developers. No license is granted under any intellec
 industrial property rights of Acoustic, L.P. except as may be provided in an agreement with 
 Acoustic, L.P. Any unauthorized copying or distribution of content from this file is prohibited.
 -->
-<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0" id="cordova-acoustic-mobile-push-plugin-inapp" version="3.9.22">
+<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0" id="cordova-acoustic-mobile-push-plugin-inapp" version="3.9.23">
     <name>InApp Action for Acoustic MCE Cordova Plugin</name>
     <author>Acoustic MCE</author>
     <description>InApp Action for Acoustic MCE Push Services</description>
