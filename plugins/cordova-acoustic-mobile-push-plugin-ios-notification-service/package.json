@@ -31,17 +31,16 @@
     "license": "See license in license/license.txt",
     "name": "cordova-acoustic-mobile-push-plugin-ios-notification-service-beta",
     "peerDependencies": {
-        "cordova-acoustic-mobile-push-sdk-beta": "3.9.23",
+        "cordova-acoustic-mobile-push-sdk": "npm:cordova-acoustic-mobile-push-sdk-beta@^3.9.24",
         "jquery": "^3.6.0",
         "jquery-mobile": "^1.5.0-alpha.1"
     },
     "repository": {
-        "directory": "plugins/cordova-acoustic-mobile-push-plugin-ios-notification-service",
         "type": "git",
-        "url": "https://github.com/aipoweredmarketer/ca-mce-cordova-sdk"
+        "url": "git+https://github.com/aipoweredmarketer/ca-mce-cordova-sdk.git",
+        "directory": "plugins/cordova-acoustic-mobile-push-plugin-ios-notification-service"
     },
     "scripts": {
-        
     },
-    "version": "3.9.23"
+    "version": "3.9.24"
 }

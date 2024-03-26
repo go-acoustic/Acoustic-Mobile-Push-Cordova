@@ -35,9 +35,10 @@
         "jquery": "^3.6.0"
     },
     "repository": {
-        "directory": "plugins/cordova-acoustic-mobile-push-sdk",
         "type": "git",
-        "url": "https://github.com/aipoweredmarketer/ca-mce-cordova-sdk"
+        "url": "git+https://github.com/aipoweredmarketer/ca-mce-cordova-sdk.git",
+        "directory": "plugins/cordova-acoustic-mobile-push-sdk"
     },
-    "version": "3.9.23"
+    
+    "version": "3.9.24"
 }

@@ -4,15 +4,16 @@
         "url": "https://github.com/go-acoustic/Acoustic-Mobile-Push-Cordova/issues"
     },
     "cordova": {
-        "id": "cordova-acoustic-mobile-push-plugin-displayweb",
+        "id": "cordova-acoustic-mobile-push-plugin-inbox",
         "platforms": [
-            "ios",
-            "android"
+            "ios"
         ]
     },
-    "description": "Display Web Action for Acoustic MCE Push Services",
+    "description": "iOS notification service for Acoustic Campaign Mobile Push SDKs",
     "devDependencies": {
         "@types/cordova": "^0.0.34",
+        "@types/jquery": "^3.5.6",
+        "@types/jquerymobile": "^1.4.31",
         "typescript": "^4.4.3"
     },
     "engines": {
@@ -25,19 +26,21 @@
         "mce",
         "ecosystem:cordova",
         "cordova",
-        "cordova-ios",
-        "cordova-android"
+        "cordova-ios"
     ],
     "license": "See license in license/license.txt",
-    "name": "cordova-acoustic-mobile-push-plugin-displayweb-beta",
+    "name": "cordova-acoustic-mobile-push-plugin-ios-notification-service-beta",
     "peerDependencies": {
-        "cordova-acoustic-mobile-push-sdk": "npm:cordova-acoustic-mobile-push-sdk-beta@^3.9.24"
+        "cordova-acoustic-mobile-push-sdk": "file:../cordova-acoustic-mobile-push-sdk",
+        "jquery": "^3.6.0",
+        "jquery-mobile": "^1.5.0-alpha.1"
     },
     "repository": {
         "type": "git",
         "url": "git+https://github.com/aipoweredmarketer/ca-mce-cordova-sdk.git",
-        "directory": "plugins/cordova-acoustic-mobile-push-plugin-displayweb"
+        "directory": "plugins/cordova-acoustic-mobile-push-plugin-ios-notification-service"
     },
-    
-    "version": "3.9.24"
+    "scripts": {
+    },
+    "version": "3.9.23"
 }
