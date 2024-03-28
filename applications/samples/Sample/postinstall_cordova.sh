@@ -13,7 +13,7 @@ syncRadius=10000
 syncInterval=60
 
 # Used in cordova-acoustic-mobile-push-plugin-beacon
-uuid=21A9A7F4-0DD8-46B7-9D4D-379F3C4AF77D
+myUUID="21A9A7F4-0DD8-46B7-9D4D-379F3C4AF77D"
 
 echo "Adding android platform"
 cordova platform add android
@@ -36,7 +36,7 @@ cordova plugin add cordova-acoustic-mobile-push-plugin-location-beta --variable 
 echo ""
 
 echo "Adding Beacon plugin"
-cordova plugin add cordova-acoustic-mobile-push-plugin-beacon-beta --variable UUID="$uuid"
+cordova plugin add cordova-acoustic-mobile-push-plugin-beacon-beta --variable UUID="$myUUID"
 echo ""
 
 echo "Adding Inapp plugin"
