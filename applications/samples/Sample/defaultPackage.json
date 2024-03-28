@@ -1,0 +1,10 @@
+{
+  "scripts": {
+    "preinstall": "./preinstall_cordova.sh",
+    "postinstall": "./postinstall_cordova.sh"
+  },
+  "cordova": {
+    "plugins": {},
+    "platforms": []
+  }
+}
