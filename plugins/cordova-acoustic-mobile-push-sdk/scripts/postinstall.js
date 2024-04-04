@@ -1,0 +1,603 @@
+/*
+ * Copyright (C) 2024 Acoustic, L.P. All rights reserved.
+ *
+ * NOTICE: This file contains material that is confidential and proprietary to
+ * Acoustic, L.P. and/or other developers. No license is granted under any intellectual or
+ * industrial property rights of Acoustic, L.P. except as may be provided in an agreement with
+ * Acoustic, L.P. Any unauthorized copying or distribution of content from this file is
+ * prohibited.
+ */
+const fs           = require('fs');
+const plist        = require('plist');
+const path         = require('path');
+const ncp          = require('ncp');
+const xml2js       = require('xml2js');
+const chalk        = require('chalk');
+const { execSync } = require('child_process');
+
+function containsStanza(array, stanza, type) {
+	for(var i = 0; i < array.length; i++) {
+		if(array[i]['$']['android:name'] == stanza[type]['$']['android:name']) {
+			return true
+		}
+	}
+	return false;
+}
+
+function verifyStanza(array, stanzaString) {
+	if(typeof array == "undefined") {
+		array = [];
+	}
+	new xml2js.Parser().parseString(stanzaString, function (err, stanza) {
+		const types = Object.getOwnPropertyNames(stanza);
+		const type = types[0];
+		if( !containsStanza(array, stanza, type) ) {
+			console.log("Adding required " + type + " stanza to AndroidManifest.xml");
+			array.push( stanza[type] )
+		}
+	});
+	return array;
+}
+
+function modifyManifest(installDirectory) {
+	let manifestPath = path.join(installDirectory, "android", "app", "src", "main", "AndroidManifest.xml");
+	new xml2js.Parser().parseString(fs.readFileSync(manifestPath), function (err, document) {
+
+		console.log("Adding required receivers to AndroidManifest.xml");
+		var receivers = document.manifest.application[0].receiver;
+		[
+			'<receiver android:name="co.acoustic.mobile.push.sdk.wi.AlarmReceiver" tools:replace="android:exported" android:exported="true"><intent-filter><action android:name="android.intent.action.BOOT_COMPLETED" /></intent-filter><intent-filter><action android:name="android.intent.action.TIMEZONE_CHANGED" /></intent-filter><intent-filter><action android:name="android.intent.action.PACKAGE_REPLACED" /><data android:scheme="package" /></intent-filter><intent-filter><action android:name="android.intent.action.LOCALE_CHANGED" /></intent-filter></receiver>',
+			'<receiver android:name="co.acoustic.mobile.push.RNAcousticMobilePushBroadcastReceiver" android:exported="true"><intent-filter><action android:name="co.acoustic.mobile.push.sdk.NOTIFIER" /></intent-filter></receiver>',
+			'<receiver android:name="co.acoustic.mobile.push.sdk.notification.NotifActionReceiver" />',
+			'<receiver android:name="co.acoustic.mobile.push.sdk.location.LocationBroadcastReceiver"/>'
+
+		].forEach((receiver) => {
+			receivers = verifyStanza(receivers, receiver);
+		});
+		document.manifest.application[0].receiver = receivers;
+
+		console.log("Adding required providers to AndroidManifest.xml");
+		var providers = document.manifest.application[0].provider;
+		var provider = '<provider android:name="co.acoustic.mobile.push.sdk.db.Provider" android:authorities="${applicationId}.MCE_PROVIDER" android:exported="false" />';
+		document.manifest.application[0].provider = verifyStanza(providers, provider);
+
+		console.log("Adding required services to AndroidManifest.xml");
+		var services = document.manifest.application[0].service;
+		[
+			'<service android:name="co.acoustic.mobile.push.sdk.session.SessionTrackingIntentService"/>',
+			'<service android:name="co.acoustic.mobile.push.sdk.events.EventsAlarmListener" />',
+			'<service android:name="co.acoustic.mobile.push.sdk.registration.PhoneHomeIntentService" />',
+			'<service android:name="co.acoustic.mobile.push.sdk.registration.RegistrationIntentService" />',
+			'<service android:name="co.acoustic.mobile.push.sdk.attributes.AttributesQueueConsumer" />',
+			'<service android:name="co.acoustic.mobile.push.sdk.job.MceJobService" android:permission="android.permission.BIND_JOB_SERVICE"/>',
+			'<service android:name="co.acoustic.mobile.push.sdk.messaging.fcm.FcmMessagingService"><intent-filter><action android:name="com.google.firebase.MESSAGING_EVENT"/></intent-filter></service>'
+		].forEach((service) => {
+			services = verifyStanza(services, service);
+		});
+		document.manifest.application[0].service = services;
+
+		console.log("Adding internet, wake lock, boot, vibrate and call_phone permisssions to AndroidManifest.xml");
+		var permissions = document.manifest['uses-permission'];
+		[
+			'<uses-permission android:name="android.permission.INTERNET"/>',
+			'<uses-permission android:name="android.permission.WAKE_LOCK"/>',
+			'<uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>',
+			'<uses-permission android:name="android.permission.VIBRATE"/>',
+			'<uses-permission android:name="android.permission.CALL_PHONE"/>'
+		].forEach((permission) => {
+			permissions = verifyStanza(permissions, permission);
+		});
+		document.manifest['uses-permission'] = permissions;
+
+		var output = new xml2js.Builder().buildObject(document);
+		fs.writeFileSync(manifestPath, output);
+	});
+}
+
+function modifyInfoPlist(mainAppPath) {
+	if(!fs.existsSync(mainAppPath) || !fs.lstatSync(mainAppPath).isDirectory()) {
+		console.error("Incorrect main app path: " + mainAppPath);
+		return;
+	}
+
+	const infoPath = path.join(mainAppPath, "Info.plist");
+	if(!fs.existsSync(infoPath) || !fs.lstatSync(infoPath).isFile()) {
+		console.error("Couldn't locate Info.plist.");
+		return;
+	}
+
+	var infoPlist = plist.parse(fs.readFileSync(infoPath, 'utf8'));
+	if(typeof infoPlist.UIBackgroundModes == "undefined") {
+		infoPlist.UIBackgroundModes = [];
+	}
+
+	var backgroundSet = new Set(infoPlist.UIBackgroundModes);
+	console.log("Adding remote-notification and fetch to UIBackgroundModes of info.plist");
+	backgroundSet.add("remote-notification");
+	backgroundSet.add("fetch");
+	infoPlist.UIBackgroundModes = Array.from(backgroundSet);
+
+	fs.writeFileSync(infoPath, plist.build(infoPlist), "utf8");
+}
+
+function findMainPath(installDirectory) {
+	if(!fs.existsSync(installDirectory)) {
+		console.error("Couldn't locate install directory.");
+		return;
+	}
+
+	const iosDirectory = path.join(installDirectory, 'ios');
+	var directory;
+	fs.readdirSync(iosDirectory).forEach((basename) => {
+		const mainPath = path.join(iosDirectory, basename);
+		if(fs.lstatSync(mainPath).isDirectory()) {
+			const filename = path.join(mainPath, "main.m");
+			if(fs.existsSync(filename)) {
+				directory = mainPath;
+			}
+		}
+	});
+	return directory;
+}
+
+function replaceMain(mainAppPath) {
+	if(!fs.existsSync(mainAppPath) || !fs.lstatSync(mainAppPath).isDirectory()) {
+		console.error(chalk.red("Incorrect main app path: " + mainAppPath));
+		return;
+	}
+
+	const mainPath = path.join(mainAppPath, "main.m");
+	if(!fs.existsSync(mainPath) || !fs.lstatSync(mainPath).isFile()) {
+		console.error(chalk.red("Couldn't locate main.m."));
+		return;
+	}
+
+	const backupMainPath = mainPath + "-backup";
+	if(!fs.existsSync(backupMainPath)) {
+		console.log("Backing up main.m as main.m-backup");
+		fs.renameSync(mainPath, backupMainPath);
+
+		console.log("Replacing main.m with SDK provided code");
+		fs.copyFileSync( path.join("postinstall", "ios", "main.m"), mainPath);
+	}
+}
+
+function addAndroidConfigFile(installDirectory) {
+	const configName = 'MceConfig.json';
+	const destinationDirectory = path.join(installDirectory, "android", "app", "src", "main", "assets");
+	const configPath = path.join(destinationDirectory, configName);
+
+	if(!fs.existsSync(destinationDirectory)) {
+		console.log('Creating asset path');
+		fs.mkdirSync(destinationDirectory, { recursive: true });
+	}
+
+	if(!fs.existsSync(configPath)) {
+		console.log('Copying MceConfig.json file into Android project');
+		ncp.ncp( path.join('postinstall', 'android', configName), configPath);
+	}
+}
+
+function stringExists(name, strings) {
+	for(var i=0; i<strings.resources.string.length; i++) {
+		if(strings.resources.string[i]['$'].name == name) {
+			return true;
+		}
+	}
+	return false;
+}
+
+function verifyString(name, strings) {
+	if(!stringExists(name, strings)) {
+		new xml2js.Parser().parseString('<string name="' + name + '">REPLACE THIS PLACEHOLDER</string>', function (err, string) {
+			strings.resources.string.push( string.string );
+		});
+	}
+	return strings;
+}
+
+function modifyStrings(installDirectory) {
+	if(process.env.MCE_RN_NOSTRINGS) {
+		console.log(chalk.yellow.bold("Android strings.xml will not be modified because MCE_RN_NOSTRINGS environment flag detected."));
+		return;
+	}
+
+	let stringsPath = path.join(installDirectory, "android", "app", "src", "main", "res", "values", "strings.xml");
+
+	console.log("Modifying strings.xml in Android project");
+	new xml2js.Parser().parseString(fs.readFileSync(stringsPath), function (err, strings) {
+		// TODO: it seems that both strings cannot be added to strings.xml as build will
+		// fail with information about duplicated entries
+		return;
+
+		["google_api_key", "google_app_id"].forEach((name) => {
+			verifyString(name, strings);
+		});
+		var output = new xml2js.Builder().buildObject(strings);
+		fs.writeFileSync(stringsPath, output);
+	});
+}
+
+function addiOSConfigFile(mainAppPath) {
+	const configName = 'MceConfig.json';
+	const configPath = path.join(mainAppPath, configName);
+	if(!fs.existsSync(configPath)) {
+		console.log("Copying MceConfig.json file into iOS project - " + configPath);
+		ncp.ncp( path.join('postinstall', 'ios', configName), configPath);
+	} else {
+		console.log("MceConfig.json already exists at " + configPath);
+	}
+}
+
+if(process.env.MCE_RN_NOCONFIG) {
+	console.log(chalk.yellow.bold("Acoustic Mobile Push SDK installed, but will not be auto configured because MCE_RN_NOCONFIG environment flag detected."));
+	return;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/**
+ * Get the current directory command is using.
+ * 
+ * @returns Get the current directory command is using.
+ */
+function findInstallDirectory() {
+	if(process.env.MCE_RN_DIRECTORY) {
+		console.log(chalk.yellow.bold("Using MCE_RN_DIRECTORY override instead of finding the application source directory."))
+		return process.env.MCE_RN_DIRECTORY;
+	}
+
+	// Mac
+	var currentDirectory = process.argv[ process.argv.length-1 ];
+	if(currentDirectory != "$INIT_CWD") {
+		return currentDirectory;
+	}
+
+	// Windows
+	currentDirectory = process.cwd();
+	while(!fs.existsSync(path.join(currentDirectory, "app.json"))) {
+		var parentDirectory = path.dirname(currentDirectory);
+		console.log("cwd: ", currentDirectory, ", parent: ", parentDirectory);
+		if(parentDirectory == currentDirectory) {
+			console.error(chalk.red("Could not find installation directory!"));
+			return;
+		}
+		currentDirectory = parentDirectory;
+	}
+	console.log("Install Directory Found:", currentDirectory);
+
+	return currentDirectory;
+}
+
+/**
+ * Used to add CampaignConfig.json or update according to values found on appliaction.
+ * 
+ * @param {*} currentAppWorkingDirectory Current application directory where cordova plugin add or npm install is being ran.
+ */
+function addOrReplaceMobilePushConfigFile(currentAppWorkingDirectory) {
+	const configName        = 'CampaignConfig.json';
+	const pluginPath        = path.resolve(__dirname, '');
+	const defaultConfigFile = path.join(pluginPath, configName);
+	const appConfigFile     = path.join(currentAppWorkingDirectory, configName);
+
+	console.log("Add or Replace CampaignConfig.json file into the App at " + currentAppWorkingDirectory);
+
+	if(!fs.existsSync(appConfigFile)) {
+		console.log("Add default CampaignConfig.json file into project - " + appConfigFile);
+		fs.copyFileSync(defaultConfigFile, appConfigFile);
+	} else {
+		console.log("CampaignConfig.json already exists at " + currentAppWorkingDirectory + "/" + configName);
+	}
+
+	// Read and save corresponding ios/android json sections to postinstall folders, in the plugin project
+	readAndSaveMceConfig(currentAppWorkingDirectory, pluginPath, appConfigFile);
+}
+
+/**
+ * Used to read current settings in CampaignConfig.json and creating MceConfig.json.
+ * 
+ * @param {*} currentAppWorkingDirectory Current application directory where cordova plugin add or npm install is being ran.
+ * @param {*} pluginPath Path to plugin.
+ * @param {*} campaignConfigFile CampaignConfig.json file.
+ */
+function readAndSaveMceConfig(currentAppWorkingDirectory, pluginPath, campaignConfigFile) {
+	try {
+	  // Read the file synchronously
+	  const fileData = fs.readFileSync(campaignConfigFile, 'utf8');
+	  const jsonData = JSON.parse(fileData);
+  
+	  if (jsonData.android && jsonData.iOS) {
+			if (jsonData.android) {
+				const androidConfig = JSON.stringify(jsonData.android, null, 2);
+				const androidDestinationPath = path.join(pluginPath, 'postinstall/android/MceConfig.json');
+				saveConfig(androidConfig, androidDestinationPath);
+			}
+  
+			if (jsonData.iOS) {
+				const iosConfig = JSON.stringify(jsonData.iOS, null, 2);
+				const iosDestinationPath = path.join(pluginPath, 'postinstall/ios/MceConfig.json');
+				saveConfig(iosConfig, iosDestinationPath);
+			}
+	  } else {
+			console.error(`No "android/ios" object found in the ${campaignConfigFile} file.`);
+		}
+
+		if (jsonData.plugins) {
+			managePlugins(currentAppWorkingDirectory, pluginPath, jsonData);
+		} else {
+			console.error("Plugins section missing from Campaign");
+		}
+	} catch (error) {
+		if (error.code === 'ENOENT') { // Handle "file not found" error specifically
+			console.error(`File not found: ${campaignConfigFile}`);
+		} else {
+			console.error(`Error reading or parsing ${campaignConfigFile} file: ${error}`);
+		}
+	}
+}
+
+/**
+ * Used to save json configuration.
+ * 
+ * @param {*} configData Data to be saved.
+ * @param {*} destinationPath Location to save file.
+ */
+function saveConfig(configData, destinationPath) {
+	try {
+	  fs.writeFileSync(destinationPath, configData, { flag: 'w' });
+	  console.log(`${destinationPath} saved successfully!`);
+	} catch (error) {
+	  console.error(`Error saving ${destinationPath}:`, error);
+	}
+}
+
+/**
+ * Used to add or remove cordova plugin that are configured in CampaignConfig.json.
+ * 
+ * @param {*} currentAppWorkingDirectory Current application directory where cordova plugin add or npm install is being ran.
+ * @param {*} pluginPath Path to plugin.
+ * @param {*} configData CampaignConfig.json data.
+ */
+function managePlugins(currentAppWorkingDirectory, pluginPath, configData) {
+	try {
+		// console.log(`Run cordova platform remove android`);
+		// console.log(`cd "${currentAppWorkingDirectory}" && cordova platform remove android`);
+		// execSync(`cd "${currentAppWorkingDirectory}" && cordova platform remove android`, { stdio: 'inherit', cwd: process.cwd() });
+		// console.log(`Run cordova platform remove ios`);
+		// execSync(`cd "${currentAppWorkingDirectory}" && cordova platform remove ios`, { stdio: 'inherit', cwd: process.cwd() });
+	} catch (error) {
+		console.error(`Failed to manage plugin ${plugin}:`, error);
+	}
+
+	Object.entries(configData.plugins).forEach(([plugin, isEnabled]) => {
+		if (configData.plugins.useRelease == false) {
+			plugin = `${plugin}-beta`
+		}
+
+		// Update podfile to use
+		updatePluginXMLPodName(pluginPath, configData.plugins.useRelease)
+		// Update gradle for beta/release version
+		updateBuildExtrasGradle(pluginPath, configData.plugins.useRelease)
+
+		const installed = isPluginInstalled(currentAppWorkingDirectory, plugin);
+
+		try {
+			console.log(`Review ${plugin}:installed=${installed}`);
+			if (isEnabled == true && !installed) {
+				console.log(`Adding ${plugin}...`);
+				if (plugin == "cordova-acoustic-mobile-push-sdk-beta" || plugin == "cordova-acoustic-mobile-push-sdk") {
+					// Android
+					// updateConfigXMLPreference(currentAppWorkingDirectory, "androidAppkey", "uupadte"); //configData.android.appKey.prod);
+					// iOS
+					// updateConfigXMLPreference(currentAppWorkingDirectory, "iOSAppkey", "uupadte"); //configData.iOS.appKey.dev);
+					// updateConfigXMLPreference(currentAppWorkingDirectory, "iOSProdkey", "uupadte"); //configData.iOS.appKey.prod);
+					// updateConfigXMLPreference(currentAppWorkingDirectory, "serverUrl", "uupadte"); //configData.iOS.baseUrl);
+					// updateConfigXMLPreference(currentAppWorkingDirectory, "logLevel", "uupadte"); //configData.iOS.logLevel);
+					customAction       = configData.customAction;
+					androidAppkey      = configData.android.appKey.prod;
+					iOSAppkey          = configData.iOS.appKey.dev;
+					iOSProdkey         = configData.iOS.appKey.prod;
+					serverUrl          = configData.iOS.baseUrl;
+					logLevel           = configData.iOS.logLevel;
+					mceCanSyncOverride = configData.mceCanSyncOverride;
+					execSync(`cd "${currentAppWorkingDirectory}" && cordova plugin add ${plugin} --variable CUSTOM_ACTIONS="${customAction}" --variable ANDROID_APPKEY="${androidAppkey}" --variable IOS_DEV_APPKEY="${iOSAppkey}" --variable IOS_PROD_APPKEY="${iOSProdkey}" --variable SERVER_URL="${serverUrl}" --variable LOGLEVEL="${logLevel}" --variable MCE_CAN_SYNC_OVERRIDE="${mceCanSyncOverride}" --force`, { stdio: 'inherit', cwd: process.cwd() });
+				} else if (plugin == "cordova-acoustic-mobile-push-plugin-location-beta" || plugin == "cordova-acoustic-mobile-push-plugin-location") {
+					syncRadius   = configData.android.location.sync.syncRadius;// or configData.iOS.location.sync.syncRadius
+					syncInterval = configData.android.location.sync.syncInterval;// or configData.iOS.location.sync.syncInterval
+					execSync(`cd "${currentAppWorkingDirectory}" && cordova plugin add ${plugin} --variable SYNC_RADIUS="${syncRadius}" --variable SYNC_INTERVAL="${syncInterval}"`);
+				} else if (plugin == "cordova-acoustic-mobile-push-plugin-beacon-beta" || plugin == "cordova-acoustic-mobile-push-plugin-beacon") {
+					myUuid = configData.android.location.ibeacon.uuid;// or configData.iOS.location.ibeacon.UUID
+					execSync(`cd "${currentAppWorkingDirectory}" && cordova plugin add ${plugin} --variable UUID="${myUuid}"`);
+				} else {
+					execSync(`cd "${currentAppWorkingDirectory}" && cordova plugin add ${plugin}`, { stdio: 'inherit', cwd: process.cwd() });
+				}
+			} else if (isEnabled == false && installed) {
+				console.log(`Removing ${plugin}...`);
+				execSync(`cd "${currentAppWorkingDirectory}" && cordova plugin rm ${plugin}`, { stdio: 'inherit', cwd: process.cwd() });
+			} else {
+				console.log(`Skip for ${plugin} with ${isEnabled} which is installed using ${installed}`);
+			}
+		} catch (error) {
+			console.error(`Failed to manage plugin ${plugin}:`, error);
+		}
+	});
+
+	// console.log(`Run cordova platform add android`);
+	// execSync(`cd "${currentAppWorkingDirectory}" && cordova platform add android`, { stdio: 'inherit', cwd: process.cwd() });
+	// console.log(`Run cordova platform add ios`);
+	// execSync(`cd "${currentAppWorkingDirectory}" && cordova platform add ios`, { stdio: 'inherit', cwd: process.cwd() });
+}
+
+/**
+ * Used to update preference values in config.xml file.
+ * 
+ * @param {*} currentAppWorkingDirectory Current application directory where cordova plugin add or npm install is being ran.
+ * @param {*} nam Name property in xml.
+ * @param {*} val Value in xml.
+ */
+function updateConfigXMLPreference(currentAppWorkingDirectory, nam, val) {
+	try {
+		let appName = currentAppWorkingDirectory.substring(currentAppWorkingDirectory.lastIndexOf('/') + 1);
+		let configPathEnd = (`platforms/ios/${appName}/config.xml`);
+		let configPath = path.join(currentAppWorkingDirectory, configPathEnd);
+		let configContent = fs.readFileSync(configPath, 'utf8');
+		const preferenceToAdd = `<preference name="${nam}" value="${val}" />`;
+		const regx = new RegExp(`\\<preference\\s*name="` + nam + `"\\s*value="true"\\s*/>`, 'gi');
+
+		if (regx.test(configContent)) {
+			configContent = configContent.replace(regx, preferenceToAdd);
+		} else {
+			// Add 
+			const repositoriesIndex = configContent.lastIndexOf('</widget>') + 9;
+			const widgetString = `    ${preferenceToAdd}\n</widget>\n`;
+			let configContentArray = configContent.split('</widget>');
+			configContent = configContentArray[0] + widgetString + configContentArray[1];
+		}
+		fs.writeFileSync(configPath, configContent, 'utf8');
+		console.log(`Add preference to ${configPath}`);
+	} catch (error) {
+		console.error(`Error updating ${configPath}:`, error);
+	}
+}
+
+/**
+ * Check if plugin has been installed.
+ * 
+ * @param {*} pluginName Plugin name to be tested
+ * @returns Whether plugin is already installed.
+ */
+function isPluginInstalled(currentAppWorkingDirectory, pluginName) {
+	// var cordovaPluginList = execSync(`cd "${currentAppWorkingDirectory}" && cordova plugin list`).toString()
+	// var plugins = cordova.require("cordova/plugin_list").metadata;
+
+	const appPackageJsonFile = path.join(currentAppWorkingDirectory, 'package.json');
+	const packageJsonData    = fs.readFileSync(appPackageJsonFile, 'utf8');
+	const packageJson        = JSON.parse(packageJsonData);
+	return packageJson.dependencies && packageJson.dependencies[pluginName] ||
+		   packageJson.devDependencies && packageJson.devDependencies[pluginName];
+}
+
+/**
+ * Update the podname to be used in podfile.
+ * 
+ * @param {*} pluginPath Path to plugin.
+ * @param {*} isRelease Whether configuration is to use release.
+ */
+function updatePluginXMLPodName(plugPath, isRelease) {
+	try {
+		let pluginPath = path.join(plugPath, "plugin.xml");
+		let pluginContent = fs.readFileSync(pluginPath, 'utf8');
+		const podNameRegex = /\$POD_NAME/;
+
+		if (podNameRegex.test(pluginContent)) {
+
+			let podname
+			if (plugPath.includes('cordova-acoustic-mobile-push-plugin-action-menu') ||
+				plugPath.includes('cordova-acoustic-mobile-push-plugin-beacon') ||
+				plugPath.includes('cordova-acoustic-mobile-push-plugin-calendar') ||
+				plugPath.includes('cordova-acoustic-mobile-push-plugin-displayweb') ||
+				plugPath.includes('cordova-acoustic-mobile-push-plugin-geofence') ||
+				plugPath.includes('cordova-acoustic-mobile-push-plugin-inapp') ||
+				plugPath.includes('cordova-acoustic-mobile-push-plugin-inbox') ||
+				plugPath.includes('cordova-acoustic-mobile-push-plugin-ios-notification-service')) {
+				podname = isRelease ? "AcousticMobilePushNotification" : "AcousticMobilePushNotificationDebug";
+			} else {
+				// cordova-acoustic-mobile-push-plugin-location
+				// cordova-acoustic-mobile-push-plugin-passbook
+				// cordova-acoustic-mobile-push-plugin-snooze
+				// cordova-acoustic-mobile-push-sdk
+				podname = isRelease ? "AcousticMobilePush" : "AcousticMobilePushDebug";
+			}
+
+			pluginContent = pluginContent.replace(podNameRegex, podname);
+
+			fs.writeFileSync(pluginPath, pluginContent, 'utf8');
+			console.log(`Update to use podName: ${podname}`);
+		}
+	} catch (error) {
+		console.error(`Error updating ${pluginPath}:`, error);
+	}
+}
+
+/**
+ * Adjust build-extras.gradle which is used to indicate to beta or release version of Android.
+ * 
+ * @param {*} pluginPath Path to plugin.
+ * @param {*} isRelease Whether configuration is to use release.
+ */
+function updateBuildExtrasGradle(plugPath, isRelease) {
+	try {
+		let pluginPath = path.join(plugPath, "src/android/build-extras.gradle");
+		let pluginContent = fs.readFileSync(pluginPath, 'utf8');
+		const mavenUrlRegex = /maven\s*{\s*url\s*\"https:\/\/s01\.oss\.sonatype\.org\/content\/repositories\/staging"\s*}/;
+
+		if (isRelease && mavenUrlRegex.test(pluginContent)) {
+			// Remove Maven URL if useRelease is true and it exists
+			pluginContent = pluginContent.replace(mavenUrlRegex, '');
+			fs.writeFileSync(pluginPath, pluginContent, 'utf8');
+			console.log('Maven URL removed from build-extras.gradle');
+		} else if (!isRelease && !mavenUrlRegex.test(pluginContent)) {
+			// Add Maven URL if useRelease is true and it doesn't already exist
+			const repositoriesIndex = pluginContent.lastIndexOf('mavenCentral()') + 14;
+			const mavenUrlString = 'mavenCentral()\n  maven { url "https://s01.oss.sonatype.org/content/repositories/staging" }\n';
+			let pluginContentArray = pluginContent.split('mavenCentral()')
+			pluginContent = pluginContentArray[0] + mavenUrlString + pluginContentArray[1]
+			fs.writeFileSync(pluginPath, pluginContent, 'utf8');
+			console.log('Maven URL added to build.gradle');
+		} else {
+			console.log('No changes needed in build-extras.gradle');
+		}
+	} catch (error) {
+		console.error(`Error updating ${pluginPath}:`, error);
+	}
+}
+
+
+
+
+
+
+console.log(chalk.green.bold("Setting up Acoustic Mobile Push SDK"));
+const installDirectory = process.cwd();//findInstallDirectory();
+addOrReplaceMobilePushConfigFile(installDirectory);
+// const mainAppPath = findMainPath(installDirectory);
+// replaceMain(mainAppPath);
+// modifyInfoPlist(mainAppPath);
+// addiOSConfigFile(mainAppPath);
+// addAndroidConfigFile(installDirectory);
+// modifyManifest(installDirectory);
+// modifyStrings(installDirectory);
+
+// console.log(chalk.green("Installation Complete!"));
+
+// console.log(chalk.blue.bold("\nPost Installation Steps\n"));
+// console.log(chalk.blue('For react-native 0.59 and lower link the plugin with:'));
+// console.log('react-native link react-native-acoustic-mobile-push\n');
+
+// console.log(chalk.blue('iOS Support:'));
+// console.log("1. Open the iOS project in Xcode.");
+// console.log("2. In the `Capabilities` tab of the main app target, enable push notifications by turning the switch to the on position");
+// console.log("3. Drag and drop `react-native-acoustic-mobile-push/AcousticMobilePush.framework` from the Finder into the target's `General` tab, under `Linked Frameworks and Libraries`. Verify that 'embed and sign' is selected.");
+// console.log("4. Drag and drop `react-native-acoustic-mobile-push` folder from the Finder into the `Framework Search Paths` setting in the `Build Setting` tab of the new target.");
+// console.log("5. Then add a new `Notification Service Extension` target");
+// console.log("6. Drag and drop `react-native-acoustic-mobile-push/Notification Service/AcousticMobilePushNotification.framework` from the Finder into the new target's `General` tab, under `Linked Frameworks and Libraries`.");
+// console.log("7. Drag and drop `react-native-acoustic-mobile-push/Notification Service` folder from the Finder into the `Framework Search Paths` setting in the `Build Setting` tab of the new target.");
+// console.log("8. Replace the contents of `NotificationService.m` and `NotificationService.h` with the ones provided in the `react-native-acoustic-mobile-push Notification Service` folder");
+// console.log("9. Add the `MceConfig.json` file in the project directory to the xcode project to **Application** AND **Notification Service** targets");
+// console.log("10. Adjust the `baseUrl` and `appKey`s provided by your account team");
+
+// console.log(chalk.blue('Android Support:'));
+// console.log("1. Open the Android project in Android Studio.");
+// console.log("2. Replace the `google_api_key` and `google_app_id` placeholder values in `android/app/src/main/res/values/strings.xml` with your Google provided FCM credentials");
+// console.log("3. Then edit the MceConfig.json file in the project and fill in the appKeys and baseUrl provided by your account team.\n");

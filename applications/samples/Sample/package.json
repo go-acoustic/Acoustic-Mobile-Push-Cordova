@@ -46,21 +46,21 @@
     ]
   },
   "devDependencies": {
-    "cordova-acoustic-mobile-push-plugin-action-menu-beta": "^3.9.27",
-    "cordova-acoustic-mobile-push-plugin-beacon-beta": "^3.9.27",
-    "cordova-acoustic-mobile-push-plugin-calendar-beta": "^3.9.27",
-    "cordova-acoustic-mobile-push-plugin-dial-beta": "^3.9.27",
-    "cordova-acoustic-mobile-push-plugin-displayweb-beta": "^3.9.27",
-    "cordova-acoustic-mobile-push-plugin-fcm-beta": "^3.9.27",
-    "cordova-acoustic-mobile-push-plugin-geofence-beta": "^3.9.27",
-    "cordova-acoustic-mobile-push-plugin-inapp-beta": "^3.9.27",
-    "cordova-acoustic-mobile-push-plugin-inbox-beta": "^3.9.27",
-    "cordova-acoustic-mobile-push-plugin-ios-notification-service-beta": "^3.9.27",
-    "cordova-acoustic-mobile-push-plugin-location-beta": "^3.9.27",
-    "cordova-acoustic-mobile-push-plugin-passbook-beta": "^3.9.27",
-    "cordova-acoustic-mobile-push-plugin-snooze-beta": "^3.9.27",
-    "cordova-acoustic-mobile-push-sdk-beta": "^3.9.27",
+    "cordova-acoustic-mobile-push-plugin-action-menu-beta": "^3.9.28",
+    "cordova-acoustic-mobile-push-plugin-beacon-beta": "^3.9.28",
+    "cordova-acoustic-mobile-push-plugin-calendar-beta": "^3.9.28",
+    "cordova-acoustic-mobile-push-plugin-dial-beta": "^3.9.28",
+    "cordova-acoustic-mobile-push-plugin-displayweb-beta": "^3.9.28",
+    "cordova-acoustic-mobile-push-plugin-fcm-beta": "^3.9.28",
+    "cordova-acoustic-mobile-push-plugin-geofence-beta": "^3.9.28",
+    "cordova-acoustic-mobile-push-plugin-inapp-beta": "^3.9.28",
+    "cordova-acoustic-mobile-push-plugin-inbox-beta": "^3.9.28",
+    "cordova-acoustic-mobile-push-plugin-ios-notification-service-beta": "^3.9.28",
+    "cordova-acoustic-mobile-push-plugin-location-beta": "^3.9.28",
+    "cordova-acoustic-mobile-push-plugin-passbook-beta": "^3.9.28",
+    "cordova-acoustic-mobile-push-plugin-snooze-beta": "^3.9.28",
+    "cordova-acoustic-mobile-push-sdk-beta": "^3.9.28",
     "cordova-android": "^12.0.1",
-    "cordova-ios": "^7.0.1"
+    "cordova-ios": "^7.1.0"
   }
 }
