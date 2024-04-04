@@ -245,41 +245,6 @@ if(process.env.MCE_RN_NOCONFIG) {
 
 
 
-
-
-/**
- * Get the current directory command is using.
- * 
- * @returns Get the current directory command is using.
- */
-function findInstallDirectory() {
-	if(process.env.MCE_RN_DIRECTORY) {
-		console.log(chalk.yellow.bold("Using MCE_RN_DIRECTORY override instead of finding the application source directory."))
-		return process.env.MCE_RN_DIRECTORY;
-	}
-
-	// Mac
-	var currentDirectory = process.argv[ process.argv.length-1 ];
-	if(currentDirectory != "$INIT_CWD") {
-		return currentDirectory;
-	}
-
-	// Windows
-	currentDirectory = process.cwd();
-	while(!fs.existsSync(path.join(currentDirectory, "app.json"))) {
-		var parentDirectory = path.dirname(currentDirectory);
-		console.log("cwd: ", currentDirectory, ", parent: ", parentDirectory);
-		if(parentDirectory == currentDirectory) {
-			console.error(chalk.red("Could not find installation directory!"));
-			return;
-		}
-		currentDirectory = parentDirectory;
-	}
-	console.log("Install Directory Found:", currentDirectory);
-
-	return currentDirectory;
-}
-
 /**
  * Used to add CampaignConfig.json or update according to values found on appliaction.
  * 
@@ -287,7 +252,7 @@ function findInstallDirectory() {
  */
 function addOrReplaceMobilePushConfigFile(currentAppWorkingDirectory) {
 	const configName        = 'CampaignConfig.json';
-	const pluginPath        = path.resolve(__dirname, '');
+	const pluginPath        = path.resolve(__dirname, '..');
 	const defaultConfigFile = path.join(pluginPath, configName);
 	const appConfigFile     = path.join(currentAppWorkingDirectory, configName);
 
@@ -376,6 +341,30 @@ function managePlugins(currentAppWorkingDirectory, pluginPath, configData) {
 		// execSync(`cd "${currentAppWorkingDirectory}" && cordova platform remove android`, { stdio: 'inherit', cwd: process.cwd() });
 		// console.log(`Run cordova platform remove ios`);
 		// execSync(`cd "${currentAppWorkingDirectory}" && cordova platform remove ios`, { stdio: 'inherit', cwd: process.cwd() });
+		let pluginName = "cordova-acoustic-mobile-push-sdk"
+		if (configData.plugins.useRelease == false) {
+			pluginName = `${pluginName}-beta`
+		}
+		// Android
+		// updateConfigXMLPreference(currentAppWorkingDirectory, "androidAppkey", configData.android.appKey.prod);
+		// iOS
+		// updateConfigXMLPreference(currentAppWorkingDirectory, "iOSAppkey", configData.iOS.appKey.dev);
+		// updateConfigXMLPreference(currentAppWorkingDirectory, "iOSProdkey", configData.iOS.appKey.prod);
+		// updateConfigXMLPreference(currentAppWorkingDirectory, "serverUrl", configData.iOS.baseUrl);
+		// updateConfigXMLPreference(currentAppWorkingDirectory, "logLevel", configData.iOS.logLevel);
+		customAction       = configData.customAction;
+		androidAppkey      = configData.android.appKey.prod;
+		iOSAppkey          = configData.iOS.appKey.dev;
+		iOSProdkey         = configData.iOS.appKey.prod;
+		serverUrl          = configData.iOS.baseUrl;
+		logLevel           = configData.iOS.logLevel;
+		mceCanSyncOverride = configData.mceCanSyncOverride;
+
+		const androidBuildExtrasGradleFile = path.join(currentAppWorkingDirectory, "platforms/android/cordova-acoustic-mobile-push-sdk/android-build-extras.gradle");
+		if(fs.existsSync(androidBuildExtrasGradleFile)) {
+			fs.unlinkSync(androidBuildExtrasGradleFile);
+		}
+		execSync(`cd "${currentAppWorkingDirectory}" && cordova plugin add ${pluginName} --variable CUSTOM_ACTIONS="${customAction}" --variable ANDROID_APPKEY="${androidAppkey}" --variable IOS_DEV_APPKEY="${iOSAppkey}" --variable IOS_PROD_APPKEY="${iOSProdkey}" --variable SERVER_URL="${serverUrl}" --variable LOGLEVEL="${logLevel}" --variable MCE_CAN_SYNC_OVERRIDE="${mceCanSyncOverride}" --force`, { stdio: 'inherit', cwd: process.cwd() });
 	} catch (error) {
 		console.error(`Failed to manage plugin ${plugin}:`, error);
 	}
@@ -396,23 +385,7 @@ function managePlugins(currentAppWorkingDirectory, pluginPath, configData) {
 			console.log(`Review ${plugin}:installed=${installed}`);
 			if (isEnabled == true && !installed) {
 				console.log(`Adding ${plugin}...`);
-				if (plugin == "cordova-acoustic-mobile-push-sdk-beta" || plugin == "cordova-acoustic-mobile-push-sdk") {
-					// Android
-					// updateConfigXMLPreference(currentAppWorkingDirectory, "androidAppkey", "uupadte"); //configData.android.appKey.prod);
-					// iOS
-					// updateConfigXMLPreference(currentAppWorkingDirectory, "iOSAppkey", "uupadte"); //configData.iOS.appKey.dev);
-					// updateConfigXMLPreference(currentAppWorkingDirectory, "iOSProdkey", "uupadte"); //configData.iOS.appKey.prod);
-					// updateConfigXMLPreference(currentAppWorkingDirectory, "serverUrl", "uupadte"); //configData.iOS.baseUrl);
-					// updateConfigXMLPreference(currentAppWorkingDirectory, "logLevel", "uupadte"); //configData.iOS.logLevel);
-					customAction       = configData.customAction;
-					androidAppkey      = configData.android.appKey.prod;
-					iOSAppkey          = configData.iOS.appKey.dev;
-					iOSProdkey         = configData.iOS.appKey.prod;
-					serverUrl          = configData.iOS.baseUrl;
-					logLevel           = configData.iOS.logLevel;
-					mceCanSyncOverride = configData.mceCanSyncOverride;
-					execSync(`cd "${currentAppWorkingDirectory}" && cordova plugin add ${plugin} --variable CUSTOM_ACTIONS="${customAction}" --variable ANDROID_APPKEY="${androidAppkey}" --variable IOS_DEV_APPKEY="${iOSAppkey}" --variable IOS_PROD_APPKEY="${iOSProdkey}" --variable SERVER_URL="${serverUrl}" --variable LOGLEVEL="${logLevel}" --variable MCE_CAN_SYNC_OVERRIDE="${mceCanSyncOverride}" --force`, { stdio: 'inherit', cwd: process.cwd() });
-				} else if (plugin == "cordova-acoustic-mobile-push-plugin-location-beta" || plugin == "cordova-acoustic-mobile-push-plugin-location") {
+				if (plugin == "cordova-acoustic-mobile-push-plugin-location-beta" || plugin == "cordova-acoustic-mobile-push-plugin-location") {
 					syncRadius   = configData.android.location.sync.syncRadius;// or configData.iOS.location.sync.syncRadius
 					syncInterval = configData.android.location.sync.syncInterval;// or configData.iOS.location.sync.syncInterval
 					execSync(`cd "${currentAppWorkingDirectory}" && cordova plugin add ${plugin} --variable SYNC_RADIUS="${syncRadius}" --variable SYNC_INTERVAL="${syncInterval}"`);
@@ -459,7 +432,6 @@ function updateConfigXMLPreference(currentAppWorkingDirectory, nam, val) {
 			configContent = configContent.replace(regx, preferenceToAdd);
 		} else {
 			// Add 
-			const repositoriesIndex = configContent.lastIndexOf('</widget>') + 9;
 			const widgetString = `    ${preferenceToAdd}\n</widget>\n`;
 			let configContentArray = configContent.split('</widget>');
 			configContent = configContentArray[0] + widgetString + configContentArray[1];
@@ -479,7 +451,6 @@ function updateConfigXMLPreference(currentAppWorkingDirectory, nam, val) {
  */
 function isPluginInstalled(currentAppWorkingDirectory, pluginName) {
 	// var cordovaPluginList = execSync(`cd "${currentAppWorkingDirectory}" && cordova plugin list`).toString()
-	// var plugins = cordova.require("cordova/plugin_list").metadata;
 
 	const appPackageJsonFile = path.join(currentAppWorkingDirectory, 'package.json');
 	const packageJsonData    = fs.readFileSync(appPackageJsonFile, 'utf8');
@@ -549,7 +520,6 @@ function updateBuildExtrasGradle(plugPath, isRelease) {
 			console.log('Maven URL removed from build-extras.gradle');
 		} else if (!isRelease && !mavenUrlRegex.test(pluginContent)) {
 			// Add Maven URL if useRelease is true and it doesn't already exist
-			const repositoriesIndex = pluginContent.lastIndexOf('mavenCentral()') + 14;
 			const mavenUrlString = 'mavenCentral()\n  maven { url "https://s01.oss.sonatype.org/content/repositories/staging" }\n';
 			let pluginContentArray = pluginContent.split('mavenCentral()')
 			pluginContent = pluginContentArray[0] + mavenUrlString + pluginContentArray[1]
@@ -569,7 +539,7 @@ function updateBuildExtrasGradle(plugPath, isRelease) {
 
 
 console.log(chalk.green.bold("Setting up Acoustic Mobile Push SDK"));
-const installDirectory = process.cwd();//findInstallDirectory();
+const installDirectory = process.cwd();
 addOrReplaceMobilePushConfigFile(installDirectory);
 // const mainAppPath = findMainPath(installDirectory);
 // replaceMain(mainAppPath);
