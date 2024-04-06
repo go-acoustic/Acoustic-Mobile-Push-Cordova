@@ -336,13 +336,8 @@ function saveConfig(configData, destinationPath) {
  */
 function managePlugins(currentAppWorkingDirectory, pluginPath, configData) {
 	try {
-		// console.log(`Run cordova platform remove android`);
-		// console.log(`cd "${currentAppWorkingDirectory}" && cordova platform remove android`);
-		// execSync(`cd "${currentAppWorkingDirectory}" && cordova platform remove android`, { stdio: 'inherit', cwd: process.cwd() });
-		// console.log(`Run cordova platform remove ios`);
-		// execSync(`cd "${currentAppWorkingDirectory}" && cordova platform remove ios`, { stdio: 'inherit', cwd: process.cwd() });
 		let pluginName = "cordova-acoustic-mobile-push-sdk"
-		if (configData.plugins.useRelease == false) {
+		if (pluginPath.includes('-beta')) {
 			pluginName = `${pluginName}-beta`
 		}
 		// Android
@@ -357,7 +352,7 @@ function managePlugins(currentAppWorkingDirectory, pluginPath, configData) {
 		iOSAppkey          = configData.iOS.appKey.dev;
 		iOSProdkey         = configData.iOS.appKey.prod;
 		serverUrl          = configData.iOS.baseUrl;
-		logLevel           = configData.iOS.logLevel;
+		logLevel           = configData.iOS.loglevel;
 		mceCanSyncOverride = configData.mceCanSyncOverride;
 
 		const androidBuildExtrasGradleFile = path.join(currentAppWorkingDirectory, "platforms/android/cordova-acoustic-mobile-push-sdk/android-build-extras.gradle");
@@ -370,16 +365,15 @@ function managePlugins(currentAppWorkingDirectory, pluginPath, configData) {
 	}
 
 	Object.entries(configData.plugins).forEach(([plugin, isEnabled]) => {
-		if (configData.plugins.useRelease == false) {
-			plugin = `${plugin}-beta`
-		}
+		// let cordovaPluginName = plugin.includes('-beta') ? plugin.replace('-beta','') : plugin;
 
 		// Update podfile to use
 		updatePluginXMLPodName(pluginPath, configData.plugins.useRelease)
 		// Update gradle for beta/release version
 		updateBuildExtrasGradle(pluginPath, configData.plugins.useRelease)
 
-		const installed = isPluginInstalled(currentAppWorkingDirectory, plugin);
+		const installed = isNPMPluginInstalled(currentAppWorkingDirectory, plugin);
+		const cordovaPluginInstalled = isPluginInstalled(currentAppWorkingDirectory, plugin);
 
 		try {
 			console.log(`Review ${plugin}:installed=${installed}`);
@@ -388,11 +382,20 @@ function managePlugins(currentAppWorkingDirectory, pluginPath, configData) {
 				if (plugin == "cordova-acoustic-mobile-push-plugin-location-beta" || plugin == "cordova-acoustic-mobile-push-plugin-location") {
 					syncRadius   = configData.android.location.sync.syncRadius;// or configData.iOS.location.sync.syncRadius
 					syncInterval = configData.android.location.sync.syncInterval;// or configData.iOS.location.sync.syncInterval
+					if(cordovaPluginInstalled) {
+						execSync(`cd "${currentAppWorkingDirectory}" && cordova plugin rm ${plugin} --variable SYNC_RADIUS="${syncRadius}" --variable SYNC_INTERVAL="${syncInterval}"`);
+					}
 					execSync(`cd "${currentAppWorkingDirectory}" && cordova plugin add ${plugin} --variable SYNC_RADIUS="${syncRadius}" --variable SYNC_INTERVAL="${syncInterval}"`);
 				} else if (plugin == "cordova-acoustic-mobile-push-plugin-beacon-beta" || plugin == "cordova-acoustic-mobile-push-plugin-beacon") {
 					myUuid = configData.android.location.ibeacon.uuid;// or configData.iOS.location.ibeacon.UUID
+					if (cordovaPluginInstalled) {
+						execSync(`cd "${currentAppWorkingDirectory}" && cordova plugin rm ${plugin} --variable UUID="${myUuid}"`);
+					}
 					execSync(`cd "${currentAppWorkingDirectory}" && cordova plugin add ${plugin} --variable UUID="${myUuid}"`);
 				} else {
+					if (cordovaPluginInstalled) {
+						execSync(`cd "${currentAppWorkingDirectory}" && cordova plugin rm ${plugin}`, { stdio: 'inherit', cwd: process.cwd() });
+					}
 					execSync(`cd "${currentAppWorkingDirectory}" && cordova plugin add ${plugin}`, { stdio: 'inherit', cwd: process.cwd() });
 				}
 			} else if (isEnabled == false && installed) {
@@ -405,11 +408,6 @@ function managePlugins(currentAppWorkingDirectory, pluginPath, configData) {
 			console.error(`Failed to manage plugin ${plugin}:`, error);
 		}
 	});
-
-	// console.log(`Run cordova platform add android`);
-	// execSync(`cd "${currentAppWorkingDirectory}" && cordova platform add android`, { stdio: 'inherit', cwd: process.cwd() });
-	// console.log(`Run cordova platform add ios`);
-	// execSync(`cd "${currentAppWorkingDirectory}" && cordova platform add ios`, { stdio: 'inherit', cwd: process.cwd() });
 }
 
 /**
@@ -444,19 +442,29 @@ function updateConfigXMLPreference(currentAppWorkingDirectory, nam, val) {
 }
 
 /**
+ * Check if npm package has been installed.
+ * 
+ * @param {*} pluginName Plugin name to be tested
+ * @returns Whether plugin is already installed.
+ */
+function isNPMPluginInstalled(currentAppWorkingDirectory, pluginName) {
+	const appPackageJsonFile = path.join(currentAppWorkingDirectory, 'package.json');
+	const packageJsonData    = fs.readFileSync(appPackageJsonFile, 'utf8');
+	const packageJson        = JSON.parse(packageJsonData);
+	return packageJson.dependencies && packageJson.dependencies[pluginName] ||
+		   packageJson.devDependencies && packageJson.devDependencies[pluginName] ||
+			 false;
+}
+
+/**
  * Check if plugin has been installed.
  * 
  * @param {*} pluginName Plugin name to be tested
  * @returns Whether plugin is already installed.
  */
 function isPluginInstalled(currentAppWorkingDirectory, pluginName) {
-	// var cordovaPluginList = execSync(`cd "${currentAppWorkingDirectory}" && cordova plugin list`).toString()
-
-	const appPackageJsonFile = path.join(currentAppWorkingDirectory, 'package.json');
-	const packageJsonData    = fs.readFileSync(appPackageJsonFile, 'utf8');
-	const packageJson        = JSON.parse(packageJsonData);
-	return packageJson.dependencies && packageJson.dependencies[pluginName] ||
-		   packageJson.devDependencies && packageJson.devDependencies[pluginName];
+	var cordovaPluginList = execSync(`cd "${currentAppWorkingDirectory}" && cordova plugin list`).toString();
+	return cordovaPluginList ? cordovaPluginList.includes(pluginName) : false;
 }
 
 /**
