@@ -545,9 +545,12 @@ function updateBuildExtrasGradle(plugPath, isRelease) {
 
 
 
-
 console.log(chalk.green.bold("Setting up Acoustic Mobile Push SDK"));
-const installDirectory = process.cwd();
+let installDirectory = process.cwd();
+if (installDirectory.includes('node_modules')) {
+	let p = currentAppWorkingDirectory.split('node_modules')
+	installDirectory = p[0]
+}
 addOrReplaceMobilePushConfigFile(installDirectory);
 // const mainAppPath = findMainPath(installDirectory);
 // replaceMain(mainAppPath);
