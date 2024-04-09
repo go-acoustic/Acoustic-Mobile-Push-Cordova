@@ -40,9 +40,10 @@
         "directory": "plugins/cordova-acoustic-mobile-push-sdk"
     },
     "scripts": {
+        "postinstall": "node scripts/postinstall.js $INIT_CWD",
         "test": "echo \"Error: no test specified\" && exit 1"
     },
-    "version": "3.9.34",
+    "version": "3.9.35",
     "dependencies": {
         "chalk": "^4.1.2",
         "ncp": "^2.0.0",
