@@ -11,21 +11,21 @@
     "useRelease": false,
 
     "Required Mobile-Push plugins": "<true/false>, enable or disable plugin",
-    "cordova-acoustic-mobile-push-sdk": true,
-    "cordova-acoustic-mobile-push-plugin-ios-notification-service": true,
-    "cordova-acoustic-mobile-push-plugin-inapp": true,
-    "cordova-acoustic-mobile-push-plugin-inbox": true,
+    "cordova-acoustic-mobile-push-sdk-beta": true,
+    "cordova-acoustic-mobile-push-plugin-ios-notification-service-beta": true,
+    "cordova-acoustic-mobile-push-plugin-inapp-beta": true,
+    "cordova-acoustic-mobile-push-plugin-inbox-beta": true,
 
     "Optional Mobile-Push plugins": "<true/false>, enable or disable plugin",
-    "cordova-acoustic-mobile-push-plugin-action-menu": true,
-    "cordova-acoustic-mobile-push-plugin-beacon": true,
-    "cordova-acoustic-mobile-push-plugin-calendar": true,
-    "cordova-acoustic-mobile-push-plugin-dial": true,
-    "cordova-acoustic-mobile-push-plugin-displayweb": true,
-    "cordova-acoustic-mobile-push-plugin-geofence": true,
-    "cordova-acoustic-mobile-push-plugin-location": true,
-    "cordova-acoustic-mobile-push-plugin-passbook": true,
-    "cordova-acoustic-mobile-push-plugin-snooze": true
+    "cordova-acoustic-mobile-push-plugin-action-menu-beta": true,
+    "cordova-acoustic-mobile-push-plugin-beacon-beta": true,
+    "cordova-acoustic-mobile-push-plugin-calendar-beta": true,
+    "cordova-acoustic-mobile-push-plugin-dial-beta": true,
+    "cordova-acoustic-mobile-push-plugin-displayweb-beta": true,
+    "cordova-acoustic-mobile-push-plugin-geofence-beta": true,
+    "cordova-acoustic-mobile-push-plugin-location-beta": true,
+    "cordova-acoustic-mobile-push-plugin-passbook-beta": true,
+    "cordova-acoustic-mobile-push-plugin-snooze-beta": true
   },
 
   "customAction": "openInboxMessage sendEmail",
@@ -114,7 +114,7 @@
     "Please note": "you will need to update your baseUrl to the one supplied to you",
     "baseUrl": "https://mobile-sdk-lib-us-0.brilliantcollector.com",
     "appKey": {
-      "prod": "apB9YG5Umw"
+      "prod": "gcnslVYNku"
     },
     "Set this to the google project number if you are using GCM or to an empty string if you are using FCM": "",
     "Use 'gcm' for GCM or 'fcm' for FCM": "",
@@ -178,7 +178,7 @@
       "Please note, unlike iOS, the existence of the ibeacon key does not enable iBeacon support, iBeacon support is enabled only if iBeacons are nearby":"",
       "ibeacon": {
         "Please note: if this is not set, iBeacon events will not be sent": "This value should never be empty. Leave the default value if you don't want to use iBeacons",
-        "uuid": "21A9A7F4-0DD8-46B7-9D4D-379F3C4AF77D",
+        "uuid": "21A9A7F4-0DD8-46B7-9D4D-379F3C4AF77Dn",
         "Specify how much time the sdk will scan for iBeacons in every scan session while the application is in the foreground, default is 5 seconds": "",
         "beaconForegroundScanDuration": 5,
         "Specify how much time the sdk will wait between iBeacons scan sessions while the application is in the foreground, default is 30 seconds": "",
