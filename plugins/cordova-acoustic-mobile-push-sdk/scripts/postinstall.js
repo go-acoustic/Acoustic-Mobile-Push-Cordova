@@ -372,8 +372,8 @@ function managePlugins(currentAppWorkingDirectory, pluginPath, configData) {
 		// Update gradle for beta/release version
 		updateBuildExtrasGradle(pluginPath, configData.plugins.useRelease)
 
-		const installed = isNPMPluginInstalled(currentAppWorkingDirectory, plugin);
-		const cordovaPluginInstalled = isPluginInstalled(currentAppWorkingDirectory, plugin);
+		let installed = isNPMPluginInstalled(currentAppWorkingDirectory, plugin);
+		let cordovaPluginInstalled = isPluginInstalled(currentAppWorkingDirectory, plugin);
 
 		if (plugin == "cordova-acoustic-mobile-push-sdk-beta" || plugin == "cordova-acoustic-mobile-push-sdk") {
 			installed = true;
