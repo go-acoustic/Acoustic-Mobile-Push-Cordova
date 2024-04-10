@@ -375,6 +375,11 @@ function managePlugins(currentAppWorkingDirectory, pluginPath, configData) {
 		const installed = isNPMPluginInstalled(currentAppWorkingDirectory, plugin);
 		const cordovaPluginInstalled = isPluginInstalled(currentAppWorkingDirectory, plugin);
 
+		if (plugin == "cordova-acoustic-mobile-push-sdk-beta" || plugin == "cordova-acoustic-mobile-push-sdk") {
+			installed = true;
+			cordovaPluginInstalled = true;
+		}
+
 		try {
 			console.log(`Review ${plugin}:installed=${installed}`);
 			if (isEnabled == true && !installed) {
