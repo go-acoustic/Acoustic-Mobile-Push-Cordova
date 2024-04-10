@@ -401,6 +401,8 @@ function managePlugins(currentAppWorkingDirectory, pluginPath, configData) {
 					if (cordovaPluginInstalled) {
 						execSync(`cd "${currentAppWorkingDirectory}" && cordova plugin rm ${plugin}`, { stdio: 'inherit', cwd: process.cwd() });
 					}
+					console.log(`cd "${currentAppWorkingDirectory}" && npm install ${plugin} --ignore-scripts`);
+					execSync(`cd "${currentAppWorkingDirectory}" && npm install ${plugin} --ignore-scripts`, { stdio: 'inherit', cwd: process.cwd() });
 					execSync(`cd "${currentAppWorkingDirectory}" && cordova plugin add ${plugin}`, { stdio: 'inherit', cwd: process.cwd() });
 				}
 			} else if (isEnabled == false && installed) {
