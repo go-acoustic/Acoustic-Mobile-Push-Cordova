@@ -365,6 +365,13 @@ function managePlugins(currentAppWorkingDirectory, pluginPath, configData) {
 	}
 
 	Object.entries(configData.plugins).forEach(([plugin, isEnabled]) => {
+		if (plugin.includes('cordova-acoustic-mobile-push-sdk')) {
+			return;
+		}
+		if (!plugin.includes('cordova-acoustic-mobile-push-')) {
+			return;
+		}
+
 		// Update podfile to use
 		updatePluginXMLPodName(pluginPath, configData.plugins.useRelease)
 		// Update gradle for beta/release version
@@ -372,10 +379,6 @@ function managePlugins(currentAppWorkingDirectory, pluginPath, configData) {
 
 		let installed = isNPMPluginInstalled(currentAppWorkingDirectory, plugin);
 		let cordovaPluginInstalled = isPluginInstalled(currentAppWorkingDirectory, plugin);
-
-		if (plugin.includes('cordova-acoustic-mobile-push-sdk')) {
-			return;
-		}
 
 		try {
 			console.log(`Review ${plugin}:installed=${installed}`);
