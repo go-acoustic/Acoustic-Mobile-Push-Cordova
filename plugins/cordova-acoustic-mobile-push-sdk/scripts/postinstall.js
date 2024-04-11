@@ -389,7 +389,7 @@ function managePlugins(currentAppWorkingDirectory, pluginPath, configData) {
 					syncInterval = configData.android.location.sync.syncInterval;// or configData.iOS.location.sync.syncInterval
 					if(cordovaPluginInstalled) {
 						runExecSync(`cd "${currentAppWorkingDirectory}" && cordova plugin rm ${plugin} --variable SYNC_RADIUS="${syncRadius}" --variable SYNC_INTERVAL="${syncInterval}"`);
-						runExecSync(`cd "${currentAppWorkingDirectory}" && npm uninstall ${plugin} --ignore-scripts`);
+						// runExecSync(`cd "${currentAppWorkingDirectory}" && npm uninstall ${plugin} --ignore-scripts`);
 					}
 					runExecSync(`cd "${currentAppWorkingDirectory}" && npm install ${plugin} --ignore-scripts`);
 					runExecSync(`cd "${currentAppWorkingDirectory}" && cordova plugin add ${plugin} --variable SYNC_RADIUS="${syncRadius}" --variable SYNC_INTERVAL="${syncInterval}"`);
@@ -397,22 +397,22 @@ function managePlugins(currentAppWorkingDirectory, pluginPath, configData) {
 					myUuid = configData.android.location.ibeacon.uuid;// or configData.iOS.location.ibeacon.UUID
 					if (cordovaPluginInstalled) {
 						runExecSync(`cd "${currentAppWorkingDirectory}" && cordova plugin rm ${plugin} --variable UUID="${myUuid}"`);
-						runExecSync(`cd "${currentAppWorkingDirectory}" && npm uninstall ${plugin} --ignore-scripts`);
+						// runExecSync(`cd "${currentAppWorkingDirectory}" && npm uninstall ${plugin} --ignore-scripts`);
 					}
-					runExecSync(`cd "${currentAppWorkingDirectory}" && npm install ${plugin} --ignore-scripts`);
+					// runExecSync(`cd "${currentAppWorkingDirectory}" && npm install ${plugin} --ignore-scripts`);
 					runExecSync(`cd "${currentAppWorkingDirectory}" && cordova plugin add ${plugin} --variable UUID="${myUuid}"`);
 				} else {
 					if (cordovaPluginInstalled) {
 						runExecSync(`cd "${currentAppWorkingDirectory}" && cordova plugin rm ${plugin}`);
-						runExecSync(`cd "${currentAppWorkingDirectory}" && npm uninstall ${plugin} --ignore-scripts`);
+						// runExecSync(`cd "${currentAppWorkingDirectory}" && npm uninstall ${plugin} --ignore-scripts`);
 					}
-					runExecSync(`cd "${currentAppWorkingDirectory}" && npm install ${plugin} --ignore-scripts`);
+					// runExecSync(`cd "${currentAppWorkingDirectory}" && npm install ${plugin} --ignore-scripts`);
 					runExecSync(`cd "${currentAppWorkingDirectory}" && cordova plugin add ${plugin}`);
 				}
 			} else if (isEnabled == false && installed) {
 				console.log(`Removing ${plugin}...`);
 				runExecSync(`cd "${currentAppWorkingDirectory}" && cordova plugin rm ${plugin}`);
-				runExecSync(`cd "${currentAppWorkingDirectory}" && npm uninstall ${plugin} --ignore-scripts`);
+				// runExecSync(`cd "${currentAppWorkingDirectory}" && npm uninstall ${plugin} --ignore-scripts`);
 			} else {
 				console.log(`Skip for ${plugin} with ${isEnabled} which is installed using ${installed}`);
 			}
