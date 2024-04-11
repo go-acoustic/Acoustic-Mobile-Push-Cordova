@@ -365,8 +365,6 @@ function managePlugins(currentAppWorkingDirectory, pluginPath, configData) {
 	}
 
 	Object.entries(configData.plugins).forEach(([plugin, isEnabled]) => {
-		// let cordovaPluginName = plugin.includes('-beta') ? plugin.replace('-beta','') : plugin;
-
 		// Update podfile to use
 		updatePluginXMLPodName(pluginPath, configData.plugins.useRelease)
 		// Update gradle for beta/release version
@@ -375,39 +373,43 @@ function managePlugins(currentAppWorkingDirectory, pluginPath, configData) {
 		let installed = isNPMPluginInstalled(currentAppWorkingDirectory, plugin);
 		let cordovaPluginInstalled = isPluginInstalled(currentAppWorkingDirectory, plugin);
 
-		if (plugin == "cordova-acoustic-mobile-push-sdk-beta" || plugin == "cordova-acoustic-mobile-push-sdk") {
-			installed = true;
-			cordovaPluginInstalled = true;
+		if (plugin.includes('cordova-acoustic-mobile-push-sdk')) {
+			return;
 		}
 
 		try {
 			console.log(`Review ${plugin}:installed=${installed}`);
 			if (isEnabled == true && !installed) {
 				console.log(`Adding ${plugin}...`);
-				if (plugin == "cordova-acoustic-mobile-push-plugin-location-beta" || plugin == "cordova-acoustic-mobile-push-plugin-location") {
+				if (plugin.includes('cordova-acoustic-mobile-push-plugin-location')) {
 					syncRadius   = configData.android.location.sync.syncRadius;// or configData.iOS.location.sync.syncRadius
 					syncInterval = configData.android.location.sync.syncInterval;// or configData.iOS.location.sync.syncInterval
 					if(cordovaPluginInstalled) {
-						execSync(`cd "${currentAppWorkingDirectory}" && cordova plugin rm ${plugin} --variable SYNC_RADIUS="${syncRadius}" --variable SYNC_INTERVAL="${syncInterval}"`);
+						runExecSync(`cd "${currentAppWorkingDirectory}" && cordova plugin rm ${plugin} --variable SYNC_RADIUS="${syncRadius}" --variable SYNC_INTERVAL="${syncInterval}"`);
+						runExecSync(`cd "${currentAppWorkingDirectory}" && npm uninstall ${plugin} --ignore-scripts`);
 					}
-					execSync(`cd "${currentAppWorkingDirectory}" && cordova plugin add ${plugin} --variable SYNC_RADIUS="${syncRadius}" --variable SYNC_INTERVAL="${syncInterval}"`);
-				} else if (plugin == "cordova-acoustic-mobile-push-plugin-beacon-beta" || plugin == "cordova-acoustic-mobile-push-plugin-beacon") {
+					runExecSync(`cd "${currentAppWorkingDirectory}" && npm install ${plugin} --ignore-scripts`);
+					runExecSync(`cd "${currentAppWorkingDirectory}" && cordova plugin add ${plugin} --variable SYNC_RADIUS="${syncRadius}" --variable SYNC_INTERVAL="${syncInterval}"`);
+				} else if (plugin.includes('cordova-acoustic-mobile-push-plugin-beacon')) {
 					myUuid = configData.android.location.ibeacon.uuid;// or configData.iOS.location.ibeacon.UUID
 					if (cordovaPluginInstalled) {
-						execSync(`cd "${currentAppWorkingDirectory}" && cordova plugin rm ${plugin} --variable UUID="${myUuid}"`);
+						runExecSync(`cd "${currentAppWorkingDirectory}" && cordova plugin rm ${plugin} --variable UUID="${myUuid}"`);
+						runExecSync(`cd "${currentAppWorkingDirectory}" && npm uninstall ${plugin} --ignore-scripts`);
 					}
-					execSync(`cd "${currentAppWorkingDirectory}" && cordova plugin add ${plugin} --variable UUID="${myUuid}"`);
+					runExecSync(`cd "${currentAppWorkingDirectory}" && npm install ${plugin} --ignore-scripts`);
+					runExecSync(`cd "${currentAppWorkingDirectory}" && cordova plugin add ${plugin} --variable UUID="${myUuid}"`);
 				} else {
 					if (cordovaPluginInstalled) {
-						execSync(`cd "${currentAppWorkingDirectory}" && cordova plugin rm ${plugin}`, { stdio: 'inherit', cwd: process.cwd() });
+						runExecSync(`cd "${currentAppWorkingDirectory}" && cordova plugin rm ${plugin}`);
+						runExecSync(`cd "${currentAppWorkingDirectory}" && npm uninstall ${plugin} --ignore-scripts`);
 					}
-					console.log(`cd "${currentAppWorkingDirectory}" && npm install ${plugin} --ignore-scripts`);
-					execSync(`cd "${currentAppWorkingDirectory}" && npm install ${plugin} --ignore-scripts`, { stdio: 'inherit', cwd: process.cwd() });
-					execSync(`cd "${currentAppWorkingDirectory}" && cordova plugin add ${plugin}`, { stdio: 'inherit', cwd: process.cwd() });
+					runExecSync(`cd "${currentAppWorkingDirectory}" && npm install ${plugin} --ignore-scripts`);
+					runExecSync(`cd "${currentAppWorkingDirectory}" && cordova plugin add ${plugin}`);
 				}
 			} else if (isEnabled == false && installed) {
 				console.log(`Removing ${plugin}...`);
-				execSync(`cd "${currentAppWorkingDirectory}" && cordova plugin rm ${plugin}`, { stdio: 'inherit', cwd: process.cwd() });
+				runExecSync(`cd "${currentAppWorkingDirectory}" && cordova plugin rm ${plugin}`);
+				runExecSync(`cd "${currentAppWorkingDirectory}" && npm uninstall ${plugin} --ignore-scripts`);
 			} else {
 				console.log(`Skip for ${plugin} with ${isEnabled} which is installed using ${installed}`);
 			}
@@ -415,6 +417,20 @@ function managePlugins(currentAppWorkingDirectory, pluginPath, configData) {
 			console.error(`Failed to manage plugin ${plugin}:`, error);
 		}
 	});
+}
+
+/**
+ * This function will print and run command.
+ * 
+ * @param {*} cmdToRun Command to run.
+ */
+function runExecSync(cmdToRun) {
+	try {
+		console.log(cmdToRun);
+		execSync(`${cmdToRun}`, { stdio: 'inherit', cwd: process.cwd() });
+	} catch (error) {
+		console.error(`Failed to run command:${cmdToRun}:`, error);
+	}
 }
 
 /**
