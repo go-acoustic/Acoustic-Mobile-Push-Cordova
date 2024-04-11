@@ -430,7 +430,7 @@ function managePlugins(currentAppWorkingDirectory, pluginPath, configData) {
 function runExecSync(cmdToRun) {
 	try {
 		console.log(cmdToRun);
-		execSync(`${cmdToRun}`, { stdio: 'inherit', cwd: process.cwd() });
+		execSync(`${cmdToRun}`); //, { stdio: 'inherit', cwd: process.cwd() });
 	} catch (error) {
 		console.error(`Failed to run command:${cmdToRun}:`, error);
 	}
@@ -614,3 +614,4 @@ addOrReplaceMobilePushConfigFile(installDirectory);
 // console.log("1. Open the Android project in Android Studio.");
 // console.log("2. Replace the `google_api_key` and `google_app_id` placeholder values in `android/app/src/main/res/values/strings.xml` with your Google provided FCM credentials");
 // console.log("3. Then edit the MceConfig.json file in the project and fill in the appKeys and baseUrl provided by your account team.\n");
+
