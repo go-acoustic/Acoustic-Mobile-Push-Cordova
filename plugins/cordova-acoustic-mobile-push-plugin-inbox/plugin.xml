@@ -8,7 +8,7 @@ industrial property rights of Acoustic, L.P. except as may be provided in an agr
 Acoustic, L.P. Any unauthorized copying or distribution of content from this file is prohibited.
 -->
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0" id="cordova-acoustic-mobile-push-plugin-inbox"
-version="3.9.50">
+version="3.9.51">
     <name>Inbox Action for Acoustic MCE Cordova Plugin</name>
     <author>Acoustic MCE</author>
     <description>Inbox Action for Acoustic MCE Push Services</description>
@@ -41,6 +41,10 @@ version="3.9.50">
   
     <hook type="after_plugin_install" src="scripts/after_plugin_install.js" />
 
+    <!-- Library settings -->
+    <preference name="POD_NAME" default="AcousticMobilePushNotificationDebug" />
+    <preference name="POD_VERSION" default="3.9.51" />
+
     <platform name="ios">
         <config-file target="config.xml" parent="/*">
             <feature name="MCEInboxPlugin" >
@@ -54,7 +58,7 @@ version="3.9.50">
                 <source url="https://github.com/CocoaPods/Specs.git"/>
             </config>
             <pods use-frameworks="true">
-                <pod name="AcousticMobilePushNotificationDebug" />
+                <pod name="$POD_NAME" spec="$POD_VERSION" />
             </pods>
         </podspec>
     </platform>

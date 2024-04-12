@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <!-- 
-Copyright © 2011, 2019 Acoustic, L.P. All rights reserved.
+Copyright (C) 2024 Acoustic, L.P. All rights reserved.
 
 NOTICE: This file contains material that is confidential and proprietary to 
 Acoustic, L.P. and/or other developers. No license is granted under any intellectual or 
@@ -8,7 +8,7 @@ industrial property rights of Acoustic, L.P. except as may be provided in an agr
 Acoustic, L.P. Any unauthorized copying or distribution of content from this file is prohibited.
 -->
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0" id="cordova-acoustic-mobile-push-plugin-dial"
-version="3.9.50">
+version="3.9.51">
     <name>Acoustic MCE Cordova Plugin for Dial</name>
     <author>Acoustic MCE</author>
     <description>Allows Cordova applications to integrate with Acoustic MCE Push Services</description>

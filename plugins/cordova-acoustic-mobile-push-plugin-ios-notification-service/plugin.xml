@@ -7,20 +7,25 @@ Acoustic, L.P. and/or other developers. No license is granted under any intellec
 industrial property rights of Acoustic, L.P. except as may be provided in an agreement with 
 Acoustic, L.P. Any unauthorized copying or distribution of content from this file is prohibited.
 -->
-<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0" id="cordova-acoustic-mobile-push-plugin-ios-notification-service" version="3.9.50">
+<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0" id="cordova-acoustic-mobile-push-plugin-ios-notification-service" version="3.9.51">
   <name>Acoustic MCE Cordova iOS Notification Service</name>
   <author>Acoustic MCE</author>
   <description>iOS notification service for Acoustic Campaign Mobile Push SDKs</description>
   <keywords>mce</keywords>
   <license>Apache 2.0 License</license>
+
+   <!-- Library settings -->
+  <preference name="POD_NAME" default="AcousticMobilePushNotificationDebug" />
+  <preference name="POD_VERSION" default="3.9.51" />
+
   <platform name="ios">
     <podspec>
-        <config>
-            <source url="https://github.com/CocoaPods/Specs.git"/>
-        </config>
-        <pods use-frameworks="true">
-            <pod name="AcousticMobilePushNotificationDebug" />
-        </pods>
+      <config>
+        <source url="https://github.com/CocoaPods/Specs.git"/>
+      </config>
+      <pods use-frameworks="true">
+        <pod name="$POD_NAME" spec="$POD_VERSION" />
+      </pods>
     </podspec>
   </platform>
 </plugin>

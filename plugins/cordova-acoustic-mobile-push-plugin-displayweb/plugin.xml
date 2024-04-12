@@ -8,18 +8,23 @@ industrial property rights of Acoustic, L.P. except as may be provided in an agr
 Acoustic, L.P. Any unauthorized copying or distribution of content from this file is prohibited.
 -->
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0" id="cordova-acoustic-mobile-push-plugin-displayweb"
-version="3.9.50">
-  <name>Display Web Action for Acoustic MCE Cordova Plugin</name>
-  <author>Acoustic MCE</author>
-  <description>Display Web Action for Acoustic MCE Push Services</description>
-  <keywords>mce</keywords>
-  <license>Apache 2.0 License</license>
-  <engines>
-    <engine name="cordova" version=">=3.0" />
-  </engines>
-  <js-module src="www/js/MCEDisplayWebPlugin.js" name="MCEDisplayWebPlugin">
-    <clobbers target="MCEDisplayWebPlugin" />
-  </js-module>
+version="3.9.51">
+    <name>Display Web Action for Acoustic MCE Cordova Plugin</name>
+    <author>Acoustic MCE</author>
+    <description>Display Web Action for Acoustic MCE Push Services</description>
+    <keywords>mce</keywords>
+    <license>Apache 2.0 License</license>
+    <engines>
+        <engine name="cordova" version=">=3.0" />
+    </engines>
+    <js-module src="www/js/MCEDisplayWebPlugin.js" name="MCEDisplayWebPlugin">
+        <clobbers target="MCEDisplayWebPlugin" />
+    </js-module>
+
+    <!-- Library settings -->
+    <preference name="POD_NAME" default="AcousticMobilePushNotificationDebug" />
+    <preference name="POD_VERSION" default="3.9.51" />
+
     <platform name="ios">
         <config-file target="config.xml" parent="/*">
             <feature name="MCEDisplayWebPlugin" >
@@ -35,14 +40,13 @@ version="3.9.50">
                 <source url="https://github.com/CocoaPods/Specs.git"/>
             </config>
             <pods use-frameworks="true">
-                <pod name="AcousticMobilePushNotificationDebug" />
+                <pod name="$POD_NAME" spec="$POD_VERSION" />
             </pods>
         </podspec>
     </platform>
     <platform name="android">
         <config-file target="AndroidManifest.xml" parent="/manifest/application">
-            <activity
-                android:name="co.acoustic.mobile.push.sdk.plugin.displayweb.DisplayWebViewActivity" android:theme="@style/Theme.AppCompat.Light" />
+            <activity android:name="co.acoustic.mobile.push.sdk.plugin.displayweb.DisplayWebViewActivity" android:theme="@style/Theme.AppCompat.Light" />
         </config-file>
         
         <framework src="src/android/build-extras.gradle" custom="true" type="gradleReference" />
