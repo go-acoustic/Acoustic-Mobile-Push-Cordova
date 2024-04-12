@@ -8,7 +8,7 @@ industrial property rights of Acoustic, L.P. except as may be provided in an agr
 Acoustic, L.P. Any unauthorized copying or distribution of content from this file is prohibited.
 -->
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0" id="cordova-acoustic-mobile-push-plugin-snooze"
-version="3.9.52">
+version="3.9.53">
   <name>Snooze Action for Acoustic MCE Cordova Plugin</name>
   <author>Acoustic MCE</author>
   <description>Snooze Action for Acoustic MCE Push Services</description>
@@ -23,7 +23,7 @@ version="3.9.52">
 
   <!-- Library settings -->
   <preference name="POD_NAME" default="AcousticMobilePushDebug" />
-  <preference name="POD_VERSION" default="3.9.52" />
+  <preference name="POD_VERSION" default="3.9.53" />
 
   <platform name="ios">
     <config-file target="config.xml" parent="/*">
@@ -44,7 +44,6 @@ version="3.9.52">
   </platform>
   <platform name="android">
     <framework src="src/android/build-extras.gradle" custom="true" type="gradleReference" />
-    <source-file src="src/android/assets/mce/plugins/snooze.json" target-dir="assets/mce/plugins" framework="false" />
     <config-file target="AndroidManifest.xml" parent="/manifest/application">
       <service android:name="co.acoustic.mobile.push.sdk.plugin.snooze.SnoozeIntentService" />
     </config-file>

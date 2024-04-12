@@ -1,0 +1,23 @@
+repositories{    
+  jcenter()
+  flatDir {
+    dirs 'libs'
+  }
+  google()
+  mavenCentral()
+  maven {
+    url "https://plugins.gradle.org/m2/"
+  }
+  maven {
+    url "https://maven.google.com"
+    name 'Google'
+  }
+}
+
+dependencies {
+   implementation('androidx.appcompat:appcompat:1.6.0')
+   implementation "com.google.firebase:firebase-core:+"
+   implementation "com.google.firebase:firebase-messaging:+"
+   implementation "com.google.firebase:firebase-iid:+"
+}
+

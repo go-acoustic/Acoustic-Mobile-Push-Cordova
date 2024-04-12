@@ -17,6 +17,7 @@ repositories{
 
 dependencies {
   implementation('androidx.appcompat:appcompat:1.6.0')
+  implementation "com.google.android.gms:play-services-base:18.3.0"
   implementation "io.github.go-acoustic:acoustic-mobile-push-android-sdk:+"
   implementation 'com.google.code.gson:gson:2.2.4'
 }
