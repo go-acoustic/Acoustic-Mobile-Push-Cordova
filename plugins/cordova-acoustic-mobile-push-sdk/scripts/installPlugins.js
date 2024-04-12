@@ -380,10 +380,36 @@ function managePlugins(currentAppWorkingDirectory, pluginPath, configData) {
 
 		logMessageTitle(`Install ${plugin}`);
 
+		const packagePluginPath = path.join(currentAppWorkingDirectory, 'node_modules', plugin);
 		// Update podfile to use
-		updatePluginXMLPodName(pluginPath, configData.plugins.useRelease)
+		if (!plugin.includes('cordova-acoustic-mobile-push-plugin-inapp') &&
+		!plugin.includes('cordova-acoustic-mobile-push-plugin-inbox') &&
+		!plugin.includes('cordova-acoustic-mobile-push-plugin-action-menu') &&
+		!plugin.includes('cordova-acoustic-mobile-push-plugin-beacon') &&
+		!plugin.includes('cordova-acoustic-mobile-push-plugin-calendar') &&
+		!plugin.includes('cordova-acoustic-mobile-push-plugin-dial') &&
+		!plugin.includes('cordova-acoustic-mobile-push-plugin-displayweb') &&
+		!plugin.includes('cordova-acoustic-mobile-push-plugin-geofence') &&
+		!plugin.includes('cordova-acoustic-mobile-push-plugin-location') &&
+		!plugin.includes('cordova-acoustic-mobile-push-plugin-passbook') &&
+		!plugin.includes('cordova-acoustic-mobile-push-plugin-snooze')) {
+			updatePluginXMLPodName(packagePluginPath, configData.plugins.useRelease);
+		}
 		// Update gradle for beta/release version
-		updateBuildExtrasGradle(pluginPath, configData.plugins.useRelease)
+		if (!plugin.includes('cordova-acoustic-mobile-push-plugin-ios-notification-service') && 
+			!plugin.includes('cordova-acoustic-mobile-push-plugin-inapp') &&
+			!plugin.includes('cordova-acoustic-mobile-push-plugin-inbox') &&
+			!plugin.includes('cordova-acoustic-mobile-push-plugin-action-menu') &&
+			!plugin.includes('cordova-acoustic-mobile-push-plugin-beacon') &&
+			!plugin.includes('cordova-acoustic-mobile-push-plugin-calendar') &&
+			!plugin.includes('cordova-acoustic-mobile-push-plugin-dial') &&
+			!plugin.includes('cordova-acoustic-mobile-push-plugin-displayweb') &&
+			!plugin.includes('cordova-acoustic-mobile-push-plugin-geofence') &&
+			!plugin.includes('cordova-acoustic-mobile-push-plugin-location') &&
+			!plugin.includes('cordova-acoustic-mobile-push-plugin-passbook') &&
+			!plugin.includes('cordova-acoustic-mobile-push-plugin-snooze')) {
+			updateBuildExtrasGradle(packagePluginPath, configData.plugins.useRelease);
+		}
 
 		let installed = isNPMPluginInstalled(currentAppWorkingDirectory, plugin);
 		let cordovaPluginInstalled = isPluginInstalled(currentAppWorkingDirectory, plugin);
