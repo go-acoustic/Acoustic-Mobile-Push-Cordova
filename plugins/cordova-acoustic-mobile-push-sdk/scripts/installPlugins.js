@@ -344,6 +344,7 @@ function managePlugins(currentAppWorkingDirectory, pluginPath, configData) {
 		if (pluginPath.includes('-beta')) {
 			pluginName = `${pluginName}-beta`
 		}
+		let packagePluginPath = path.join(currentAppWorkingDirectory, 'node_modules', pluginName);
 		// Android
 		// updateConfigXMLPreference(currentAppWorkingDirectory, "androidAppkey", configData.android.appKey.prod);
 		// iOS
@@ -366,6 +367,7 @@ function managePlugins(currentAppWorkingDirectory, pluginPath, configData) {
 		logMessageTitle(`Install base ${pluginName}`);
 		logMessageTitle(`cd "${currentAppWorkingDirectory}" && cordova plugin add ${pluginName} --variable CUSTOM_ACTIONS="${customAction}" --variable ANDROID_APPKEY="${androidAppkey}" --variable IOS_DEV_APPKEY="${iOSAppkey}" --variable IOS_PROD_APPKEY="${iOSProdkey}" --variable SERVER_URL="${serverUrl}" --variable LOGLEVEL="${logLevel}" --variable MCE_CAN_SYNC_OVERRIDE="${mceCanSyncOverride}" --force`);
 		execSync(`cd "${currentAppWorkingDirectory}" && cordova plugin add ${pluginName} --variable CUSTOM_ACTIONS="${customAction}" --variable ANDROID_APPKEY="${androidAppkey}" --variable IOS_DEV_APPKEY="${iOSAppkey}" --variable IOS_PROD_APPKEY="${iOSProdkey}" --variable SERVER_URL="${serverUrl}" --variable LOGLEVEL="${logLevel}" --variable MCE_CAN_SYNC_OVERRIDE="${mceCanSyncOverride}" --force`, { stdio: 'inherit', cwd: process.cwd() });
+		updatePluginXMLPodName(packagePluginPath, configData.plugins.useRelease);
 	} catch (error) {
 		console.error(`Failed to manage plugin ${plugin}:`, error);
 	}
@@ -380,39 +382,9 @@ function managePlugins(currentAppWorkingDirectory, pluginPath, configData) {
 
 		logMessageTitle(`Install ${plugin}`);
 
-		const packagePluginPath = path.join(currentAppWorkingDirectory, 'node_modules', plugin);
-		// Update podfile to use
-		if (!plugin.includes('cordova-acoustic-mobile-push-plugin-inapp') &&
-		!plugin.includes('cordova-acoustic-mobile-push-plugin-inbox') &&
-		!plugin.includes('cordova-acoustic-mobile-push-plugin-action-menu') &&
-		!plugin.includes('cordova-acoustic-mobile-push-plugin-beacon') &&
-		!plugin.includes('cordova-acoustic-mobile-push-plugin-calendar') &&
-		!plugin.includes('cordova-acoustic-mobile-push-plugin-dial') &&
-		!plugin.includes('cordova-acoustic-mobile-push-plugin-displayweb') &&
-		!plugin.includes('cordova-acoustic-mobile-push-plugin-geofence') &&
-		!plugin.includes('cordova-acoustic-mobile-push-plugin-location') &&
-		!plugin.includes('cordova-acoustic-mobile-push-plugin-passbook') &&
-		!plugin.includes('cordova-acoustic-mobile-push-plugin-snooze')) {
-			updatePluginXMLPodName(packagePluginPath, configData.plugins.useRelease);
-		}
-		// Update gradle for beta/release version
-		if (!plugin.includes('cordova-acoustic-mobile-push-plugin-ios-notification-service') && 
-			!plugin.includes('cordova-acoustic-mobile-push-plugin-inapp') &&
-			!plugin.includes('cordova-acoustic-mobile-push-plugin-inbox') &&
-			!plugin.includes('cordova-acoustic-mobile-push-plugin-action-menu') &&
-			!plugin.includes('cordova-acoustic-mobile-push-plugin-beacon') &&
-			!plugin.includes('cordova-acoustic-mobile-push-plugin-calendar') &&
-			!plugin.includes('cordova-acoustic-mobile-push-plugin-dial') &&
-			!plugin.includes('cordova-acoustic-mobile-push-plugin-displayweb') &&
-			!plugin.includes('cordova-acoustic-mobile-push-plugin-geofence') &&
-			!plugin.includes('cordova-acoustic-mobile-push-plugin-location') &&
-			!plugin.includes('cordova-acoustic-mobile-push-plugin-passbook') &&
-			!plugin.includes('cordova-acoustic-mobile-push-plugin-snooze')) {
-			updateBuildExtrasGradle(packagePluginPath, configData.plugins.useRelease);
-		}
-
 		let installed = isNPMPluginInstalled(currentAppWorkingDirectory, plugin);
 		let cordovaPluginInstalled = isPluginInstalled(currentAppWorkingDirectory, plugin);
+		let update = false;
 
 		try {
 			logMessageInfo(`Review ${plugin}:installed=${installed}`);
@@ -427,6 +399,7 @@ function managePlugins(currentAppWorkingDirectory, pluginPath, configData) {
 					}
 					runExecSync(`cd "${currentAppWorkingDirectory}" && npm install ${plugin} --ignore-scripts`);
 					runExecSync(`cd "${currentAppWorkingDirectory}" && cordova plugin add ${plugin} --variable SYNC_RADIUS="${syncRadius}" --variable SYNC_INTERVAL="${syncInterval}"`);
+					update = true;
 				} else if (plugin.includes('cordova-acoustic-mobile-push-plugin-beacon')) {
 					myUuid = configData.android.location.ibeacon.uuid;// or configData.iOS.location.ibeacon.UUID
 					if (cordovaPluginInstalled) {
@@ -435,6 +408,7 @@ function managePlugins(currentAppWorkingDirectory, pluginPath, configData) {
 					}
 					// runExecSync(`cd "${currentAppWorkingDirectory}" && npm install ${plugin} --ignore-scripts`);
 					runExecSync(`cd "${currentAppWorkingDirectory}" && cordova plugin add ${plugin} --variable UUID="${myUuid}"`);
+					update = true;
 				} else {
 					if (cordovaPluginInstalled) {
 						runExecSync(`cd "${currentAppWorkingDirectory}" && cordova plugin rm ${plugin}`);
@@ -442,6 +416,7 @@ function managePlugins(currentAppWorkingDirectory, pluginPath, configData) {
 					}
 					// runExecSync(`cd "${currentAppWorkingDirectory}" && npm install ${plugin} --ignore-scripts`);
 					runExecSync(`cd "${currentAppWorkingDirectory}" && cordova plugin add ${plugin}`);
+					update = true;
 				}
 			} else if (isEnabled == false && installed) {
 				logMessageInfo(`Removing ${plugin}...`);
@@ -449,9 +424,43 @@ function managePlugins(currentAppWorkingDirectory, pluginPath, configData) {
 				// runExecSync(`cd "${currentAppWorkingDirectory}" && npm uninstall ${plugin} --ignore-scripts`);
 			} else {
 				logMessageInfo(`Skip for ${plugin} with ${isEnabled} which is installed using ${installed}`);
+				// update = true; review 
 			}
 		} catch (error) {
 			logMessageError(`Failed to manage plugin ${plugin}:`, error);
+		}
+
+		if (update) {
+			packagePluginPath = path.join(currentAppWorkingDirectory, 'node_modules', plugin);
+			// Update podfile to use
+			if (!plugin.includes('cordova-acoustic-mobile-push-plugin-inapp') &&
+			!plugin.includes('cordova-acoustic-mobile-push-plugin-inbox') &&
+			!plugin.includes('cordova-acoustic-mobile-push-plugin-action-menu') &&
+			!plugin.includes('cordova-acoustic-mobile-push-plugin-beacon') &&
+			!plugin.includes('cordova-acoustic-mobile-push-plugin-calendar') &&
+			!plugin.includes('cordova-acoustic-mobile-push-plugin-dial') &&
+			!plugin.includes('cordova-acoustic-mobile-push-plugin-displayweb') &&
+			!plugin.includes('cordova-acoustic-mobile-push-plugin-geofence') &&
+			!plugin.includes('cordova-acoustic-mobile-push-plugin-location') &&
+			!plugin.includes('cordova-acoustic-mobile-push-plugin-passbook') &&
+			!plugin.includes('cordova-acoustic-mobile-push-plugin-snooze')) {
+				updatePluginXMLPodName(packagePluginPath, configData.plugins.useRelease);
+			}
+			// Update gradle for beta/release version
+			if (!plugin.includes('cordova-acoustic-mobile-push-plugin-ios-notification-service') && 
+				!plugin.includes('cordova-acoustic-mobile-push-plugin-inapp') &&
+				!plugin.includes('cordova-acoustic-mobile-push-plugin-inbox') &&
+				!plugin.includes('cordova-acoustic-mobile-push-plugin-action-menu') &&
+				!plugin.includes('cordova-acoustic-mobile-push-plugin-beacon') &&
+				!plugin.includes('cordova-acoustic-mobile-push-plugin-calendar') &&
+				!plugin.includes('cordova-acoustic-mobile-push-plugin-dial') &&
+				!plugin.includes('cordova-acoustic-mobile-push-plugin-displayweb') &&
+				!plugin.includes('cordova-acoustic-mobile-push-plugin-geofence') &&
+				!plugin.includes('cordova-acoustic-mobile-push-plugin-location') &&
+				!plugin.includes('cordova-acoustic-mobile-push-plugin-passbook') &&
+				!plugin.includes('cordova-acoustic-mobile-push-plugin-snooze')) {
+				updateBuildExtrasGradle(packagePluginPath, configData.plugins.useRelease);
+			}
 		}
 	});
 }
