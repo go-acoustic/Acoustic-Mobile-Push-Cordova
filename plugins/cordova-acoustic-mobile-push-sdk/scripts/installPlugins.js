@@ -433,32 +433,14 @@ function managePlugins(currentAppWorkingDirectory, pluginPath, configData) {
 		if (update) {
 			packagePluginPath = path.join(currentAppWorkingDirectory, 'node_modules', plugin);
 			// Update podfile to use
-			if (!plugin.includes('cordova-acoustic-mobile-push-plugin-inapp') &&
-			!plugin.includes('cordova-acoustic-mobile-push-plugin-inbox') &&
-			!plugin.includes('cordova-acoustic-mobile-push-plugin-action-menu') &&
-			!plugin.includes('cordova-acoustic-mobile-push-plugin-beacon') &&
-			!plugin.includes('cordova-acoustic-mobile-push-plugin-calendar') &&
-			!plugin.includes('cordova-acoustic-mobile-push-plugin-dial') &&
-			!plugin.includes('cordova-acoustic-mobile-push-plugin-displayweb') &&
-			!plugin.includes('cordova-acoustic-mobile-push-plugin-geofence') &&
-			!plugin.includes('cordova-acoustic-mobile-push-plugin-location') &&
-			!plugin.includes('cordova-acoustic-mobile-push-plugin-passbook') &&
-			!plugin.includes('cordova-acoustic-mobile-push-plugin-snooze')) {
+			if (!plugin.includes('cordova-acoustic-mobile-push-plugin-dial')) {
 				updatePluginXMLPodName(packagePluginPath, configData.plugins.useRelease);
 			}
 			// Update gradle for beta/release version
-			if (!plugin.includes('cordova-acoustic-mobile-push-plugin-ios-notification-service') && 
-				!plugin.includes('cordova-acoustic-mobile-push-plugin-inapp') &&
-				!plugin.includes('cordova-acoustic-mobile-push-plugin-inbox') &&
+			if (!plugin.includes('cordova-acoustic-mobile-push-plugin-ios-notification-service') &&
 				!plugin.includes('cordova-acoustic-mobile-push-plugin-action-menu') &&
-				!plugin.includes('cordova-acoustic-mobile-push-plugin-beacon') &&
-				!plugin.includes('cordova-acoustic-mobile-push-plugin-calendar') &&
 				!plugin.includes('cordova-acoustic-mobile-push-plugin-dial') &&
-				!plugin.includes('cordova-acoustic-mobile-push-plugin-displayweb') &&
-				!plugin.includes('cordova-acoustic-mobile-push-plugin-geofence') &&
-				!plugin.includes('cordova-acoustic-mobile-push-plugin-location') &&
-				!plugin.includes('cordova-acoustic-mobile-push-plugin-passbook') &&
-				!plugin.includes('cordova-acoustic-mobile-push-plugin-snooze')) {
+				!plugin.includes('cordova-acoustic-mobile-push-plugin-passbook')) {
 				updateBuildExtrasGradle(packagePluginPath, configData.plugins.useRelease);
 			}
 		}
