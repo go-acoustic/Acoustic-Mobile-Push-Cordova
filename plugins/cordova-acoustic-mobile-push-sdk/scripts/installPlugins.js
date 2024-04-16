@@ -370,81 +370,81 @@ function managePlugins(currentAppWorkingDirectory, pluginPath, configData) {
 		updatePluginXMLPodName(packagePluginPath, configData.plugins.useRelease);
 	} catch (error) {
 		console.error(`Failed to manage plugin ${plugin}:`, error);
-	}
+	} finally {
+		Object.entries(configData.plugins).forEach(([plugin, isEnabled]) => {
+			if (plugin.includes('cordova-acoustic-mobile-push-sdk')) {
+				return;
+			}
+			if (!plugin.includes('cordova-acoustic-mobile-push-')) {
+				return;
+			}
 
-	Object.entries(configData.plugins).forEach(([plugin, isEnabled]) => {
-		if (plugin.includes('cordova-acoustic-mobile-push-sdk')) {
-			return;
-		}
-		if (!plugin.includes('cordova-acoustic-mobile-push-')) {
-			return;
-		}
+			logMessageTitle(`Install ${plugin}`);
 
-		logMessageTitle(`Install ${plugin}`);
+			let installed = isNPMPluginInstalled(currentAppWorkingDirectory, plugin);
+			let cordovaPluginInstalled = isPluginInstalled(currentAppWorkingDirectory, plugin);
+			let update = false;
 
-		let installed = isNPMPluginInstalled(currentAppWorkingDirectory, plugin);
-		let cordovaPluginInstalled = isPluginInstalled(currentAppWorkingDirectory, plugin);
-		let update = false;
-
-		try {
-			logMessageInfo(`Review ${plugin}:installed=${installed}`);
-			if (isEnabled == true && !installed) {
-				logMessageInfo(`Adding ${plugin}...`);
-				if (plugin.includes('cordova-acoustic-mobile-push-plugin-location')) {
-					syncRadius   = configData.android.location.sync.syncRadius;// or configData.iOS.location.sync.syncRadius
-					syncInterval = configData.android.location.sync.syncInterval;// or configData.iOS.location.sync.syncInterval
-					if(cordovaPluginInstalled) {
-						runExecSync(`cd "${currentAppWorkingDirectory}" && cordova plugin rm ${plugin} --variable SYNC_RADIUS="${syncRadius}" --variable SYNC_INTERVAL="${syncInterval}"`);
-						// runExecSync(`cd "${currentAppWorkingDirectory}" && npm uninstall ${plugin} --ignore-scripts`);
+			try {
+				logMessageInfo(`Review ${plugin}:installed=${installed}`);
+				if (isEnabled == true && !installed) {
+					logMessageInfo(`Adding ${plugin}...`);
+					if (plugin.includes('cordova-acoustic-mobile-push-plugin-location')) {
+						syncRadius   = configData.android.location.sync.syncRadius;// or configData.iOS.location.sync.syncRadius
+						syncInterval = configData.android.location.sync.syncInterval;// or configData.iOS.location.sync.syncInterval
+						if(cordovaPluginInstalled) {
+							runExecSync(`cd "${currentAppWorkingDirectory}" && cordova plugin rm ${plugin} --variable SYNC_RADIUS="${syncRadius}" --variable SYNC_INTERVAL="${syncInterval}"`);
+							// runExecSync(`cd "${currentAppWorkingDirectory}" && npm uninstall ${plugin} --ignore-scripts`);
+						}
+						runExecSync(`cd "${currentAppWorkingDirectory}" && npm install ${plugin} --ignore-scripts`);
+						runExecSync(`cd "${currentAppWorkingDirectory}" && cordova plugin add ${plugin} --variable SYNC_RADIUS="${syncRadius}" --variable SYNC_INTERVAL="${syncInterval}"`);
+						update = true;
+					} else if (plugin.includes('cordova-acoustic-mobile-push-plugin-beacon')) {
+						myUuid = configData.android.location.ibeacon.uuid;// or configData.iOS.location.ibeacon.UUID
+						if (cordovaPluginInstalled) {
+							runExecSync(`cd "${currentAppWorkingDirectory}" && cordova plugin rm ${plugin} --variable UUID="${myUuid}"`);
+							// runExecSync(`cd "${currentAppWorkingDirectory}" && npm uninstall ${plugin} --ignore-scripts`);
+						}
+						// runExecSync(`cd "${currentAppWorkingDirectory}" && npm install ${plugin} --ignore-scripts`);
+						runExecSync(`cd "${currentAppWorkingDirectory}" && cordova plugin add ${plugin} --variable UUID="${myUuid}"`);
+						update = true;
+					} else {
+						if (cordovaPluginInstalled) {
+							runExecSync(`cd "${currentAppWorkingDirectory}" && cordova plugin rm ${plugin}`);
+							// runExecSync(`cd "${currentAppWorkingDirectory}" && npm uninstall ${plugin} --ignore-scripts`);
+						}
+						// runExecSync(`cd "${currentAppWorkingDirectory}" && npm install ${plugin} --ignore-scripts`);
+						runExecSync(`cd "${currentAppWorkingDirectory}" && cordova plugin add ${plugin}`);
+						update = true;
 					}
-					runExecSync(`cd "${currentAppWorkingDirectory}" && npm install ${plugin} --ignore-scripts`);
-					runExecSync(`cd "${currentAppWorkingDirectory}" && cordova plugin add ${plugin} --variable SYNC_RADIUS="${syncRadius}" --variable SYNC_INTERVAL="${syncInterval}"`);
-					update = true;
-				} else if (plugin.includes('cordova-acoustic-mobile-push-plugin-beacon')) {
-					myUuid = configData.android.location.ibeacon.uuid;// or configData.iOS.location.ibeacon.UUID
-					if (cordovaPluginInstalled) {
-						runExecSync(`cd "${currentAppWorkingDirectory}" && cordova plugin rm ${plugin} --variable UUID="${myUuid}"`);
-						// runExecSync(`cd "${currentAppWorkingDirectory}" && npm uninstall ${plugin} --ignore-scripts`);
-					}
-					// runExecSync(`cd "${currentAppWorkingDirectory}" && npm install ${plugin} --ignore-scripts`);
-					runExecSync(`cd "${currentAppWorkingDirectory}" && cordova plugin add ${plugin} --variable UUID="${myUuid}"`);
-					update = true;
+				} else if (isEnabled == false && installed) {
+					logMessageInfo(`Removing ${plugin}...`);
+					runExecSync(`cd "${currentAppWorkingDirectory}" && cordova plugin rm ${plugin}`);
+					// runExecSync(`cd "${currentAppWorkingDirectory}" && npm uninstall ${plugin} --ignore-scripts`);
 				} else {
-					if (cordovaPluginInstalled) {
-						runExecSync(`cd "${currentAppWorkingDirectory}" && cordova plugin rm ${plugin}`);
-						// runExecSync(`cd "${currentAppWorkingDirectory}" && npm uninstall ${plugin} --ignore-scripts`);
-					}
-					// runExecSync(`cd "${currentAppWorkingDirectory}" && npm install ${plugin} --ignore-scripts`);
-					runExecSync(`cd "${currentAppWorkingDirectory}" && cordova plugin add ${plugin}`);
-					update = true;
+					logMessageInfo(`Skip for ${plugin} with ${isEnabled} which is installed using ${installed}`);
+					// update = true; review 
 				}
-			} else if (isEnabled == false && installed) {
-				logMessageInfo(`Removing ${plugin}...`);
-				runExecSync(`cd "${currentAppWorkingDirectory}" && cordova plugin rm ${plugin}`);
-				// runExecSync(`cd "${currentAppWorkingDirectory}" && npm uninstall ${plugin} --ignore-scripts`);
-			} else {
-				logMessageInfo(`Skip for ${plugin} with ${isEnabled} which is installed using ${installed}`);
-				// update = true; review 
+			} catch (error) {
+				logMessageError(`Failed to manage plugin ${plugin}:`, error);
 			}
-		} catch (error) {
-			logMessageError(`Failed to manage plugin ${plugin}:`, error);
-		}
 
-		if (update) {
-			packagePluginPath = path.join(currentAppWorkingDirectory, 'node_modules', plugin);
-			// Update podfile to use
-			if (!plugin.includes('cordova-acoustic-mobile-push-plugin-dial')) {
-				updatePluginXMLPodName(packagePluginPath, configData.plugins.useRelease);
+			if (update) {
+				packagePluginPath = path.join(currentAppWorkingDirectory, 'node_modules', plugin);
+				// Update podfile to use
+				if (!plugin.includes('cordova-acoustic-mobile-push-plugin-dial')) {
+					updatePluginXMLPodName(packagePluginPath, configData.plugins.useRelease);
+				}
+				// Update gradle for beta/release version
+				if (!plugin.includes('cordova-acoustic-mobile-push-plugin-ios-notification-service') &&
+					!plugin.includes('cordova-acoustic-mobile-push-plugin-action-menu') &&
+					!plugin.includes('cordova-acoustic-mobile-push-plugin-dial') &&
+					!plugin.includes('cordova-acoustic-mobile-push-plugin-passbook')) {
+					updateBuildExtrasGradle(packagePluginPath, configData.plugins.useRelease);
+				}
 			}
-			// Update gradle for beta/release version
-			if (!plugin.includes('cordova-acoustic-mobile-push-plugin-ios-notification-service') &&
-				!plugin.includes('cordova-acoustic-mobile-push-plugin-action-menu') &&
-				!plugin.includes('cordova-acoustic-mobile-push-plugin-dial') &&
-				!plugin.includes('cordova-acoustic-mobile-push-plugin-passbook')) {
-				updateBuildExtrasGradle(packagePluginPath, configData.plugins.useRelease);
-			}
-		}
-	});
+		});
+	}
 }
 
 /**
