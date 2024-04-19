@@ -365,9 +365,9 @@ function managePlugins(currentAppWorkingDirectory, pluginPath, configData) {
 			fs.unlinkSync(androidBuildExtrasGradleFile);
 		}
 		logMessageTitle(`Install base ${pluginName}`);
+		updatePluginXMLPodName(packagePluginPath, configData.plugins.useRelease, configData);
 		logMessageTitle(`cd "${currentAppWorkingDirectory}" && cordova plugin add ${pluginName} --variable CUSTOM_ACTIONS="${customAction}" --variable ANDROID_APPKEY="${androidAppkey}" --variable IOS_DEV_APPKEY="${iOSAppkey}" --variable IOS_PROD_APPKEY="${iOSProdkey}" --variable SERVER_URL="${serverUrl}" --variable LOGLEVEL="${logLevel}" --variable MCE_CAN_SYNC_OVERRIDE="${mceCanSyncOverride}" --force`);
 		execSync(`cd "${currentAppWorkingDirectory}" && cordova plugin add ${pluginName} --variable CUSTOM_ACTIONS="${customAction}" --variable ANDROID_APPKEY="${androidAppkey}" --variable IOS_DEV_APPKEY="${iOSAppkey}" --variable IOS_PROD_APPKEY="${iOSProdkey}" --variable SERVER_URL="${serverUrl}" --variable LOGLEVEL="${logLevel}" --variable MCE_CAN_SYNC_OVERRIDE="${mceCanSyncOverride}" --force`, { stdio: 'inherit', cwd: process.cwd() });
-		updatePluginXMLPodName(packagePluginPath, configData.plugins.useRelease, configData);
 	} catch (error) {
 		console.error(`Failed to manage plugin ${plugin}:`, error);
 	} finally {
