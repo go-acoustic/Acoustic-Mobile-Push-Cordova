@@ -367,7 +367,7 @@ function managePlugins(currentAppWorkingDirectory, pluginPath, configData) {
 		logMessageTitle(`Install base ${pluginName}`);
 		logMessageTitle(`cd "${currentAppWorkingDirectory}" && cordova plugin add ${pluginName} --variable CUSTOM_ACTIONS="${customAction}" --variable ANDROID_APPKEY="${androidAppkey}" --variable IOS_DEV_APPKEY="${iOSAppkey}" --variable IOS_PROD_APPKEY="${iOSProdkey}" --variable SERVER_URL="${serverUrl}" --variable LOGLEVEL="${logLevel}" --variable MCE_CAN_SYNC_OVERRIDE="${mceCanSyncOverride}" --force`);
 		execSync(`cd "${currentAppWorkingDirectory}" && cordova plugin add ${pluginName} --variable CUSTOM_ACTIONS="${customAction}" --variable ANDROID_APPKEY="${androidAppkey}" --variable IOS_DEV_APPKEY="${iOSAppkey}" --variable IOS_PROD_APPKEY="${iOSProdkey}" --variable SERVER_URL="${serverUrl}" --variable LOGLEVEL="${logLevel}" --variable MCE_CAN_SYNC_OVERRIDE="${mceCanSyncOverride}" --force`, { stdio: 'inherit', cwd: process.cwd() });
-		updatePluginXMLPodName(packagePluginPath, configData.plugins.useRelease);
+		updatePluginXMLPodName(packagePluginPath, configData.plugins.useRelease, configData);
 	} catch (error) {
 		console.error(`Failed to manage plugin ${plugin}:`, error);
 	} finally {
@@ -433,7 +433,7 @@ function managePlugins(currentAppWorkingDirectory, pluginPath, configData) {
 				packagePluginPath = path.join(currentAppWorkingDirectory, 'node_modules', plugin);
 				// Update podfile to use
 				if (!plugin.includes('cordova-acoustic-mobile-push-plugin-dial')) {
-					updatePluginXMLPodName(packagePluginPath, configData.plugins.useRelease);
+					updatePluginXMLPodName(packagePluginPath, configData.plugins.useRelease, configData);
 				}
 				// Update gradle for beta/release version
 				if (!plugin.includes('cordova-acoustic-mobile-push-plugin-ios-notification-service') &&
@@ -455,7 +455,8 @@ function managePlugins(currentAppWorkingDirectory, pluginPath, configData) {
 function runExecSync(cmdToRun) {
 	try {
 		console.log(cmdToRun);
-		execSync(`${cmdToRun}`); //, { stdio: 'inherit', cwd: process.cwd() });
+		const result = execSync(`${cmdToRun}`);
+		return result !== null ? result.toString() : result;
 	} catch (error) {
 		console.error(`Failed to run command:${cmdToRun}:`, error);
 	}
@@ -524,32 +525,25 @@ function isPluginInstalled(currentAppWorkingDirectory, pluginName) {
  * @param {*} pluginPath Path to plugin.
  * @param {*} isRelease Whether configuration is to use release.
  */
-function updatePluginXMLPodName(plugPath, isRelease) {
+function updatePluginXMLPodName(plugPath, isRelease, configData) {
 	try {
 		let pluginPath = path.join(plugPath, "plugin.xml");
 		let pluginContent = fs.readFileSync(pluginPath, 'utf8');
-		const podNameRegex = /\$POD_NAME/;
+		let podNameRegex = /<pod name="AcousticMobilePush.*\/>/;
+		let podname = isRelease ? "AcousticMobilePush" : "AcousticMobilePushDebug";
+
+		if (plugPath.includes('cordova-acoustic-mobile-push-plugin-ios-notification-service')) {
+			podNameRegex = /<pod name="AcousticMobilePushNotification.*\/>/;
+			podname = isRelease ? "AcousticMobilePushNotification" : "AcousticMobilePushNotificationDebug";
+		}
 
 		if (podNameRegex.test(pluginContent)) {
-			let podname
-			if (plugPath.includes('cordova-acoustic-mobile-push-plugin-action-menu') ||
-				plugPath.includes('cordova-acoustic-mobile-push-plugin-beacon') ||
-				plugPath.includes('cordova-acoustic-mobile-push-plugin-calendar') ||
-				plugPath.includes('cordova-acoustic-mobile-push-plugin-displayweb') ||
-				plugPath.includes('cordova-acoustic-mobile-push-plugin-geofence') ||
-				plugPath.includes('cordova-acoustic-mobile-push-plugin-inapp') ||
-				plugPath.includes('cordova-acoustic-mobile-push-plugin-inbox') ||
-				plugPath.includes('cordova-acoustic-mobile-push-plugin-ios-notification-service')) {
-				podname = isRelease ? "AcousticMobilePushNotification" : "AcousticMobilePushNotificationDebug";
-			} else {
-				// cordova-acoustic-mobile-push-plugin-location
-				// cordova-acoustic-mobile-push-plugin-passbook
-				// cordova-acoustic-mobile-push-plugin-snooze
-				// cordova-acoustic-mobile-push-sdk
-				podname = isRelease ? "AcousticMobilePush" : "AcousticMobilePushDebug";
+			let version = '';
+			if (configData.iOSVersion) {
+				version = `spec="${configData.iOSVersion}" `
 			}
-
-			pluginContent = pluginContent.replace(podNameRegex, podname);
+			const podNameUpdate = `<pod name="${podname}" ${version}/>`;
+			pluginContent = pluginContent.replace(podNameRegex, podNameUpdate);
 
 			fs.writeFileSync(pluginPath, pluginContent, 'utf8');
 			logMessageInfo(`Update to use podName: ${podname} for ${pluginPath}`);
@@ -637,6 +631,24 @@ function getInstallDirectory() {
 }
 
 /**
+ * This will get latest release version from github for iOS.
+ * 
+ * @returns Latest release version.
+ */
+function getLatestiOSVersion() {
+	return runExecSync(`curl -H "Accept: application/vnd.github.v3+json" https://api.github.com/repos/go-acoustic/Acoustic-Mobile-Push-iOS/releases | jq -r '.[0].tag_name'`);
+}
+
+/**
+ * This will get latest release version from github for Android.
+ * 
+ * @returns Latest release version.
+ */
+function getLatestAndroidVersion() {
+	return runExecSync(`curl -H "Accept: application/vnd.github.v3+json" https://api.github.com/repos/go-acoustic/Acoustic-Mobile-Push-Android/releases | jq -r '.[0].tag_name'`);
+}
+
+/**
  * Start install of sdk on application.
  */
 function startInstall() {
@@ -690,3 +702,4 @@ function startInstall() {
 }
 
 startInstall();
+
