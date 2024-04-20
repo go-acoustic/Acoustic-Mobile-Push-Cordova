@@ -8,7 +8,7 @@ industrial property rights of Acoustic, L.P. except as may be provided in an agr
 Acoustic, L.P. Any unauthorized copying or distribution of content from this file is prohibited.
 -->
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0" id="cordova-acoustic-mobile-push-plugin-snooze"
-version="3.9.66">
+version="3.9.67">
   <name>Snooze Action for Acoustic MCE Cordova Plugin</name>
   <author>Acoustic MCE</author>
   <description>Snooze Action for Acoustic MCE Push Services</description>
@@ -22,7 +22,7 @@ version="3.9.66">
   </js-module>
 
   <!-- Library settings -->
-  <preference name="POD_VERSION" default="3.9.66" />
+  <preference name="POD_VERSION" default="3.9.67" />
   <platform name="ios">
     <config-file target="config.xml" parent="/*">
       <feature name="MCESnoozePlugin" >

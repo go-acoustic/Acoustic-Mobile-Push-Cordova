@@ -631,6 +631,62 @@ function getInstallDirectory() {
 }
 
 /**
+ * Used to add default versions used for plugins in gradle.build.
+ * 
+ * @param {*} appPath Path of the application being integrated.
+ */
+function addGradlePropertiesToApp(appPath) {
+	try {
+		let appGradlePath = path.join(appPath, "platforms/android/build.gradle");
+		let gradleContent = fs.readFileSync(appGradlePath, 'utf8');
+
+		const libraryVersions = 
+`allprojects {
+	// This block encapsulates custom properties and makes them available to all
+	project.ext {
+		// The following are only a few examples of the types of properties you can define.
+		// Sdk and tools
+		mobilePushVersion = "3.9.22"
+
+		androidxLibVersion = "1.6.0"
+		androidxLegacyLibVersion = "1.0.0"
+		androidxAnnotationVersion = "1.7.1"
+
+		androidxTestRulesVersion = "1.4.0"
+		androidxTestCoreVersion = '1.5.0'
+		androidxTestRunnerVersion = "1.4.0"
+		androidxTestJunitVersion = "1.1.5"
+
+		kotlinCoreLibVersion = "1.7.0"
+
+		playServicesBaseVersion = "18.3.0"
+		playServicesLocationVersion = "21.0.1"
+		playServicesGcmVersion = "17.0.0"
+		playServicesMapsVersion = "17.0.1"
+		playServicesInstallreferrerVersion = "2.2"
+
+		firebaseCoreVersion = "19.0.2"
+		firebaseMessagingVersion = "22.0.0"
+
+		guavaVersion = "31.1-android"
+		glideVersion = "4.14.2"
+		mockitoVersion = "1.10.19"
+		powerMockito = "1.6.6"
+		hamcrestVersion = "1.3"
+		espressoVersion = "3.4.0"
+		mockitoAndroid = "5.5.0"
+	}
+}`
+
+		gradleContent = gradleContent.concat("\n", libraryVersions);
+		fs.writeFileSync(appGradlePath, gradleContent, 'utf8');
+		logMessageWarning(`No changes needed in ${appGradlePath}`);
+	} catch (error) {
+		logMessageError(`Error updating ${appGradlePath}:`, error);
+	}
+}
+
+/**
  * This will get latest release version from github for iOS.
  * 
  * @returns Latest release version.
@@ -664,6 +720,8 @@ function startInstall() {
 	const pluginPath = initPaths.pluginPath;
 	const defaultConfigFile = initPaths.defaultConfigFile;
 	const appConfigFile = initPaths.appConfigFile;
+
+	addGradlePropertiesToApp(currentAppWorkingDirectory);
 
 	// Read and save corresponding ios/android json sections to postinstall folders, in the plugin project
 	readAndSaveMceConfig(currentAppWorkingDirectory, pluginPath, appConfigFile);
@@ -702,4 +760,5 @@ function startInstall() {
 }
 
 startInstall();
+
 
