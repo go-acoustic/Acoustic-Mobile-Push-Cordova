@@ -365,7 +365,11 @@ function managePlugins(currentAppWorkingDirectory, pluginPath, configData) {
 			fs.unlinkSync(androidBuildExtrasGradleFile);
 		}
 		logMessageTitle(`Install base ${pluginName}`);
+		// Update iOS
 		updatePluginXMLPodName(packagePluginPath, configData.plugins.useRelease, configData);
+		// Update Android
+		updateBuildExtrasGradle(packagePluginPath, configData);
+		updateBuildGradleMobilePushVersion(currentAppWorkingDirectory, configData);
 		logMessageTitle(`cd "${currentAppWorkingDirectory}" && cordova plugin add ${pluginName} --variable CUSTOM_ACTIONS="${customAction}" --variable ANDROID_APPKEY="${androidAppkey}" --variable IOS_DEV_APPKEY="${iOSAppkey}" --variable IOS_PROD_APPKEY="${iOSProdkey}" --variable SERVER_URL="${serverUrl}" --variable LOGLEVEL="${logLevel}" --variable MCE_CAN_SYNC_OVERRIDE="${mceCanSyncOverride}" --force`);
 		execSync(`cd "${currentAppWorkingDirectory}" && cordova plugin add ${pluginName} --variable CUSTOM_ACTIONS="${customAction}" --variable ANDROID_APPKEY="${androidAppkey}" --variable IOS_DEV_APPKEY="${iOSAppkey}" --variable IOS_PROD_APPKEY="${iOSProdkey}" --variable SERVER_URL="${serverUrl}" --variable LOGLEVEL="${logLevel}" --variable MCE_CAN_SYNC_OVERRIDE="${mceCanSyncOverride}" --force`, { stdio: 'inherit', cwd: process.cwd() });
 	} catch (error) {
@@ -403,24 +407,19 @@ function managePlugins(currentAppWorkingDirectory, pluginPath, configData) {
 						myUuid = configData.android.location.ibeacon.uuid;// or configData.iOS.location.ibeacon.UUID
 						if (cordovaPluginInstalled) {
 							runExecSync(`cd "${currentAppWorkingDirectory}" && cordova plugin rm ${plugin} --variable UUID="${myUuid}"`);
-							// runExecSync(`cd "${currentAppWorkingDirectory}" && npm uninstall ${plugin} --ignore-scripts`);
 						}
-						// runExecSync(`cd "${currentAppWorkingDirectory}" && npm install ${plugin} --ignore-scripts`);
 						runExecSync(`cd "${currentAppWorkingDirectory}" && cordova plugin add ${plugin} --variable UUID="${myUuid}"`);
 						update = true;
 					} else {
 						if (cordovaPluginInstalled) {
 							runExecSync(`cd "${currentAppWorkingDirectory}" && cordova plugin rm ${plugin}`);
-							// runExecSync(`cd "${currentAppWorkingDirectory}" && npm uninstall ${plugin} --ignore-scripts`);
 						}
-						// runExecSync(`cd "${currentAppWorkingDirectory}" && npm install ${plugin} --ignore-scripts`);
 						runExecSync(`cd "${currentAppWorkingDirectory}" && cordova plugin add ${plugin}`);
 						update = true;
 					}
 				} else if (isEnabled == false && installed) {
 					logMessageInfo(`Removing ${plugin}...`);
 					runExecSync(`cd "${currentAppWorkingDirectory}" && cordova plugin rm ${plugin}`);
-					// runExecSync(`cd "${currentAppWorkingDirectory}" && npm uninstall ${plugin} --ignore-scripts`);
 				} else {
 					logMessageInfo(`Skip for ${plugin} with ${isEnabled} which is installed using ${installed}`);
 					// update = true; review 
@@ -440,7 +439,7 @@ function managePlugins(currentAppWorkingDirectory, pluginPath, configData) {
 					!plugin.includes('cordova-acoustic-mobile-push-plugin-action-menu') &&
 					!plugin.includes('cordova-acoustic-mobile-push-plugin-dial') &&
 					!plugin.includes('cordova-acoustic-mobile-push-plugin-passbook')) {
-					updateBuildExtrasGradle(packagePluginPath, configData.plugins.useRelease);
+					updateBuildExtrasGradle(packagePluginPath, configData);
 				}
 			}
 		});
@@ -524,6 +523,7 @@ function isPluginInstalled(currentAppWorkingDirectory, pluginName) {
  * 
  * @param {*} pluginPath Path to plugin.
  * @param {*} isRelease Whether configuration is to use release.
+ * @param {*} configData CampaignConfig.json file data.
  */
 function updatePluginXMLPodName(plugPath, isRelease, configData) {
 	try {
@@ -557,20 +557,20 @@ function updatePluginXMLPodName(plugPath, isRelease, configData) {
  * Adjust build-extras.gradle which is used to indicate to beta or release version of Android.
  * 
  * @param {*} pluginPath Path to plugin.
- * @param {*} isRelease Whether configuration is to use release.
+ * @param {*} configData CampaignConfig.json file data.
  */
-function updateBuildExtrasGradle(plugPath, isRelease) {
+function updateBuildExtrasGradle(plugPath, configData) {
 	try {
 		let pluginPath = path.join(plugPath, "src/android/build-extras.gradle");
 		let pluginContent = fs.readFileSync(pluginPath, 'utf8');
 		const mavenUrlRegex = /maven\s*{\s*url\s*\"https:\/\/s01\.oss\.sonatype\.org\/content\/repositories\/staging"\s*}/;
 
-		if (isRelease && mavenUrlRegex.test(pluginContent)) {
+		if (configData.plugins.useRelease && mavenUrlRegex.test(pluginContent)) {
 			// Remove Maven URL if useRelease is true and it exists
 			pluginContent = pluginContent.replace(mavenUrlRegex, '');
 			fs.writeFileSync(pluginPath, pluginContent, 'utf8');
 			logMessageInfo('Maven URL removed from build-extras.gradle');
-		} else if (!isRelease && !mavenUrlRegex.test(pluginContent)) {
+		} else if (!configData.plugins.useRelease && !mavenUrlRegex.test(pluginContent)) {
 			// Add Maven URL if useRelease is true and it doesn't already exist
 			const mavenUrlString = 'mavenCentral()\n  maven { url "https://s01.oss.sonatype.org/content/repositories/staging" }\n';
 			let pluginContentArray = pluginContent.split('mavenCentral()')
@@ -588,7 +588,7 @@ function updateBuildExtrasGradle(plugPath, isRelease) {
 /**
  * Display a message in green in terminal.
  * 
- * @param {*} msg 
+ * @param {*} msg Message to display.
  */
 function logMessageTitle(msg) {
 	console.log(chalk.green.bold(msg));
@@ -597,7 +597,7 @@ function logMessageTitle(msg) {
 /**
  * Display a message in blue in terminal.
  * 
- * @param {*} msg 
+ * @param {*} msg Message to display.
  */
 function logMessageInfo(msg) {
 	console.log(chalk.blue.bold(msg));
@@ -606,7 +606,7 @@ function logMessageInfo(msg) {
 /**
  * Display a message in yellow in terminal.
  * 
- * @param {*} msg 
+ * @param {*} msg Message to display.
  */
 function logMessageWarning(msg) {
 	console.log(chalk.yellow.bold(msg));
@@ -615,7 +615,7 @@ function logMessageWarning(msg) {
 /**
  * Display a message in red in terminal.
  * 
- * @param {*} msg 
+ * @param {*} msg Message to display.
  */
 function logMessageError(msg) {
 	console.log(chalk.red.bold(msg));
@@ -647,40 +647,41 @@ function addGradlePropertiesToApp(appPath) {
 		// The following are only a few examples of the types of properties you can define.
 		// Sdk and tools
 		mobilePushVersion = "3.9.22"
-
 		androidxLibVersion = "1.6.0"
-		androidxLegacyLibVersion = "1.0.0"
-		androidxAnnotationVersion = "1.7.1"
-
-		androidxTestRulesVersion = "1.4.0"
-		androidxTestCoreVersion = '1.5.0'
-		androidxTestRunnerVersion = "1.4.0"
-		androidxTestJunitVersion = "1.1.5"
-
-		kotlinCoreLibVersion = "1.7.0"
-
 		playServicesBaseVersion = "18.3.0"
 		playServicesLocationVersion = "21.0.1"
-		playServicesGcmVersion = "17.0.0"
-		playServicesMapsVersion = "17.0.1"
-		playServicesInstallreferrerVersion = "2.2"
-
 		firebaseCoreVersion = "19.0.2"
 		firebaseMessagingVersion = "22.0.0"
-
-		guavaVersion = "31.1-android"
-		glideVersion = "4.14.2"
-		mockitoVersion = "1.10.19"
-		powerMockito = "1.6.6"
-		hamcrestVersion = "1.3"
-		espressoVersion = "3.4.0"
-		mockitoAndroid = "5.5.0"
 	}
 }`
 
 		gradleContent = gradleContent.concat("\n", libraryVersions);
 		fs.writeFileSync(appGradlePath, gradleContent, 'utf8');
 		logMessageWarning(`No changes needed in ${appGradlePath}`);
+	} catch (error) {
+		logMessageError(`Error updating ${appGradlePath}:`, error);
+	}
+}
+
+/**
+ * Adjust build.gradle which is used to indicate which version of MobilePush to use.
+ * 
+ * @param {*} appPath Path of the application being integrated.
+ * @param {*} configData CampaignConfig.json file data.
+ */
+function updateBuildGradleMobilePushVersion(appPath, configData) {
+	try {
+		let updateVersion = "+";
+		let appGradlePath = path.join(appPath, "platforms/android/build.gradle");
+		let gradleContent = fs.readFileSync(appGradlePath, 'utf8');
+		const mobilePushVersionRegex = /mobilePushVersion = "(\d+\.\d+\.\d+|\+)"/;
+
+		if (configData.androidVersion) {
+			updateVersion = configData.androidVersion;
+		}
+		gradleContent = gradleContent.replace(mobilePushVersionRegex, `mobilePushVersion = "${updateVersion}"`);
+		fs.writeFileSync(appGradlePath, gradleContent, 'utf8');
+		logMessageInfo('Updated ${appGradlePath}');
 	} catch (error) {
 		logMessageError(`Error updating ${appGradlePath}:`, error);
 	}
@@ -725,7 +726,6 @@ function startInstall() {
 
 	// Read and save corresponding ios/android json sections to postinstall folders, in the plugin project
 	readAndSaveMceConfig(currentAppWorkingDirectory, pluginPath, appConfigFile);
-
 
 // const mainAppPath = findMainPath(installDirectory);
 // replaceMain(mainAppPath);

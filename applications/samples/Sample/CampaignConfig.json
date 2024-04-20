@@ -2,9 +2,9 @@
   "Please note": "<true/false>, for native SDK build.  True for release build, false for beta build",
   "useRelease": false,
   "iOS Version": "<x.xx.xxx>, native iOS SDK version",
-  "iOSVersion": "3.9.22",
+  "iOSVersion": "",
   "Android Version": "<x.xx.xxx>, native Android SDK version",
-  "androidVersion": "3.9.1",
+  "androidVersion": "",
 
   "plugins": {
     "Please note": "<true/false>, for cordova build.  True for release build, false for beta build",
