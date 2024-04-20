@@ -17,7 +17,7 @@ repositories{
 
 dependencies {
   implementation "androidx.appcompat:appcompat:" + project.ext.androidxLibVersion
-  implementation "io.github.go-acoustic:acoustic-mobile-push-android-snooze:" + project.ext.playServicesLocationVersion
+  implementation "io.github.go-acoustic:acoustic-mobile-push-android-snooze:" + project.ext.mobilePushVersion
 }
 
 android {
