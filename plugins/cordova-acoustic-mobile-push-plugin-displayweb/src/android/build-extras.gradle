@@ -1,8 +1,5 @@
 repositories{    
   jcenter()
-  flatDir {
-    dirs 'libs'
-  }
   google()
   mavenCentral()
   maven {
@@ -16,8 +13,8 @@ repositories{
 }
 
 dependencies {
-  implementation('androidx.appcompat:appcompat:1.6.0')
-  implementation "io.github.go-acoustic:acoustic-mobile-push-android-displayweb:+"
+  implementation "androidx.appcompat:appcompat:" + project.ext.androidxLibVersion
+  implementation "io.github.go-acoustic:acoustic-mobile-push-android-displayweb:" + project.ext.mobilePushVersion
 }
 
 android {
