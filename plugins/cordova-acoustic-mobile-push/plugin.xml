@@ -7,7 +7,7 @@ Acoustic, L.P. and/or other developers. No license is granted under any intellec
 industrial property rights of Acoustic, L.P. except as may be provided in an agreement with 
 Acoustic, L.P. Any unauthorized copying or distribution of content from this file is prohibited.
 -->
-<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0" id="cordova-acoustic-mobile-push" version="3.9.71">
+<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0" id="cordova-acoustic-mobile-push" version="3.9.72">
     <name>Acoustic MCE Cordova Plugin</name>
     <author>Acoustic MCE</author>
     <description>Allows Cordova applications to integrate with Acoustic MCE Push Services</description>
@@ -21,7 +21,7 @@ Acoustic, L.P. Any unauthorized copying or distribution of content from this fil
     </js-module>
 
     <!-- Library settings -->
-    <preference name="POD_VERSION" default="3.9.71" />
+    <preference name="POD_VERSION" default="3.9.72" />
 
     <preference name="CHANNEL_NAME" default="MCE SDK Notification Channel" />
     <preference name="CHANNEL_DESCRIPTION" default="This is the notification channel for the MCE SDK sample application"/>
@@ -197,6 +197,8 @@ Acoustic, L.P. Any unauthorized copying or distribution of content from this fil
             <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
             <!-- VIBRATE is required for notification configuration -->
             <uses-permission android:name="android.permission.VIBRATE" />
+            <!-- CALL_PHONE is optional. It is only required is the dial action is used -->
+            <uses-permission android:name="android.permission.CALL_PHONE" />
         </config-file>
         <config-file target="res/values/strings.xml" parent="/*">
             <string name="appkey">$ANDROID_APPKEY</string>

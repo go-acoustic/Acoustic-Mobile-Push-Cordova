@@ -17,7 +17,6 @@ cordova plugin rm cordova-acoustic-mobile-push-plugin-inapp
 cordova plugin rm cordova-acoustic-mobile-push-plugin-inbox
 cordova plugin rm cordova-acoustic-mobile-push-plugin-calendar
 cordova plugin rm cordova-acoustic-mobile-push-plugin-displayweb
-cordova plugin rm cordova-acoustic-mobile-push-plugin-dial
 cordova plugin rm cordova-acoustic-mobile-push-plugin-snooze
 cordova plugin rm cordova-acoustic-mobile-push-plugin-geofence
 cordova plugin rm cordova-acoustic-mobile-push-plugin-ios-notification-service
@@ -31,7 +30,6 @@ npm rm cordova-acoustic-mobile-push-plugin-inapp-beta
 npm rm cordova-acoustic-mobile-push-plugin-inbox-beta
 npm rm cordova-acoustic-mobile-push-plugin-calendar-beta
 npm rm cordova-acoustic-mobile-push-plugin-displayweb-beta
-npm rm cordova-acoustic-mobile-push-plugin-dial-beta
 npm rm cordova-acoustic-mobile-push-plugin-snooze-beta
 npm rm cordova-acoustic-mobile-push-plugin-geofence-beta
 npm rm cordova-acoustic-mobile-push-plugin-ios-notification-service-beta
