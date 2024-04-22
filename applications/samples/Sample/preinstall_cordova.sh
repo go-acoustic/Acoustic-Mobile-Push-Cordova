@@ -11,7 +11,6 @@ echo ""
 
 echo "Removing all Acoustic plugins"
 cordova plugin rm cordova-acoustic-mobile-push
-cordova plugin rm cordova-acoustic-mobile-push-plugin-fcm
 cordova plugin rm cordova-acoustic-mobile-push-plugin-location
 cordova plugin rm cordova-acoustic-mobile-push-plugin-beacon
 cordova plugin rm cordova-acoustic-mobile-push-plugin-inapp
@@ -26,7 +25,6 @@ cordova plugin rm cordova-acoustic-mobile-push-plugin-action-menu
 cordova plugin rm cordova-acoustic-mobile-push-plugin-passbook
 
 npm rm cordova-acoustic-mobile-push-beta
-npm rm cordova-acoustic-mobile-push-plugin-fcm-beta
 npm rm cordova-acoustic-mobile-push-plugin-location-beta
 npm rm cordova-acoustic-mobile-push-plugin-beacon-beta
 npm rm cordova-acoustic-mobile-push-plugin-inapp-beta
