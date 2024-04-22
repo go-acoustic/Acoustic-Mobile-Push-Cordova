@@ -14,7 +14,7 @@ After the plugin is installed, `CampaignConfig.json` file will be created if not
 For production Campaign SDKs, set "useRelease" to true, false uses beta build.  Note: It's recommended to set the property to "false" during testing phase.
 
 ```shell json
-  "useRelease": true,
+  "useRelease": false,
 ```
 
 ## Set up your Android project

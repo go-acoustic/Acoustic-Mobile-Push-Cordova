@@ -33,7 +33,7 @@
     "license": "See license in license/license.txt",
     "name": "cordova-acoustic-mobile-push-plugin-inbox-beta",
     "peerDependencies": {
-        "cordova-acoustic-mobile-push": "npm:cordova-acoustic-mobile-push-beta@^3.9.75",
+        "cordova-acoustic-mobile-push": "npm:cordova-acoustic-mobile-push-beta@^3.9.76",
         "jquery": "^3.6.0",
         "jquery-mobile": "^1.5.0-alpha.1"
     },
@@ -43,5 +43,5 @@
         "directory": "plugins/cordova-acoustic-mobile-push-plugin-inbox"
     },
     
-    "version": "3.9.75"
+    "version": "3.9.76"
 }
