@@ -30,21 +30,20 @@
         "cordova-android"
     ],
     "license": "See license in license/license.txt",
-    "name": "cordova-acoustic-mobile-push-sdk-beta",
+    "name": "cordova-acoustic-mobile-push-beta",
     "peerDependencies": {
         "jquery": "^3.6.0"
     },
     "repository": {
         "type": "git",
         "url": "git+https://github.com/aipoweredmarketer/ca-mce-cordova-sdk.git",
-        "directory": "plugins/cordova-acoustic-mobile-push-sdk"
+        "directory": "plugins/cordova-acoustic-mobile-push"
     },
     "scripts": {
-        "installPlugins": "node scripts/installPlugins.js $INIT_CWD",
-        "postinstall": "node scripts/postinstall.js $INIT_CWD",
+        "postinstall": "node scripts/postinstall.js",
         "test": "echo \"Error: no test specified\" && exit 1"
     },
-    "version": "3.9.68",
+    "version": "3.9.69",
     "dependencies": {
         "chalk": "^4.1.2",
         "ncp": "^2.0.0",

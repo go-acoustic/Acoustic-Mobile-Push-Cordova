@@ -10,7 +10,7 @@
     "esModuleInterop": true,
     "baseUrl": ".",
     "paths":{
-      "cordova-acoustic-mobile-push-sdk" : ["../cordova-acoustic-mobile-push-sdk"]
+      "cordova-acoustic-mobile-push" : ["../cordova-acoustic-mobile-push"]
     },
   },
   "include": ["./www/ts/**/*"]

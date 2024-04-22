@@ -1,4 +1,4 @@
-import { AnyObject } from "cordova-acoustic-mobile-push-sdk";
+import { AnyObject } from "cordova-acoustic-mobile-push";
 
 export interface InAppMessage {
     /** The unique identifier of the InAppMessage */

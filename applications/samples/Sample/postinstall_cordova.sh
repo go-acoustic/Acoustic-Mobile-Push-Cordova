@@ -7,9 +7,9 @@ cordova platform add ios
 echo ""
 
 echo "Adding Core Acoustic SDK plugin"
-npm install cordova-acoustic-mobile-push-sdk-beta
+npm install cordova-acoustic-mobile-push-beta
 echo ""
 
 # echo "Running install for all plugins"
-# node node_modules/cordova-acoustic-mobile-push-sdk-beta/scripts/installPlugins.js
+# node node_modules/cordova-acoustic-mobile-push-beta/scripts/installPlugins.js
 # echo ""

@@ -340,7 +340,7 @@ function saveConfig(configData, destinationPath) {
 function managePlugins(currentAppWorkingDirectory, pluginPath, configData) {
 	try {
 		logMessageTitle("Install required cordova plugins...");
-		let pluginName = "cordova-acoustic-mobile-push-sdk"
+		let pluginName = "cordova-acoustic-mobile-push"
 		if (pluginPath.includes('-beta')) {
 			pluginName = `${pluginName}-beta`
 		}
@@ -360,7 +360,7 @@ function managePlugins(currentAppWorkingDirectory, pluginPath, configData) {
 		logLevel           = configData.iOS.loglevel;
 		mceCanSyncOverride = configData.mceCanSyncOverride;
 
-		const androidBuildExtrasGradleFile = path.join(currentAppWorkingDirectory, "platforms/android/cordova-acoustic-mobile-push-sdk/android-build-extras.gradle");
+		const androidBuildExtrasGradleFile = path.join(currentAppWorkingDirectory, "platforms/android/cordova-acoustic-mobile-push/android-build-extras.gradle");
 		if(fs.existsSync(androidBuildExtrasGradleFile)) {
 			fs.unlinkSync(androidBuildExtrasGradleFile);
 		}
@@ -376,7 +376,7 @@ function managePlugins(currentAppWorkingDirectory, pluginPath, configData) {
 		console.error(`Failed to manage plugin ${plugin}:`, error);
 	} finally {
 		Object.entries(configData.plugins).forEach(([plugin, isEnabled]) => {
-			if (plugin.includes('cordova-acoustic-mobile-push-sdk')) {
+			if (plugin.includes('cordova-acoustic-mobile-push')) {
 				return;
 			}
 			if (!plugin.includes('cordova-acoustic-mobile-push-')) {

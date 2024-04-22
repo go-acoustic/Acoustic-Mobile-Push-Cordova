@@ -8,7 +8,7 @@
  * prohibited.
  */
 
-import { StringObject } from "cordova-acoustic-mobile-push-sdk/www/ts/MCEPluginTypes";
+import { StringObject } from "cordova-acoustic-mobile-push/www/ts/MCEPluginTypes";
 import MCEInbox from "./MCEInbox";
 import MCEInboxPlugin from "./MCEInboxPlugin";
 import { InboxMessage } from "./MCEInboxPluginTypes";

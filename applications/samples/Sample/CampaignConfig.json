@@ -11,7 +11,7 @@
     "useRelease": false,
 
     "Required Mobile-Push plugins": "<true/false>, enable or disable plugin",
-    "cordova-acoustic-mobile-push-sdk-beta": true,
+    "cordova-acoustic-mobile-push-beta": true,
     "cordova-acoustic-mobile-push-plugin-ios-notification-service-beta": true,
     "cordova-acoustic-mobile-push-plugin-inapp-beta": true,
     "cordova-acoustic-mobile-push-plugin-inbox-beta": true,

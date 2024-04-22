@@ -12,7 +12,7 @@ Update the values in `SampleCode_AcousticMobilePush_Android_java/Demo/app/src/ma
 
 ## Run Sample Application
 1. Open a terminal and navigate to `applications/samples/Sample`.
-1. In the line beginning with `cordova plugin add file:../../../plugins/cordova-acoustic-mobile-push-sdk` in `postinstall_cordova.sh`, configure the Acoustic SDK to your app's requirements. You will need to modify at least the app keys and the server URL.
+1. In the line beginning with `cordova plugin add file:../../../plugins/cordova-acoustic-mobile-push` in `postinstall_cordova.sh`, configure the Acoustic SDK to your app's requirements. You will need to modify at least the app keys and the server URL.
 1. Run `npm i`.
 
 ### Android

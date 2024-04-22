@@ -12,7 +12,7 @@ import {
     LocationAuthorizationCallback,
     LocationCallback,
 } from "./MCELocationPluginTypes";
-import {} from "cordova-acoustic-mobile-push-sdk";
+import {} from "cordova-acoustic-mobile-push";
 
 /**
 Acoustic MCE Location Cordova Plugin

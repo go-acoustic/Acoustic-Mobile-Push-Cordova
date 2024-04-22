@@ -1,4 +1,4 @@
-import { StringObject } from "cordova-acoustic-mobile-push-sdk/www/ts/MCEPluginTypes";
+import { StringObject } from "cordova-acoustic-mobile-push/www/ts/MCEPluginTypes";
 export interface InboxMessage {
     /** Unique identifier for inbox message */
     inboxMessageId: string;

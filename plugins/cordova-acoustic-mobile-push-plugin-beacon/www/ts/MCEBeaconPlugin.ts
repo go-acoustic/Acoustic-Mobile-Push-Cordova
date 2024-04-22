@@ -8,7 +8,7 @@
  * prohibited.
  */
 
-import {} from "cordova-acoustic-mobile-push-sdk";
+import {} from "cordova-acoustic-mobile-push";
 import { BeaconCallback, BeaconEnabledCallback, BeaconRegionsCallback, BeaconUUIDCallback } from "./MCEBeaconPluginTypes";
 
 /**

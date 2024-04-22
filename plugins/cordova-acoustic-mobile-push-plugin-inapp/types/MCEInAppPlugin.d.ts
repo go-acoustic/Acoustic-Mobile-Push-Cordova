@@ -1,4 +1,4 @@
-import { StringObject } from "cordova-acoustic-mobile-push-sdk";
+import { StringObject } from "cordova-acoustic-mobile-push";
 import { InAppTemplateCallback } from "./MCEInAppPluginTypes";
 /**
 Acoustic MCE InApp Cordova Plugin
