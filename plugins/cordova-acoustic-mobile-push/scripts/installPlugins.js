@@ -376,7 +376,7 @@ function managePlugins(currentAppWorkingDirectory, pluginPath, configData) {
 		console.error(`Failed to manage plugin ${plugin}:`, error);
 	} finally {
 		Object.entries(configData.plugins).forEach(([plugin, isEnabled]) => {
-			if (plugin.includes('cordova-acoustic-mobile-push')) {
+			if (plugin === 'cordova-acoustic-mobile-push' || plugin === 'cordova-acoustic-mobile-push-beta') {
 				return;
 			}
 			if (!plugin.includes('cordova-acoustic-mobile-push-')) {
