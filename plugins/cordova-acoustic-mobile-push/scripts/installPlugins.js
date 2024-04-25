@@ -279,12 +279,8 @@ function addOrReplaceMobilePushConfigFile(currentAppWorkingDirectory) {
  * @param {*} pluginPath Path to plugin.
  * @param {*} campaignConfigFile CampaignConfig.json file.
  */
-function readAndSaveMceConfig(currentAppWorkingDirectory, pluginPath, campaignConfigFile) {
+function readAndSaveMceConfig(currentAppWorkingDirectory, pluginPath, jsonData) {
 	try {
-	  // Read the file synchronously
-	  const fileData = fs.readFileSync(campaignConfigFile, 'utf8');
-	  const jsonData = JSON.parse(fileData);
-  
 	  if (jsonData.android && jsonData.iOS) {
 			if (jsonData.android) {
 				const androidConfig = JSON.stringify(jsonData.android, null, 2);
@@ -440,6 +436,74 @@ function managePlugins(currentAppWorkingDirectory, pluginPath, configData) {
 				}
 			}
 		});
+	}
+}
+
+function readMceConfig(campaignConfigFile) {
+	let jsonData;
+	try {
+	  // Read the file synchronously
+	  const fileData = fs.readFileSync(campaignConfigFile, 'utf8');
+	  jsonData = JSON.parse(fileData);
+	} catch (error) {
+		logMessageError(`Failed to manage plugin ${plugin}:`, error);
+	}
+	return jsonData;
+}
+
+/**
+ * Used to update MceConfig.json to application location.
+ * 
+ * @param {*} currentAppWorkingDirectory Current application directory where cordova plugin add or npm install is being ran.
+ * @param {*} pluginPath Path to plugin.
+ * @param {*} configData CampaignConfig.json data.
+ */
+function updateMceConfig(currentAppWorkingDirectory, pluginPath, configData) {
+	updateMceConfigHelper(currentAppWorkingDirectory, pluginPath, configData, 'android');
+	updateMceConfigHelper(currentAppWorkingDirectory, pluginPath, configData, 'ios');
+}
+
+/**
+ * Used to help save MceConfig.json to application location.
+ * 
+ * @param {*} currentAppWorkingDirectory Current application directory where cordova plugin add or npm install is being ran.
+ * @param {*} pluginPath Path to plugin.
+ * @param {*} configData CampaignConfig.json data.
+ * @param {*} platform Use 'android' or 'ios'.
+ */
+function updateMceConfigHelper(currentAppWorkingDirectory, pluginPath, configData, platform) {
+	try {
+		// Read the file synchronously
+		const mceConfigPath = path.join(pluginPath, `postinstall/${platform}/MceConfig.json`);
+		const fileData = fs.readFileSync(mceConfigPath, 'utf8');
+	  const jsonData = JSON.parse(fileData);
+	  
+		let needsLocation = false;
+		if (configData.plugins["cordova-acoustic-mobile-push-plugin-location"] || 
+			configData.plugins["cordova-acoustic-mobile-push-plugin-location-beta"] ||
+			configData.plugins["cordova-acoustic-mobile-push-plugin-beacon"] || 
+			configData.plugins["cordova-acoustic-mobile-push-plugin-beacon-beta"] ||
+			configData.plugins["cordova-acoustic-mobile-push-plugin-geofence"] || 
+			configData.plugins["cordova-acoustic-mobile-push-plugin-geofence-beta"]) { 
+			needsLocation = true;
+		}
+
+		if (!needsLocation) {
+			// delete location config
+			delete jsonData["location"];
+		}
+		const config = JSON.stringify(jsonData, null, 2);
+		saveConfig(config, mceConfigPath);
+
+		// copy to app
+		let appPath = `platforms/${platform}/app/src/main/assets/MceConfig.json`;
+		if (platform === 'ios') {
+			appPath = `platforms/${platform}/MceConfig.json`;
+		}
+		const appDestinationPath = path.join(currentAppWorkingDirectory, appPath);
+		saveConfig(config, appDestinationPath);
+	} catch (error) {
+		logMessageError(`Error reading or parsing ${mceConfigPath} file: ${error}`);
 	}
 }
 
@@ -722,7 +786,9 @@ function startInstall() {
 	addGradlePropertiesToApp(currentAppWorkingDirectory);
 
 	// Read and save corresponding ios/android json sections to postinstall folders, in the plugin project
-	readAndSaveMceConfig(currentAppWorkingDirectory, pluginPath, appConfigFile);
+	const configData = readMceConfig(appConfigFile);
+	readAndSaveMceConfig(currentAppWorkingDirectory, pluginPath, configData);
+	updateMceConfig(currentAppWorkingDirectory, pluginPath, configData);
 
 // const mainAppPath = findMainPath(installDirectory);
 // replaceMain(mainAppPath);
