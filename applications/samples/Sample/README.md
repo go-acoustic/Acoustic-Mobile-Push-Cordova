@@ -4,7 +4,7 @@ This project will use beta version of the libraries.
 ## Setup Application
 1. Run the following command
 ```shell npm
-npm i cordova-acoustic-mobile-push-beta
+npm install
 ```
 
 ## Update CampaignConfig.json
