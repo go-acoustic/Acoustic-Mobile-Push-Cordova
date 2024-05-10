@@ -129,14 +129,14 @@ function setupLocationPage() {
                     position.coords.longitude
                 );
                 lastLocation = geolocate;
-                var currentLocation = new google.maps.Marker({
-                    position: new google.maps.LatLng(
-                        position.coords.latitude,
-                        position.coords.longitude
-                    ),
-                    icon: "images/blue.png",
-                    map: map,
-                });
+//                var currentLocation = new google.maps.Marker.AdvancedMarkerElement({
+//                    position: new google.maps.LatLng(
+//                        position.coords.latitude,
+//                        position.coords.longitude
+//                    ),
+//                    icon: "images/blue.png",
+//                    map: map,
+//                });
 
                 updateGeofences(geolocate);
                 map.setCenter(geolocate);
