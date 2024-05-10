@@ -268,8 +268,78 @@ function updateMceConfigHelper(currentAppWorkingDirectory, pluginPath, configDat
 		}
 		const appDestinationPath = path.join(currentAppWorkingDirectory, appPath);
 		saveConfig(config, appDestinationPath);
+
+		// Update values in config.xml
+		const mainConfigXMLData = readXMLToJson(`${currentAppWorkingDirectory}/config.xml`)
+		if (platform == 'ios' && jsonData) {
+			const appConfigPath = `${currentAppWorkingDirectory}/platforms/ios/${mainConfigXMLData.widget.name[0]}/config.xml`;
+			var xmlData = readXMLToJson(appConfigPath)
+			// update file
+			for (let i = 0; i < xmlData.widget.preference.length; i++) {
+				var pref = xmlData.widget.preference[i]["$"]['name'];
+				logMessageTitle(pref);
+				if (jsonData[pref] !== undefined) {
+					xmlData.widget.preference[i]["$"]['value'] = jsonData[pref];
+				} else if (pref == 'prodAppKey' && jsonData.appKey.dev) {
+					xmlData.widget.preference[i]["$"]['value'] = jsonData.appKey.prod;
+				} else if (pref == 'devAppKey' && jsonData.appKey.dev) {
+					xmlData.widget.preference[i]["$"]['value'] = jsonData.appKey.dev;
+				} else if (pref == 'autoInitialize' && jsonData.location.autoInitialize) {
+					xmlData.widget.preference[i]["$"]['value'] = jsonData.location.autoInitialize;
+				} else if (pref == 'beaconUUID' && jsonData.location.ibeacon.UUID) {
+					xmlData.widget.preference[i]["$"]['value'] = jsonData.location.ibeacon.UUID;
+				} else if (pref == 'locationSyncRadius' && jsonData.location.sync.syncRadius) {
+					xmlData.widget.preference[i]["$"]['value'] = jsonData.location.sync.syncRadius;
+				} else if (pref == 'locationSyncInterval' && jsonData.location.sync.syncInterval) {
+					xmlData.widget.preference[i]["$"]['value'] = jsonData.location.sync.syncInterval;
+				} else if (pref == 'locationSyncInterval' && jsonData.location.sync.syncInterval) {
+					xmlData.widget.preference[i]["$"]['value'] = jsonData.location.sync.syncInterval;
+				}
+			}
+			writeJsonToXML(appConfigPath, xmlData);
+		}
 	} catch (error) {
 		logMessageError(`Error reading or parsing ${mceConfigPath} file: ${error}`);
+	}
+}
+
+/**
+ * Return Javascript JSON object from XML file.
+ * 
+ * @param {*} configPath Path of the XML file.
+ * @returns Javascript JSON object from XML file.
+ */
+function readXMLToJson(configPath) {
+	var resultFound
+	try {
+		const xmlData = fs.readFileSync(configPath, 'utf8');
+		logMessageTitle(xmlData);
+		var parseString = require("xml2js").parseString;
+		parseString(xmlData, function(err, result) {
+			if (err) console.log(err);
+			console.log(result);
+			resultFound = result;
+		})
+	} catch (error) {
+		logMessageError(`Failed to read xml ${configPath}:`, error);
+	}
+	return resultFound
+}
+
+/**
+ * Write Javascript JSON object to XML file.
+ * 
+ * @param {*} configPath Path of the XML file to write.
+ * @param {*} jsonDataToConvert Javascript JSON object to XML file.
+ */
+function writeJsonToXML(configPath, jsonDataToConvert) {
+	try {
+		var builder = new xml2js.Builder();
+		var xml = builder.buildObject(jsonDataToConvert);
+		console.log(xml);
+		saveConfig(xml, configPath);
+	} catch (error) {
+		logMessageError(`Failed to write xml ${configPath}:`, error);
 	}
 }
 
@@ -561,7 +631,7 @@ function startInstall() {
 	readAndSaveMceConfig(currentAppWorkingDirectory, pluginPath, configData);
 	updateMceConfig(currentAppWorkingDirectory, pluginPath, configData);
 
-	console.log(chalk.green("Installation Complete!"));
+	logMessageTitle("Installation Complete!");
 }
 
 startInstall();
