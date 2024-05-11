@@ -90,7 +90,7 @@ function readAndSaveMceConfig(currentAppWorkingDirectory, pluginPath, jsonData) 
 function saveConfig(configData, destinationPath) {
 	try {
 	  fs.writeFileSync(destinationPath, configData, { flag: 'w' });
-		logMessageInfo(`${destinationPath} saved successfully!`);
+		logMessageWarning(`${destinationPath} saved successfully!`);
 	} catch (error) {
 		logMessageError(`Error saving ${destinationPath}:`, error);
 	}
@@ -270,14 +270,15 @@ function updateMceConfigHelper(currentAppWorkingDirectory, pluginPath, configDat
 		saveConfig(config, appDestinationPath);
 
 		// Update values in config.xml
-		const mainConfigXMLData = readXMLToJson(`${currentAppWorkingDirectory}/config.xml`)
+		logMessageTitle('Update values in config.xml');
+		const mainConfigXMLData = readXMLToJson(`${currentAppWorkingDirectory}/config.xml`);
 		if (platform == 'ios' && jsonData) {
 			const appConfigPath = `${currentAppWorkingDirectory}/platforms/ios/${mainConfigXMLData.widget.name[0]}/config.xml`;
-			var xmlData = readXMLToJson(appConfigPath)
+			var xmlData = readXMLToJson(appConfigPath);
 			// update file
 			for (let i = 0; i < xmlData.widget.preference.length; i++) {
 				var pref = xmlData.widget.preference[i]["$"]['name'];
-				logMessageTitle(pref);
+				// logMessageTitle(pref);
 				if (jsonData[pref] !== undefined) {
 					xmlData.widget.preference[i]["$"]['value'] = jsonData[pref];
 				} else if (pref == 'prodAppKey' && jsonData.appKey.dev) {
@@ -313,11 +314,12 @@ function readXMLToJson(configPath) {
 	var resultFound
 	try {
 		const xmlData = fs.readFileSync(configPath, 'utf8');
-		logMessageTitle(xmlData);
+		logMessageTitle(`Original ${configPath}:`);
+		logMessageInfo(`${xmlData}`);
 		var parseString = require("xml2js").parseString;
 		parseString(xmlData, function(err, result) {
-			if (err) console.log(err);
-			console.log(result);
+			if (err) 
+				logMessageError(`Parsing error for ${configPath}:\n${err}`);
 			resultFound = result;
 		})
 	} catch (error) {
@@ -336,8 +338,9 @@ function writeJsonToXML(configPath, jsonDataToConvert) {
 	try {
 		var builder = new xml2js.Builder();
 		var xml = builder.buildObject(jsonDataToConvert);
-		console.log(xml);
 		saveConfig(xml, configPath);
+		logMessageTitle(`Write to ${configPath}:`);
+		logMessageInfo(`${xml}`);
 	} catch (error) {
 		logMessageError(`Failed to write xml ${configPath}:`, error);
 	}
