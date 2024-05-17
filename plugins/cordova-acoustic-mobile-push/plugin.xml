@@ -7,7 +7,7 @@ Acoustic, L.P. and/or other developers. No license is granted under any intellec
 industrial property rights of Acoustic, L.P. except as may be provided in an agreement with 
 Acoustic, L.P. Any unauthorized copying or distribution of content from this file is prohibited.
 -->
-<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0" id="cordova-acoustic-mobile-push" version="3.9.84">
+<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0" id="cordova-acoustic-mobile-push" version="3.9.85">
     <name>Acoustic MCE Cordova Plugin</name>
     <author>Acoustic MCE</author>
     <description>Allows Cordova applications to integrate with Acoustic MCE Push Services</description>
@@ -21,7 +21,7 @@ Acoustic, L.P. Any unauthorized copying or distribution of content from this fil
     </js-module>
 
     <!-- Library settings -->
-    <preference name="POD_VERSION" default="3.9.84" />
+    <preference name="POD_VERSION" default="3.9.85" />
 
     <preference name="CHANNEL_NAME" default="MCE SDK Notification Channel" />
     <preference name="CHANNEL_DESCRIPTION" default="This is the notification channel for the MCE SDK sample application"/>
@@ -94,7 +94,6 @@ Acoustic, L.P. Any unauthorized copying or distribution of content from this fil
         </config-file>
 
         <config-file target="AndroidManifest.xml" parent="/manifest">
-
             <!-- INTERNET is required for calling the MCE server -->
             <uses-permission android:name="android.permission.INTERNET" />
             <!-- WAKE_LOC is required for running scheduled tasks -->
@@ -103,10 +102,18 @@ Acoustic, L.P. Any unauthorized copying or distribution of content from this fil
             <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
             <!-- VIBRATE is required for notification configuration -->
             <uses-permission android:name="android.permission.VIBRATE" />
+            <!-- CALL_PHONE is optional. It is only required is the dial action is used -->
+            <uses-permission android:name="android.permission.CALL_PHONE" android:required="false" />
+            <!-- MdeJobService is used for launching a job while the app is in the foreground. This is only used in Android O and above -->
+            <service android:name="co.acoustic.mobile.push.sdk.job.MceJobService" android:permission="android.permission.BIND_JOB_SERVICE"/>
+            
             <queries>
+                <!-- Required for handling notifications that open the device's dialer app -->
                 <intent>
                     <action android:name="android.intent.action.DIAL" />
                 </intent>
+
+                <!-- Required for handling notifications that open the device -->
                 <intent>
                     <action android:name="android.intent.action.VIEW"/>
                     <data android:scheme="https"/>
@@ -175,31 +182,18 @@ Acoustic, L.P. Any unauthorized copying or distribution of content from this fil
             <!-- AttributesQueueConsumer is required for attributes handling -->
             <service android:name="co.acoustic.mobile.push.sdk.attributes.AttributesQueueConsumer" />
 
-            <!-- InboxUpdateService is optional. It is used for retrieving ibox updates from the MCE server. It is required only if inbox is used -->
+            <!-- InboxUpdateService is optional. It is used for retrieving inbox updates from the MCE server. It is required only if inbox is used -->
             <service android:name="co.acoustic.mobile.push.sdk.plugin.inbox.InboxUpdateService" />
-            <!-- MdeJobService is used for launching a job while the app is in the foreground. This is only used in Android O and above -->
-            <service android:name="co.acoustic.mobile.push.sdk.job.MceJobService" android:permission="android.permission.BIND_JOB_SERVICE"/>
 
             <!-- FCM Messages -->
-            <service android:name="co.acoustic.mobile.push.sdk.messaging.fcm.FcmMessagingService">
+            <service android:exported="false" android:name="co.acoustic.mobile.push.sdk.messaging.fcm.FcmMessagingService">
                 <intent-filter>
                     <action android:name="com.google.firebase.MESSAGING_EVENT" />
                 </intent-filter>
             </service>
         </config-file>
 
-        <config-file target="AndroidManifest.xml" parent="/manifest">
-            <!-- INTERNET is required for calling the MCE server -->
-            <uses-permission android:name="android.permission.INTERNET" />
-            <!-- WAKE_LOC is required for running scheduled tasks -->
-            <uses-permission android:name="android.permission.WAKE_LOCK" />
-            <!-- RECEIVE_BOOT_COMPLETED is required for performing SDK task on device startup -->
-            <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
-            <!-- VIBRATE is required for notification configuration -->
-            <uses-permission android:name="android.permission.VIBRATE" />
-            <!-- CALL_PHONE is optional. It is only required is the dial action is used -->
-            <uses-permission android:name="android.permission.CALL_PHONE" />
-        </config-file>
+        
         <config-file target="res/values/strings.xml" parent="/*">
             <string name="appkey">$ANDROID_APPKEY</string>
             <string name="senderid"></string>

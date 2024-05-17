@@ -1,5 +1,5 @@
 /*
- * Copyright © 2011, 2019 Acoustic, L.P. All rights reserved.
+ * Copyright (C) 2024 Acoustic, L.P. All rights reserved.
  *
  * NOTICE: This file contains material that is confidential and proprietary to
  * Acoustic, L.P. and/or other developers. No license is granted under any intellectual or
@@ -10,10 +10,14 @@
 package co.acoustic.mobile.push.sdk.js.format;
 
 import co.acoustic.mobile.push.sdk.api.attribute.*;
+import co.acoustic.mobile.push.sdk.util.Iso8601;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class AttributeJson {
@@ -58,10 +62,21 @@ public class AttributeJson {
                 }
             }
             return new NumberAttribute(key, number);
-        } else if(DateAttribute.TYPE.equals(type)) {
-            return new DateAttribute(key, new Date(attributeJSON.getLong(Key.value.name())));
+        } else if (DateAttribute.TYPE.equals(type)) {
+            long date;
+            Object obj = attributeJSON.get(co.acoustic.mobile.push.sdk.attributes.AttributeJson.Key.value.name());
+            if (obj instanceof String) {
+                try {
+                    date = Iso8601.toDate(String.valueOf(obj)).getTime();
+                } catch (ParseException e) {
+                    throw new JSONException("Failed to parse date " + obj + " " + e.getMessage());
+                }
+            } else {
+                date = (Long) obj;
+            }
+            return new DateAttribute(key, new Date(date));
         } else {
-            throw new JSONException("Unknown attribute type: "+type);
+            throw new JSONException("Unknown attribute type: " + type);
         }
     }
 
@@ -95,7 +110,19 @@ public class AttributeJson {
         for (Attribute attribute : attributes) {
             if(DateAttribute.TYPE.equals(attribute.getType())) {
                 JSONObject dateJSON = new JSONObject();
-                dateJSON.put(Key.mcedate.name(), ((Date)attribute.getValue()).getTime());
+                long date;
+                Object obj = attribute.getValue();
+                if (obj instanceof String) {
+                    try {
+                        date = Iso8601.toDate(String.valueOf(obj)).getTime();
+                    } catch (ParseException e) {
+                        throw new JSONException("Failed to parse date " + obj + " " + e.getMessage());
+                    }
+                } else {
+                    date = (Long) obj;
+                }
+
+                dateJSON.put(Key.mcedate.name(), date);
                 attributesJSONDictionary.put(attribute.getKey(), dateJSON);
             } else {
                 attributesJSONDictionary.put(attribute.getKey(), attribute.getValue());
