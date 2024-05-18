@@ -7,7 +7,7 @@ Acoustic, L.P. and/or other developers. No license is granted under any intellec
 industrial property rights of Acoustic, L.P. except as may be provided in an agreement with 
 Acoustic, L.P. Any unauthorized copying or distribution of content from this file is prohibited.
 -->
-<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0" id="cordova-acoustic-mobile-push" version="3.9.85">
+<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0" id="cordova-acoustic-mobile-push" version="3.9.86">
     <name>Acoustic MCE Cordova Plugin</name>
     <author>Acoustic MCE</author>
     <description>Allows Cordova applications to integrate with Acoustic MCE Push Services</description>
@@ -21,7 +21,7 @@ Acoustic, L.P. Any unauthorized copying or distribution of content from this fil
     </js-module>
 
     <!-- Library settings -->
-    <preference name="POD_VERSION" default="3.9.85" />
+    <preference name="POD_VERSION" default="3.9.86" />
 
     <preference name="CHANNEL_NAME" default="MCE SDK Notification Channel" />
     <preference name="CHANNEL_DESCRIPTION" default="This is the notification channel for the MCE SDK sample application"/>
@@ -104,8 +104,6 @@ Acoustic, L.P. Any unauthorized copying or distribution of content from this fil
             <uses-permission android:name="android.permission.VIBRATE" />
             <!-- CALL_PHONE is optional. It is only required is the dial action is used -->
             <uses-permission android:name="android.permission.CALL_PHONE" android:required="false" />
-            <!-- MdeJobService is used for launching a job while the app is in the foreground. This is only used in Android O and above -->
-            <service android:name="co.acoustic.mobile.push.sdk.job.MceJobService" android:permission="android.permission.BIND_JOB_SERVICE"/>
             
             <queries>
                 <!-- Required for handling notifications that open the device's dialer app -->
@@ -122,6 +120,9 @@ Acoustic, L.P. Any unauthorized copying or distribution of content from this fil
         </config-file>
 
         <config-file target="AndroidManifest.xml" parent="/manifest/application">
+            <!-- This is required for google play services -->
+            <meta-data android:name="com.google.android.gms.version" android:value="@integer/google_play_services_version" />
+
             <!-- MCE API26 properties -->
             <meta-data android:name="channelName" android:value="$CHANNEL_NAME" />
             <meta-data android:name="channelDescription" android:value="$CHANNEL_DESCRIPTION" />
@@ -138,7 +139,6 @@ Acoustic, L.P. Any unauthorized copying or distribution of content from this fil
             <meta-data android:name="mceSessionDuration" android:value="5" />
             <meta-data android:name="mceServer" android:value="$SERVER_URL" />
             <meta-data android:name="invalidateExistingUser" android:value="$INVALIDATE_EXISTING_USER" />
-            <meta-data android:name="com.google.android.gms.version" android:value="@integer/google_play_services_version" />
 
             <receiver android:exported="false" android:name="co.acoustic.mobile.push.sdk.js.JsonMceBroadcastReceiver">
                 <intent-filter>
@@ -191,6 +191,8 @@ Acoustic, L.P. Any unauthorized copying or distribution of content from this fil
                     <action android:name="com.google.firebase.MESSAGING_EVENT" />
                 </intent-filter>
             </service>
+            <!-- MdeJobService is used for launching a job while the app is in the foreground. This is only used in Android O and above -->
+            <service android:name="co.acoustic.mobile.push.sdk.job.MceJobService" android:permission="android.permission.BIND_JOB_SERVICE"/>
         </config-file>
 
         
