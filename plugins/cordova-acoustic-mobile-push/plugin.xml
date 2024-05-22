@@ -7,7 +7,7 @@ Acoustic, L.P. and/or other developers. No license is granted under any intellec
 industrial property rights of Acoustic, L.P. except as may be provided in an agreement with 
 Acoustic, L.P. Any unauthorized copying or distribution of content from this file is prohibited.
 -->
-<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0" id="cordova-acoustic-mobile-push" version="3.9.87">
+<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0" id="cordova-acoustic-mobile-push" version="3.9.88">
     <name>Acoustic MCE Cordova Plugin</name>
     <author>Acoustic MCE</author>
     <description>Allows Cordova applications to integrate with Acoustic MCE Push Services</description>
@@ -21,7 +21,7 @@ Acoustic, L.P. Any unauthorized copying or distribution of content from this fil
     </js-module>
 
     <!-- Library settings -->
-    <preference name="POD_VERSION" default="3.9.87" />
+    <preference name="POD_VERSION" default="3.9.88" />
 
     <preference name="CHANNEL_NAME" default="MCE SDK Notification Channel" />
     <preference name="CHANNEL_DESCRIPTION" default="This is the notification channel for the MCE SDK sample application"/>
@@ -110,7 +110,6 @@ Acoustic, L.P. Any unauthorized copying or distribution of content from this fil
                 <intent>
                     <action android:name="android.intent.action.DIAL" />
                 </intent>
-
                 <!-- Required for handling notifications that open the device -->
                 <intent>
                     <action android:name="android.intent.action.VIEW"/>
@@ -122,12 +121,10 @@ Acoustic, L.P. Any unauthorized copying or distribution of content from this fil
         <config-file target="AndroidManifest.xml" parent="/manifest/application">
             <!-- This is required for google play services -->
             <meta-data android:name="com.google.android.gms.version" android:value="@integer/google_play_services_version" />
-
             <!-- MCE API26 properties -->
             <meta-data android:name="channelName" android:value="$CHANNEL_NAME" />
             <meta-data android:name="channelDescription" android:value="$CHANNEL_DESCRIPTION" />
             <meta-data android:name="channelId" android:value="$CHANNEL_ID" />
-
             <!-- MCE properties -->
             <meta-data android:name="messagingService" android:value="fcm" />
             <meta-data android:name="mceSenderId" android:value="" />
@@ -139,13 +136,11 @@ Acoustic, L.P. Any unauthorized copying or distribution of content from this fil
             <meta-data android:name="mceSessionDuration" android:value="5" />
             <meta-data android:name="mceServer" android:value="$SERVER_URL" />
             <meta-data android:name="invalidateExistingUser" android:value="$INVALIDATE_EXISTING_USER" />
-
             <receiver android:exported="false" android:name="co.acoustic.mobile.push.sdk.js.JsonMceBroadcastReceiver">
                 <intent-filter>
                     <action android:name="co.acoustic.mobile.push.sdk.NOTIFIER" />
                 </intent-filter>
             </receiver>
-
             <!-- AlarmReceiver is required for SDK scheduled tasks and device status updates -->
             <receiver android:exported="false" android:name="co.acoustic.mobile.push.sdk.wi.AlarmReceiver">
                 <intent-filter>
@@ -156,23 +151,18 @@ Acoustic, L.P. Any unauthorized copying or distribution of content from this fil
                 </intent-filter>
                 <intent-filter>
                     <action android:name="android.intent.action.PACKAGE_REPLACED" />
-
                     <data android:scheme="package" />
                 </intent-filter>
                 <intent-filter>
                     <action android:name="android.intent.action.LOCALE_CHANGED" />
                 </intent-filter>
             </receiver>
-
             <!-- NotifActionReceiver is required for notification handling -->
             <receiver android:exported="false" android:name="co.acoustic.mobile.push.sdk.notification.NotifActionReceiver" />
-
             <!-- The provider is needed for the SDK database -->
             <provider android:name="co.acoustic.mobile.push.sdk.db.Provider" android:authorities="$PACKAGE_NAME.MCE_PROVIDER" android:exported="false" />
             <provider android:name="co.acoustic.mobile.push.sdk.js.Provider" android:authorities="$PACKAGE_NAME.MCE_JSON_PROVIDER" android:exported="false" />
-
             <service android:name="co.acoustic.mobile.push.sdk.session.SessionTrackingIntentService"/>
-
             <!-- EventsAlarmListener is required for event handling -->
             <service android:name="co.acoustic.mobile.push.sdk.events.EventsAlarmListener" />
             <!-- PhoneHomeIntentService is required to allow the client to contact the server to update state -->
@@ -181,10 +171,8 @@ Acoustic, L.P. Any unauthorized copying or distribution of content from this fil
             <service android:name="co.acoustic.mobile.push.sdk.registration.RegistrationIntentService" />
             <!-- AttributesQueueConsumer is required for attributes handling -->
             <service android:name="co.acoustic.mobile.push.sdk.attributes.AttributesQueueConsumer" />
-
             <!-- InboxUpdateService is optional. It is used for retrieving inbox updates from the MCE server. It is required only if inbox is used -->
             <service android:name="co.acoustic.mobile.push.sdk.plugin.inbox.InboxUpdateService" />
-
             <!-- FCM Messages -->
             <service android:exported="false" android:name="co.acoustic.mobile.push.sdk.messaging.fcm.FcmMessagingService">
                 <intent-filter>
@@ -218,6 +206,5 @@ Acoustic, L.P. Any unauthorized copying or distribution of content from this fil
         <source-file src="src/android/src/co/acoustic/mobile/push/sdk/js/MceJsonApplication.java" target-dir="co/acoustic/mobile/push/sdk/js" />
         <source-file src="src/android/src/co/acoustic/mobile/push/sdk/js/MceJsonSdk.java" target-dir="co/acoustic/mobile/push/sdk/js" />
         <source-file src="src/android/src/co/acoustic/mobile/push/sdk/js/Provider.java" target-dir="co/acoustic/mobile/push/sdk/js" />
-
     </platform>
 </plugin>

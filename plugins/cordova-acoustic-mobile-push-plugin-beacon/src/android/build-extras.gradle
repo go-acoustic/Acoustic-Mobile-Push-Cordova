@@ -1,14 +1,14 @@
-repositories{    
-  jcenter()
-}
+// repositories{    
+//   jcenter()
+// }
 
-dependencies {
-   implementation "androidx.appcompat:appcompat:" + project.ext.androidxLibVersion
-}
+// dependencies {
+//    implementation "androidx.appcompat:appcompat:" + project.ext.androidxLibVersion
+// }
 
-android {
-  packagingOptions {
-    exclude 'META-INF/NOTICE'
-    exclude 'META-INF/LICENSE'
-  }
-}
+// android {
+//   packagingOptions {
+//     exclude 'META-INF/NOTICE'
+//     exclude 'META-INF/LICENSE'
+//   }
+// }

@@ -1,8 +1,8 @@
-repositories{    
-  jcenter()
-}
+// repositories{    
+//   jcenter()
+// }
 
-dependencies {
-   implementation "androidx.appcompat:appcompat:" + project.ext.androidxLibVersion
-}
+// dependencies {
+//    implementation "androidx.appcompat:appcompat:" + project.ext.androidxLibVersion
+// }
 
