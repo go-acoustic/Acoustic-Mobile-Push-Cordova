@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024 Acoustic, L.P. All rights reserved.
+ * Copyright © 2011, 2019 Acoustic, L.P. All rights reserved.
  *
  * NOTICE: This file contains material that is confidential and proprietary to
  * Acoustic, L.P. and/or other developers. No license is granted under any intellectual or
@@ -36,10 +36,10 @@ public class JsonCallbacksRegistry {
     }
 
     public static class RegisteredCallback {
-        private final int id;
-        private final String  name;
-        private final boolean success;
-        private final String parameterAsString;
+        private int id;
+        private String  name;
+        private boolean success;
+        private String parameterAsString;
 
         public RegisteredCallback(int id, String name, boolean success, String parameterAsString) {
             this.id = id;
