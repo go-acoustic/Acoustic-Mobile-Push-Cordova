@@ -1,5 +1,5 @@
 /*
- * Copyright © 2011, 2019 Acoustic, L.P. All rights reserved.
+ * Copyright (C) 2024 Acoustic, L.P. All rights reserved.
  *
  * NOTICE: This file contains material that is confidential and proprietary to
  * Acoustic, L.P. and/or other developers. No license is granted under any intellectual or
@@ -15,12 +15,15 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.net.Uri;
 
+import androidx.annotation.NonNull;
+
 import co.acoustic.mobile.push.sdk.api.db.SdkDatabase;
 import co.acoustic.mobile.push.sdk.api.db.SdkDatabaseException;
 import co.acoustic.mobile.push.sdk.api.db.SdkDatabaseQueryBuilder;
 import co.acoustic.mobile.push.sdk.util.Logger;
 
 import java.util.Arrays;
+import java.util.Objects;
 
 public class Provider extends ContentProvider {
    private static final String TAG = "Provider";
@@ -36,7 +39,7 @@ public class Provider extends ContentProvider {
 
     public JsonDbAdapter.ContentUriData getUriData() {
         if(_uriData == null) {
-            _uriData = new JsonDbAdapter.ContentUriData(getContext());
+            _uriData = new JsonDbAdapter.ContentUriData(Objects.requireNonNull(getContext()));
         }
         return _uriData;
     }
@@ -48,12 +51,12 @@ public class Provider extends ContentProvider {
 
 
     @Override
-    public int delete(Uri uri, String selection, String[] selectionArgs) {
+    public int delete(@NonNull Uri uri, String selection, String[] selectionArgs) {
         String tableName = JsonDbAdapter.CALLBACKS_TABLE;
         SdkDatabase db = getfailSafeWritableDatabase(getDbHelper());
         if (db != null) {
             int count = db.delete(tableName, selection, selectionArgs);
-            getContext().getContentResolver().notifyChange(uri, null);
+            Objects.requireNonNull(getContext()).getContentResolver().notifyChange(uri, null);
             return (count);
         } else {
             return 0;
@@ -61,13 +64,15 @@ public class Provider extends ContentProvider {
     }
 
     @Override
-    public String getType(Uri uri) {
+    public String getType(@NonNull Uri uri) {
         return ("vnd.acoustic.mce.cursor.dir/"+JsonDbAdapter.CALLBACKS_TABLE);
     }
 
     @Override
-    public Uri insert(Uri uri, ContentValues values) {
-        Logger.d(TAG, "insert(uri=" + uri + ", values=" + values.toString() + ")");
+    public Uri insert(@NonNull Uri uri, ContentValues values) {
+        if (values != null) {
+            Logger.d(TAG, "insert(uri=" + uri + ", values=" + values.toString() + ")");
+        }
 
         SdkDatabase db = getfailSafeWritableDatabase(getDbHelper());
         if (db != null) {
@@ -75,7 +80,7 @@ public class Provider extends ContentProvider {
             Uri  contentUri = getUriData().getCallbacksURI();
             if (rowId > 0) {
                 Uri uriWithId = ContentUris.withAppendedId(contentUri, rowId);
-                getContext().getContentResolver().notifyChange(uriWithId, null);
+                Objects.requireNonNull(getContext()).getContentResolver().notifyChange(uriWithId, null);
                 return (uriWithId);
             }
             throw new SdkDatabaseException("Failed to insert row into " + uri);
@@ -86,27 +91,29 @@ public class Provider extends ContentProvider {
 
 
     @Override
-    public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
+    public Cursor query(@NonNull Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
         Logger.d(TAG, "query(uri=" + uri + ", proj=" + Arrays.toString(projection) + ")");
         SdkDatabaseQueryBuilder qb = getDbHelper().createQueryBuilder();
         qb.setTables(JsonDbAdapter.CALLBACKS_TABLE);
         SdkDatabase db = getfailSafeWritableDatabase(getDbHelper());
         if (db != null) {
             Cursor cur = qb.query(db, projection, selection, selectionArgs, null, null, null);
-            cur.setNotificationUri(getContext().getContentResolver(), uri);
+            cur.setNotificationUri(Objects.requireNonNull(getContext()).getContentResolver(), uri);
             return cur;
         }
         return null;
     }
 
     @Override
-    public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
-        Logger.d(TAG, "update(uri=" + uri + ", values=" + values.toString() + ")");
+    public int update(@NonNull Uri uri, ContentValues values, String selection, String[] selectionArgs) {
+        if (values != null) {
+            Logger.d(TAG, "update(uri=" + uri + ", values=" + values.toString() + ")");
+        }
         String tableName = JsonDbAdapter.CALLBACKS_TABLE;
         SdkDatabase db = getfailSafeWritableDatabase(getDbHelper());
         if (db != null) {
             int count = db.update(tableName, values, selection, selectionArgs);
-            getContext().getContentResolver().notifyChange(uri, null);
+            Objects.requireNonNull(getContext()).getContentResolver().notifyChange(uri, null);
             return (count);
         } else {
             return 0;

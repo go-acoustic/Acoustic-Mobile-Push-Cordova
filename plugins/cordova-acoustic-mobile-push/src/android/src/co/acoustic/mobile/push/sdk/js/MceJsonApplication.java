@@ -1,5 +1,5 @@
 /*
- * Copyright © 2011, 2019 Acoustic, L.P. All rights reserved.
+ * Copyright (C) 2024 Acoustic, L.P. All rights reserved.
  *
  * NOTICE: This file contains material that is confidential and proprietary to
  * Acoustic, L.P. and/or other developers. No license is granted under any intellectual or
@@ -36,7 +36,7 @@ public class MceJsonApplication extends MceApplication {
 
     private static final String TAG = "MceJsonApplication";
 
-    private static Set<String> registeredCustomActions = new HashSet<String>();
+    private static final Set<String> registeredCustomActions = new HashSet<>();
 
     @TargetApi(26)
     private static void createNotificationChannel(Context context, CharSequence name, String description, String channel_id) {
@@ -69,7 +69,7 @@ public class MceJsonApplication extends MceApplication {
         for(String customAction : registeredCustomActions) {
             List<JsonCallbacksRegistry.RegisteredCallback> registeredCallbacks = JsonCallbacksRegistry.getRegisteredCallbacks(context, "notification." + customAction);
             Logger.d(TAG, "Auto registration: Action registration: " + customAction + " Found " + registeredCallbacks.size() + " registered callbacks");
-            List<JsonCallbacksRegistry.RegisteredCallback> registeredCallbacksForDelete = new LinkedList<JsonCallbacksRegistry.RegisteredCallback>();
+            List<JsonCallbacksRegistry.RegisteredCallback> registeredCallbacksForDelete = new LinkedList<>();
             for (JsonCallbacksRegistry.RegisteredCallback regCallback : registeredCallbacks) {
                 if (regCallback.isSuccess()) {
                     MceNotificationAction action = MceNotificationActionRegistry.getNotificationAction(context, customAction);
