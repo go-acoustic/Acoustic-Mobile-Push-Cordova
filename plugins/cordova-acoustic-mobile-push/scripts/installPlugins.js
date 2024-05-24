@@ -131,6 +131,7 @@ function managePlugins(currentAppWorkingDirectory, pluginPath, configData) {
 		updatePluginXMLPodName(packagePluginPath, configData.plugins.useRelease, configData);
 		// Update Android
 		updateBuildExtrasGradle(packagePluginPath, configData);
+		addGoogleServices(packagePluginPath, configData);
 		updateBuildGradleMobilePushVersion(currentAppWorkingDirectory, configData);
 		logMessageTitle(`cd "${currentAppWorkingDirectory}" && cordova plugin add ${pluginName} --variable CUSTOM_ACTIONS="${customAction}" --variable ANDROID_APPKEY="${androidAppkey}" --variable IOS_DEV_APPKEY="${iOSAppkey}" --variable IOS_PROD_APPKEY="${iOSProdkey}" --variable SERVER_URL="${serverUrl}" --variable LOGLEVEL="${logLevel}" --variable MCE_CAN_SYNC_OVERRIDE="${mceCanSyncOverride}" --force`);
 		execSync(`cd "${currentAppWorkingDirectory}" && cordova plugin add ${pluginName} --variable CUSTOM_ACTIONS="${customAction}" --variable ANDROID_APPKEY="${androidAppkey}" --variable IOS_DEV_APPKEY="${iOSAppkey}" --variable IOS_PROD_APPKEY="${iOSProdkey}" --variable SERVER_URL="${serverUrl}" --variable LOGLEVEL="${logLevel}" --variable MCE_CAN_SYNC_OVERRIDE="${mceCanSyncOverride}" --force`, { stdio: 'inherit', cwd: process.cwd() });
@@ -614,6 +615,59 @@ function updateBuildGradleMobilePushVersion(appPath, configData) {
 		
 		fs.writeFileSync(appGradlePath, gradleContent, 'utf8');
 		logMessageInfo('Updated ${appGradlePath}');
+	} catch (error) {
+		logMessageError(`Error updating ${appGradlePath}:`, error);
+	}
+}
+
+/**
+ * Used to add google services to application gradle.
+ * 
+ * @param {*} appPath Path of the application being integrated.
+ * @param {*} configData CampaignConfig.json file data.
+ */
+function addGoogleServices(appPath, configData) {
+	try {
+		let appGradlePath = path.join(appPath, "platforms/android/app/build.gradle");
+		let gradleContent = fs.readFileSync(appGradlePath, 'utf8');
+		const hasBeenAddedRegex = /Added by Acoustic/;
+		const googleServiceToAdd = 
+`buildscript {
+	repositories {
+			google()
+			mavenCentral()
+			maven {
+					url "https://plugins.gradle.org/m2/"
+			}
+			maven {
+					url "https://maven.google.com"
+					name 'Google'
+			}
+	}
+
+	dependencies {
+			classpath 'com.google.gms:google-services:4.4.0'
+	}
+}
+// Added by Acoustic
+apply plugin: 'com.google.gms.google-services'`
+		const googlServicesVersionRegex = /com.google.gms:google-services:"(\d+\.\d+\.\d+|\+)"/;
+
+		if (configData.addGoogleServicesToAndroid) {
+			if(hasBeenAddedRegex.test(gradleContent)) {
+				logMessageWarning(`No changes needed in ${appGradlePath} already has com.google.gms:google-services`);
+			} else {
+				gradleContent = gradleContent.concat("\n", googleServiceToAdd);
+			}
+
+			if (configData.comGoogleGmsGoogleServices) {
+				updateVersion = configData.comGoogleGmsGoogleServices;
+				gradleContent = gradleContent.replace(googlServicesVersionRegex, `com.google.gms:google-services:"${updateVersion}"`);
+			}
+			
+			fs.writeFileSync(appGradlePath, gradleContent, 'utf8');
+			logMessageWarning(`Added com.google.gms:google-services in ${appGradlePath}`);
+		}
 	} catch (error) {
 		logMessageError(`Error updating ${appGradlePath}:`, error);
 	}
