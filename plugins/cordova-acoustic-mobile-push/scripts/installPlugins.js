@@ -131,7 +131,7 @@ function managePlugins(currentAppWorkingDirectory, pluginPath, configData) {
 		updatePluginXMLPodName(packagePluginPath, configData.plugins.useRelease, configData);
 		// Update Android
 		updateBuildExtrasGradle(packagePluginPath, configData);
-		addGoogleServices(packagePluginPath, configData);
+		addGoogleServices(currentAppWorkingDirectory, configData);
 		updateBuildGradleMobilePushVersion(currentAppWorkingDirectory, configData);
 		logMessageTitle(`cd "${currentAppWorkingDirectory}" && cordova plugin add ${pluginName} --variable CUSTOM_ACTIONS="${customAction}" --variable ANDROID_APPKEY="${androidAppkey}" --variable IOS_DEV_APPKEY="${iOSAppkey}" --variable IOS_PROD_APPKEY="${iOSProdkey}" --variable SERVER_URL="${serverUrl}" --variable LOGLEVEL="${logLevel}" --variable MCE_CAN_SYNC_OVERRIDE="${mceCanSyncOverride}" --force`);
 		execSync(`cd "${currentAppWorkingDirectory}" && cordova plugin add ${pluginName} --variable CUSTOM_ACTIONS="${customAction}" --variable ANDROID_APPKEY="${androidAppkey}" --variable IOS_DEV_APPKEY="${iOSAppkey}" --variable IOS_PROD_APPKEY="${iOSProdkey}" --variable SERVER_URL="${serverUrl}" --variable LOGLEVEL="${logLevel}" --variable MCE_CAN_SYNC_OVERRIDE="${mceCanSyncOverride}" --force`, { stdio: 'inherit', cwd: process.cwd() });
