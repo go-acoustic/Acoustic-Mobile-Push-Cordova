@@ -19,6 +19,8 @@
         <allow-intent href="market:*" />
         <hook src="scripts/copy_build_extra.js" type="after_prepare" />
         <preference name="AndroidXEnabled" value="true" />
+        <preference name="AndroidGradlePluginGoogleServicesEnabled" value="true" />
+        <preference name="AndroidGradlePluginGoogleServicesVersion" value="4.4.0" />
         <preference name="android-compileSdkVersion" value="34" />
         <preference name="android-targetSdkVersion" value="34" />
         <preference name="android-minSdkVersion" value="21" />

@@ -579,12 +579,39 @@ function updateBuildGradleMobilePushVersion(appPath, configData) {
 		let updateVersion = "+";
 		let appGradlePath = path.join(appPath, "platforms/android/build.gradle");
 		let gradleContent = fs.readFileSync(appGradlePath, 'utf8');
-		const mobilePushVersionRegex = /mobilePushVersion = "(\d+\.\d+\.\d+|\+)"/;
+		const mobilePushVersionRegex           = /mobilePushVersion = "(\d+\.\d+\.\d+|\+)"/;
+		const androidxLibVersionRegex          = /androidxLibVersion = "(\d+\.\d+\.\d+|\+)"/;
+		const playServicesBaseVersionRegex     = /playServicesBaseVersion = "(\d+\.\d+\.\d+|\+)"/;
+		const playServicesLocationVersionRegex = /playServicesLocationVersion = "(\d+\.\d+\.\d+|\+)"/;
+		const firebaseCoreVersionRegex         = /firebaseCoreVersion = "(\d+\.\d+\.\d+|\+)"/;
+		const firebaseMessagingVersionRegex    = /firebaseMessagingVersion = "(\d+\.\d+\.\d+|\+)"/;
 
 		if (configData.androidVersion) {
 			updateVersion = configData.androidVersion;
 		}
 		gradleContent = gradleContent.replace(mobilePushVersionRegex, `mobilePushVersion = "${updateVersion}"`);
+
+		if (configData.androidxLibVersion) {
+			updateVersion = configData.androidxLibVersion;
+			gradleContent = gradleContent.replace(androidxLibVersionRegex, `androidxLibVersion = "${updateVersion}"`);
+		}
+		if (configData.playServicesBaseVersion) {
+			updateVersion = configData.playServicesBaseVersion;
+			gradleContent = gradleContent.replace(playServicesBaseVersionRegex, `playServicesBaseVersion = "${updateVersion}"`);
+		}
+		if (configData.playServicesLocationVersion) {
+			updateVersion = configData.playServicesLocationVersion;
+			gradleContent = gradleContent.replace(playServicesLocationVersionRegex, `playServicesLocationVersion = "${updateVersion}"`);
+		}
+		if (configData.firebaseCoreVersion) {
+			updateVersion = configData.firebaseCoreVersion;
+			gradleContent = gradleContent.replace(firebaseCoreVersionRegex, `firebaseCoreVersion = "${updateVersion}"`);
+		}
+		if (configData.firebaseMessagingVersion) {
+			updateVersion = configData.firebaseMessagingVersion;
+			gradleContent = gradleContent.replace(firebaseMessagingVersionRegex, `firebaseMessagingVersion = "${updateVersion}"`);
+		}
+		
 		fs.writeFileSync(appGradlePath, gradleContent, 'utf8');
 		logMessageInfo('Updated ${appGradlePath}');
 	} catch (error) {

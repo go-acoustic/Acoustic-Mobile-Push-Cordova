@@ -14,16 +14,11 @@ repositories{
 
 dependencies {
   implementation "androidx.appcompat:appcompat:" + project.ext.androidxLibVersion
-//  implementation "com.google.android.gms:play-services-base:" + project.ext.playServicesBaseVersion
-//  implementation "com.google.firebase:firebase-messaging:" + project.ext.firebaseMessagingVersion
-//  implementation "com.google.firebase:firebase-core:" + project.ext.firebaseCoreVersion
-  // implementation "com.google.firebase:firebase-iid:+"
-  implementation "io.github.go-acoustic:acoustic-mobile-push-android-sdk:" + project.ext.mobilePushVersion
   implementation 'com.google.code.gson:gson:2.2.4'
-  implementation "com.google.firebase:firebase-core:19.0.1"
-  implementation "com.google.firebase:firebase-messaging:22.0.0"
-  implementation "com.google.firebase:firebase-iid:21.1.0"
-  implementation "com.google.android.gms:play-services-tagmanager:18.0.4"
+  implementation "io.github.go-acoustic:acoustic-mobile-push-android-sdk:" + project.ext.mobilePushVersion
+  implementation "com.google.android.gms:play-services-base:" + project.ext.playServicesBaseVersion
+  implementation "com.google.firebase:firebase-messaging:" + project.ext.firebaseMessagingVersion
+  implementation "com.google.firebase:firebase-core:" + project.ext.firebaseCoreVersion
 }
 
 android {

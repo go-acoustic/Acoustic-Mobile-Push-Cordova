@@ -4,7 +4,12 @@
   "iOS Version": "<x.xx.xxx>, native iOS SDK version, empty value will retrieve lastest version",
   "iOSVersion": "",
   "Android Version": "<x.xx.xxx>, native Android SDK version, empty value will retrieve lastest version",
-  "androidVersion": "",
+  "Android library versions used": "<x.xx.xxx>",
+  "androidxLibVersion":"1.6.0",
+  "playServicesBaseVersion":"18.3.0",
+  "playServicesLocationVersion":"21.0.1",
+  "firebaseCoreVersion":"19.0.2",
+  "firebaseMessagingVersion":"22.0.0",
 
   "plugins": {
     "Please note": "<true/false>, for cordova build.  True for release build, false for beta build",
