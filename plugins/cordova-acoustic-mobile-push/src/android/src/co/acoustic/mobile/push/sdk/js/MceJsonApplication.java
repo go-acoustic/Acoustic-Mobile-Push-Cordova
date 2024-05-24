@@ -1,5 +1,5 @@
 /*
- * Copyright © 2011, 2019 Acoustic, L.P. All rights reserved.
+ * Copyright (C) 2024 Acoustic, L.P. All rights reserved.
  *
  * NOTICE: This file contains material that is confidential and proprietary to
  * Acoustic, L.P. and/or other developers. No license is granted under any intellectual or
@@ -10,15 +10,21 @@
 package co.acoustic.mobile.push.sdk.js;
 
 import android.content.Context;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.annotation.TargetApi;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.os.Build;
+import android.util.Log;
+
+import androidx.core.content.PackageManagerCompat;
 
 import co.acoustic.mobile.push.sdk.api.MceApplication;
 import co.acoustic.mobile.push.sdk.api.notification.MceNotificationAction;
 import co.acoustic.mobile.push.sdk.api.notification.MceNotificationActionRegistry;
+import co.acoustic.mobile.push.sdk.registration.RegistrationClientImpl;
 import co.acoustic.mobile.push.sdk.util.Logger;
 import co.acoustic.mobile.push.sdk.api.notification.NotificationsPreference;
 import co.acoustic.mobile.push.sdk.api.MceSdk;
@@ -33,11 +39,27 @@ import java.util.Set;
 import java.util.StringTokenizer;
 
 public class MceJsonApplication extends MceApplication {
-
     private static final String TAG = "MceJsonApplication";
-
     private static Set<String> registeredCustomActions = new HashSet<String>();
 
+    @Override
+    public void onCreate() {
+        super.onCreate();
+
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            ApplicationInfo app = null;
+            try {
+                app = getPackageManager().getApplicationInfo(getApplicationContext().getPackageName(), PackageManager.GET_META_DATA);
+                Bundle metadata = app.metaData;
+                CharSequence name = metadata.getString("channelName");
+                String description = metadata.getString("channelDescription");
+                String channel_id = metadata.getString("channelId");
+                createNotificationChannel(getApplicationContext(), name, description, channel_id);
+            } catch (PackageManager.NameNotFoundException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
     @TargetApi(26)
     private static void createNotificationChannel(Context context, CharSequence name, String description, String channel_id) {
         NotificationManager notificationManager =
@@ -50,18 +72,6 @@ public class MceJsonApplication extends MceApplication {
             NotificationsPreference notificationsPreference = MceSdk.getNotificationsClient().getNotificationsPreference();
             notificationsPreference.setNotificationChannelId(context, channel_id);
             notificationManager.createNotificationChannel(channel);
-        }
-    }
-
-    @Override
-    public void handleMetadata(Bundle metadata) {
-        super.handleMetadata(metadata);
-
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            CharSequence name = metadata.getString("channelName");
-            String description = metadata.getString("channelDescription");
-            String channel_id = metadata.getString("channelId");
-            createNotificationChannel(getApplicationContext(), name, description, channel_id);
         }
     }
 
@@ -95,6 +105,4 @@ public class MceJsonApplication extends MceApplication {
             }
         }
     }
-
-
 }
