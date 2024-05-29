@@ -8,7 +8,7 @@ industrial property rights of Acoustic, L.P. except as may be provided in an agr
 Acoustic, L.P. Any unauthorized copying or distribution of content from this file is prohibited.
 -->
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0" id="cordova-acoustic-mobile-push-plugin-displayweb"
-version="3.9.97">
+version="3.9.98">
     <name>Display Web Action for Acoustic MCE Cordova Plugin</name>
     <author>Acoustic MCE</author>
     <description>Display Web Action for Acoustic MCE Push Services</description>
@@ -22,7 +22,7 @@ version="3.9.97">
     </js-module>
 
     <!-- Library settings -->
-    <preference name="POD_VERSION" default="3.9.97" />
+    <preference name="POD_VERSION" default="3.9.98" />
     
     <platform name="ios">
         <config-file target="config.xml" parent="/*">
@@ -49,23 +49,5 @@ version="3.9.97">
         </config-file>
         
         <framework src="src/android/build-extras.gradle" custom="true" type="gradleReference" />
-        
-        <source-file src="src/android/res/drawable-hdpi/ic_action_back.png" target-dir="res/drawable-hdpi" framework="false" />
-        <source-file src="src/android/res/drawable-hdpi/ic_action_forward.png" target-dir="res/drawable-hdpi" framework="false" />
-        <source-file src="src/android/res/drawable-mdpi/ic_action_back.png" target-dir="res/drawable-mdpi" framework="false" />
-        <source-file src="src/android/res/drawable-mdpi/ic_action_forward.png" target-dir="res/drawable-mdpi" framework="false" />
-        <source-file src="src/android/res/drawable-xhdpi/ic_action_back.png" target-dir="res/drawable-xhdpi" framework="false" />
-        <source-file src="src/android/res/drawable-xhdpi/ic_action_forward.png" target-dir="res/drawable-xhdpi" framework="false" />
-        <source-file src="src/android/res/drawable-xxhdpi/ic_action_back.png" target-dir="res/drawable-xxhdpi" framework="false" />
-        <source-file src="src/android/res/drawable-xxhdpi/ic_action_forward.png" target-dir="res/drawable-xxhdpi" framework="false" />
-        <source-file src="src/android/res/layout/activity_action_webview.xml" target-dir="res/layout" framework="false" />
-        <source-file src="src/android/res/menu/menu_action_webview.xml" target-dir="res/menu" framework="false" />
-        
-        <config-file target="app/src/main/res/values/strings.xml" parent="/resources">
-            <string name="action_back">Back</string>
-            <string name="action_forward">Forward</string>
-            <string name="action_done">Done</string>
-        </config-file>
-
     </platform>
 </plugin>
