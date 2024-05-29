@@ -40,14 +40,14 @@ import java.util.StringTokenizer;
 
 public class MceJsonApplication extends MceApplication {
     private static final String TAG = "MceJsonApplication";
-    private static Set<String> registeredCustomActions = new HashSet<String>();
+    private static final Set<String> registeredCustomActions = new HashSet<>();
 
     @Override
     public void onCreate() {
         super.onCreate();
 
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            ApplicationInfo app = null;
+            ApplicationInfo app;
             try {
                 app = getPackageManager().getApplicationInfo(getApplicationContext().getPackageName(), PackageManager.GET_META_DATA);
                 Bundle metadata = app.metaData;
@@ -79,7 +79,7 @@ public class MceJsonApplication extends MceApplication {
         for(String customAction : registeredCustomActions) {
             List<JsonCallbacksRegistry.RegisteredCallback> registeredCallbacks = JsonCallbacksRegistry.getRegisteredCallbacks(context, "notification." + customAction);
             Logger.d(TAG, "Auto registration: Action registration: " + customAction + " Found " + registeredCallbacks.size() + " registered callbacks");
-            List<JsonCallbacksRegistry.RegisteredCallback> registeredCallbacksForDelete = new LinkedList<JsonCallbacksRegistry.RegisteredCallback>();
+            List<JsonCallbacksRegistry.RegisteredCallback> registeredCallbacksForDelete = new LinkedList<>();
             for (JsonCallbacksRegistry.RegisteredCallback regCallback : registeredCallbacks) {
                 if (regCallback.isSuccess()) {
                     MceNotificationAction action = MceNotificationActionRegistry.getNotificationAction(context, customAction);

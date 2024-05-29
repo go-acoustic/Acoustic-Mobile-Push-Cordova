@@ -242,7 +242,7 @@
  
          MceNotificationAction actionImpl = MceNotificationActionRegistry.getNotificationAction(context, actionType);
          if (actionImpl != null) {
-             HashMap<String, String> payload = new HashMap<String, String>();
+             HashMap<String, String> payload = new HashMap<>();
              for (Iterator<String> iter = action.keys(); iter.hasNext(); ) {
                  String key = iter.next();
                  payload.put(key, action.getString(key));
@@ -250,7 +250,7 @@
  
              actionImpl.handleAction(context, actionType, null, null, null, payload, false);
  
-             List<Attribute> eventAttributes = new LinkedList<Attribute>();
+             List<Attribute> eventAttributes = new LinkedList<>();
              eventAttributes.add(new StringAttribute("richContentId", richContentId));
              eventAttributes.add(new StringAttribute("inboxMessageId", inboxMessageId));
              eventAttributes.add(new StringAttribute("actionTaken", actionType));
@@ -316,51 +316,51 @@
  
      public interface Methods {
          interface SetInboxMessagesUpdateCallback {
-             final String NAME = "setInboxMessagesUpdateCallback";
-             public static final int STATE_INDEX = 0;
+             String NAME = "setInboxMessagesUpdateCallback";
+             int STATE_INDEX = 0;
          }
  
-         public static interface SyncInboxMessages {
-             public static final String NAME = "syncInboxMessages";
+         interface SyncInboxMessages {
+             String NAME = "syncInboxMessages";
          }
  
-         public static interface FetchRichContentId {
-             public static final String NAME = "fetchRichContentId";
-             public static final int RICH_CONTENT_ID_INDEX = 0;
+         interface FetchRichContentId {
+             String NAME = "fetchRichContentId";
+             int RICH_CONTENT_ID_INDEX = 0;
          }
  
-         public static interface FetchInboxMessageId {
-             public static final String NAME = "fetchInboxMessageId";
-             public static final int INBOX_MESSAGE_ID_INDEX = 0;
+         interface FetchInboxMessageId {
+             String NAME = "fetchInboxMessageId";
+             int INBOX_MESSAGE_ID_INDEX = 0;
          }
  
-         public static interface ExecuteInboxAction {
-             public static final String NAME = "executeInboxAction";
-             public static final int ACTION_INDEX = 0;
-             public static final int INBOX_MESSAGE_ID_INDEX = 1;
+         interface ExecuteInboxAction {
+             String NAME = "executeInboxAction";
+             int ACTION_INDEX = 0;
+             int INBOX_MESSAGE_ID_INDEX = 1;
          }
  
-         public static interface DeleteMessageId {
-             public static final String NAME = "deleteMessageId";
-             public static final int INBOX_MESSAGE_ID_INDEX = 0;
+         interface DeleteMessageId {
+             String NAME = "deleteMessageId";
+             int INBOX_MESSAGE_ID_INDEX = 0;
          }
  
-         public static interface ReadMessageId {
-             public static final String NAME = "readMessageId";
-             public static final int INBOX_MESSAGE_ID_INDEX = 0;
+         interface ReadMessageId {
+             String NAME = "readMessageId";
+             int INBOX_MESSAGE_ID_INDEX = 0;
          }
  
-         public static interface FetchInboxMessageViaRichContentId {
-             public static final String NAME = "fetchInboxMessageViaRichContentId";
-             public static final int RICH_CONTENT_ID_INDEX = 0;
+         interface FetchInboxMessageViaRichContentId {
+             String NAME = "fetchInboxMessageViaRichContentId";
+             int RICH_CONTENT_ID_INDEX = 0;
          }
  
-         public static interface ClearExpiredMessages {
-             public static final String NAME = "clearExpiredMessages";
+         interface ClearExpiredMessages {
+             String NAME = "clearExpiredMessages";
          }
  
-         public static interface Initialize {
-             public static final String NAME = "initialize";
+         interface Initialize {
+             String NAME = "initialize";
          }
      }
  

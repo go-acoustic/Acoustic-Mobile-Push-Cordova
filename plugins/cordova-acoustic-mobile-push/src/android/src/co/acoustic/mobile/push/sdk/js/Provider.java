@@ -15,6 +15,8 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.net.Uri;
 
+import androidx.annotation.NonNull;
+
 import co.acoustic.mobile.push.sdk.api.db.SdkDatabase;
 import co.acoustic.mobile.push.sdk.api.db.SdkDatabaseException;
 import co.acoustic.mobile.push.sdk.api.db.SdkDatabaseQueryBuilder;
@@ -48,7 +50,7 @@ public class Provider extends ContentProvider {
 
 
     @Override
-    public int delete(Uri uri, String selection, String[] selectionArgs) {
+    public int delete(@NonNull Uri uri, String selection, String[] selectionArgs) {
         String tableName = JsonDbAdapter.CALLBACKS_TABLE;
         SdkDatabase db = getfailSafeWritableDatabase(getDbHelper());
         if (db != null) {
@@ -61,12 +63,12 @@ public class Provider extends ContentProvider {
     }
 
     @Override
-    public String getType(Uri uri) {
+    public String getType(@NonNull Uri uri) {
         return ("vnd.acoustic.mce.cursor.dir/"+JsonDbAdapter.CALLBACKS_TABLE);
     }
 
     @Override
-    public Uri insert(Uri uri, ContentValues values) {
+    public Uri insert(@NonNull Uri uri, ContentValues values) {
         Logger.d(TAG, "insert(uri=" + uri + ", values=" + values.toString() + ")");
 
         SdkDatabase db = getfailSafeWritableDatabase(getDbHelper());
@@ -86,7 +88,7 @@ public class Provider extends ContentProvider {
 
 
     @Override
-    public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
+    public Cursor query(@NonNull Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
         Logger.d(TAG, "query(uri=" + uri + ", proj=" + Arrays.toString(projection) + ")");
         SdkDatabaseQueryBuilder qb = getDbHelper().createQueryBuilder();
         qb.setTables(JsonDbAdapter.CALLBACKS_TABLE);
@@ -100,7 +102,7 @@ public class Provider extends ContentProvider {
     }
 
     @Override
-    public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
+    public int update(@NonNull Uri uri, ContentValues values, String selection, String[] selectionArgs) {
         Logger.d(TAG, "update(uri=" + uri + ", values=" + values.toString() + ")");
         String tableName = JsonDbAdapter.CALLBACKS_TABLE;
         SdkDatabase db = getfailSafeWritableDatabase(getDbHelper());
@@ -121,11 +123,7 @@ public class Provider extends ContentProvider {
             } catch (Exception ex) {
                 Logger.e(TAG, "Error while getting writableDataBase");
             }
-
         }
         return null;
     }
-
-
-
 }
