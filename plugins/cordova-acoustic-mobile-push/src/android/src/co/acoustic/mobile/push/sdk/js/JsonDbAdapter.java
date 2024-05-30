@@ -1,5 +1,5 @@
 /*
- * Copyright © 2011, 2019 Acoustic, L.P. All rights reserved.
+ * Copyright (C) 2024 Acoustic, L.P. All rights reserved.
  *
  * NOTICE: This file contains material that is confidential and proprietary to
  * Acoustic, L.P. and/or other developers. No license is granted under any intellectual or
@@ -65,7 +65,7 @@ public class JsonDbAdapter {
     }
 
     public static class DatabaseHelper {
-        protected SdkDatabaseOpenHelper databaseHelper;
+        protected final SdkDatabaseOpenHelper databaseHelper;
 
         DatabaseHelper(Context context) {
             databaseHelper = DbAdapter.getDatabaseImpl(context).createOpenHelper(context, DATABASE_NAME, DATABASE_VERSION, new SdkDatabaseOpenHelper.LifeCycleListener() {
@@ -144,11 +144,11 @@ public class JsonDbAdapter {
                     new ContentUriData(context).getCallbacksURI(),
                             new String[] { CALLBACK_ID_COL, CALLBACK_NAME_COL, CALLBACK_SUCCESS_COL, CALLBACK_PARAMETER_COL}, CALLBACK_NAME_COL+ "=?", new String[] {name}, null);
             if (cursor != null) {
-                LinkedList<JsonCallbacksRegistry.RegisteredCallback> registeredCallbacks = new LinkedList<JsonCallbacksRegistry.RegisteredCallback>();
+                LinkedList<JsonCallbacksRegistry.RegisteredCallback> registeredCallbacks = new LinkedList<>();
                 cursor.moveToFirst();
                 if (cursor.getCount() > 0) {
                     cursor.moveToFirst();
-                    while (cursor.isAfterLast() == false) {
+                    while (!cursor.isAfterLast()) {
                         JsonCallbacksRegistry.RegisteredCallback callbak = new JsonCallbacksRegistry.RegisteredCallback(
                                 cursor.getInt(0), // id
                                 cursor.getString(1), // name
@@ -167,7 +167,7 @@ public class JsonDbAdapter {
         } catch (Throwable th) {
             Logger.e(TAG,"Retrieving all callbacks for "+name+" from db failed",th);
         }
-        return new LinkedList<JsonCallbacksRegistry.RegisteredCallback>();
+        return new LinkedList<>();
     }
 
     public static void deleteCallbacks(Context context, List<JsonCallbacksRegistry.RegisteredCallback> callbacks) {
@@ -183,7 +183,5 @@ public class JsonDbAdapter {
         } catch (Throwable th) {
             Logger.e(TAG,"Deleting callbacks of "+callbacks.get(0).getName()+" from db failed",th);
         }
-
     }
-
 }

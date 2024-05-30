@@ -36,10 +36,10 @@ public class JsonCallbacksRegistry {
     }
 
     public static class RegisteredCallback {
-        private int id;
-        private String  name;
-        private boolean success;
-        private String parameterAsString;
+        private final int id;
+        private final String  name;
+        private final boolean success;
+        private final String parameterAsString;
 
         public RegisteredCallback(int id, String name, boolean success, String parameterAsString) {
             this.id = id;

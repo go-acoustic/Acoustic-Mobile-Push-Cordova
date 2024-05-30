@@ -8,7 +8,7 @@ industrial property rights of Acoustic, L.P. except as may be provided in an agr
 Acoustic, L.P. Any unauthorized copying or distribution of content from this file is prohibited.
 -->
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0" id="cordova-acoustic-mobile-push-plugin-geofence"
-version="3.9.99">
+version="3.9.100">
     <name>Acoustic MCE Geofence Cordova Plugin</name>
     <author>Acoustic MCE</author>
     <description>Allows Cordova applications to integrate with Acoustic MCE Push Services</description>
@@ -22,7 +22,7 @@ version="3.9.99">
     </js-module>
 
     <!-- Library settings -->
-    <preference name="POD_VERSION" default="3.9.99" />
+    <preference name="POD_VERSION" default="3.9.100" />
     
     <platform name="ios">
         <header-file src="src/ios/MCEGeofencePlugin.h" />

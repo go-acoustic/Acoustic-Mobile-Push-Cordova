@@ -36,12 +36,18 @@
         <icon src="res/android/drawable-xhdpi/icon.png" density="xhdpi" />
         <icon src="res/android/drawable-xxhdpi/icon.png" density="xxhdpi" />
         <icon src="res/android/drawable-xxxhdpi/icon.png" density="xxxhdpi" />
+
+        <resource-file src="res/android/drawable-ldpi/icon.png" target="/app/src/main/res/drawable-ldpi/icon.png" />
+        <resource-file src="res/android/drawable-mdpi/icon.png" target="/app/src/main/res/drawable-mdpi/icon.png" />
+        <resource-file src="res/android/drawable-hdpi/icon.png" target="/app/src/main/res/drawable-hdpi/icon.png" />
+        <resource-file src="res/android/drawable-xhdpi/icon.png" target="/app/src/main/res/drawable-xhdpi/icon.png" />
+        <resource-file src="res/android/drawable-xxhdpi/icon.png" target="/app/src/main/res/drawable-xxhdpi/icon.png" />
+        <resource-file src="res/android/drawable-xxxhdpi/icon.png" target="/app/src/main/res/drawable-xxxhdpi/icon.png" />
         <resource-file src="res/android/drawable/ac_logo.png" target="/app/src/main/res/drawable/ac_logo.png" />
         <resource-file src="res/android/drawable/background_activated.xml" target="/app/src/main/res/drawable/background_activated.xml" />
         <resource-file src="res/android/drawable-night/ac_logo.png" target="/app/src/main/res/drawable-night/ac_logo.png" />
         <resource-file src="res/android/values/mce-sample-colors.xml" target="/app/src/main/res/values/mce-sample-colors.xml" />
         <resource-file src="res/android/values/mce-sample-dimens.xml" target="/app/src/main/res/values/mce-sample-dimens.xml" />
-        <resource-file src="res/android/values/mce-sample-strings.xml" target="/app/src/main/res/values/mce-sample-strings.xml" />
         <resource-file src="res/android/values/mce-sample-styles.xml" target="/app/src/main/res/values/mce-sample-styles.xml" />
         <resource-file src="res/android/values-night/mce-sample-styles.xml" target="/app/src/main/res/values-night/mce-sample-styles.xml" />
     </platform>
