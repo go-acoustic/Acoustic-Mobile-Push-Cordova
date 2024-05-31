@@ -36,7 +36,7 @@ var MCEPlugin;
   @param {SdkVersionCallback} callback The callback that handles the response
   */
     MCEPlugin.getPluginVersion = function (callback) {
-        callback("3.9.104");
+        callback("3.9.105");
     };
     /**
   Allow Cordova developer to know when registration occurs.
@@ -258,7 +258,8 @@ var MCEPlugin;
         cordova.exec(null, MCEPlugin.error, "MCEPlugin", "setBadge", [badge]);
     };
     /**
-      Allow Cordova developer to change the Android icon
+      Allow Cordova developer to change the Android icon.
+      This only works for Android.
       @param {string} drawableName Name of a drawable image in app bundle
       */
     MCEPlugin.setIcon = function (drawableName) {
@@ -268,17 +269,19 @@ var MCEPlugin;
         // }
     };
     /**
-      Allow Cordova developer to change the Android icon color
-      @param {int} drawableName Color value in integer for icon color
+      Allow Cordova developer to change the Android icon color.
+      This only works for Android.
+      @param {int} colorIntValue Color value in integer for icon color
       */
-    MCEPlugin.setIconColor = function (drawableName) {
+    MCEPlugin.setIconColor = function (colorIntValue) {
         // device.platform is not defined, but this is an Android-only function
         // if(device.platform == "Android") {
-        cordova.exec(null, MCEPlugin.error, "MCEPlugin", "setIconColor", [drawableName]);
+        cordova.exec(null, MCEPlugin.error, "MCEPlugin", "setIconColor", [colorIntValue]);
         // }
     };
     /**
-      Allow Cordova developer to set the Large Android icon
+      Allow Cordova developer to set the Large Android icon.
+      This only works for Android.
       @param {string} drawableName Name of a drawable image in app bundle
       */
     MCEPlugin.setLargeIcon = function (drawableName) {
@@ -288,7 +291,8 @@ var MCEPlugin;
         // }
     };
     /**
-      Allow Cordova developer to enable sound for notifications
+      Allow Cordova developer to enable sound for notifications.
+      This only works for Android.
       @param {string} soundName Name of a raw type sound name in app bundle
       */
     MCEPlugin.setSound = function (soundName) {
@@ -298,7 +302,8 @@ var MCEPlugin;
         // }
     };
     /**
-      Allow Cordova developer to enable vibration for notifications
+      Allow Cordova developer to enable vibration for notifications.
+      This only works for Android.
       @param {boolean} hasEnabled Enable vibration for notifications
       */
     MCEPlugin.setVibrateEnabled = function (hasEnabled) {
@@ -308,7 +313,8 @@ var MCEPlugin;
         // }
     };
     /**
-      Allow Cordova developer to change the notifications vibration pattern
+      Allow Cordova developer to change the notifications vibration pattern.
+      This only works for Android.
       @param {string} vibratePattern A comma seperated list of vibrartion patterns. Example "0,100,200,300"
       */
     MCEPlugin.setVibrationPattern = function (vibratePattern) {
@@ -318,7 +324,8 @@ var MCEPlugin;
         // }
     };
     /**
-      Allow Cordova developer to enable notifications lights
+      Allow Cordova developer to enable notifications lights.
+      This only works for Android.
       @param {boolean} hasEnabled Enable notifications lights
       */
     MCEPlugin.setLightsEnabled = function (hasEnabled) {
@@ -328,11 +335,12 @@ var MCEPlugin;
         // }
     };
     /**
-     * Allow Cordova developer to change the notifications lights preferences
-     * @param ledARGB ledARGB integer value
-     * @param ledOnMS ledOnMS integer value
-     * @param ledOffMS ledOffMS integer value
-     */
+      Allow Cordova developer to change the notifications lights preferences.
+      This only works for Android.
+      @param ledARGB ledARGB integer value
+      @param ledOnMS ledOnMS integer value
+      @param ledOffMS ledOffMS integer value
+      */
     MCEPlugin.setLights = function (ledARGB, ledOnMS, ledOffMS) {
         // device.platform is not defined, but this is an Android-only function
         // if(device.platform == "Android") {
@@ -340,7 +348,8 @@ var MCEPlugin;
         // }
     };
     /**
-      Allow Cordova developer to enable or change flag notifications for your mobile app messages
+      Allow Cordova developer to enable or change flag notifications for your mobile app messages.
+      This only works for Android.
       @param {number} flagValue Integer value of flag notification
       */
     MCEPlugin.addFlags = function (flagValue) {

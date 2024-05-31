@@ -123,49 +123,58 @@ declare namespace MCEPlugin {
       */
     const setBadge: (badge: number) => void;
     /**
-      Allow Cordova developer to change the Android icon
+      Allow Cordova developer to change the Android icon.
+      This only works for Android.
       @param {string} drawableName Name of a drawable image in app bundle
       */
     const setIcon: (drawableName: string) => void;
     /**
-      Allow Cordova developer to change the Android icon color
-      @param {int} drawableName Color value in integer for icon color
+      Allow Cordova developer to change the Android icon color.
+      This only works for Android.
+      @param {int} colorIntValue Color value in integer for icon color
       */
-    const setIconColor: (drawableName: string) => void;
+    const setIconColor: (colorIntValue: string) => void;
     /**
-      Allow Cordova developer to set the Large Android icon
+      Allow Cordova developer to set the Large Android icon.
+      This only works for Android.
       @param {string} drawableName Name of a drawable image in app bundle
       */
     const setLargeIcon: (drawableName: string) => void;
     /**
-      Allow Cordova developer to enable sound for notifications
+      Allow Cordova developer to enable sound for notifications.
+      This only works for Android.
       @param {string} soundName Name of a raw type sound name in app bundle
       */
     const setSound: (soundName: string) => void;
     /**
-      Allow Cordova developer to enable vibration for notifications
+      Allow Cordova developer to enable vibration for notifications.
+      This only works for Android.
       @param {boolean} hasEnabled Enable vibration for notifications
       */
     const setVibrateEnabled: (hasEnabled: boolean) => void;
     /**
-      Allow Cordova developer to change the notifications vibration pattern
+      Allow Cordova developer to change the notifications vibration pattern.
+      This only works for Android.
       @param {string} vibratePattern A comma seperated list of vibrartion patterns. Example "0,100,200,300"
       */
     const setVibrationPattern: (vibratePattern: string) => void;
     /**
-      Allow Cordova developer to enable notifications lights
+      Allow Cordova developer to enable notifications lights.
+      This only works for Android.
       @param {boolean} hasEnabled Enable notifications lights
       */
     const setLightsEnabled: (hasEnabled: boolean) => void;
     /**
-     * Allow Cordova developer to change the notifications lights preferences
-     * @param ledARGB ledARGB integer value
-     * @param ledOnMS ledOnMS integer value
-     * @param ledOffMS ledOffMS integer value
-     */
+      Allow Cordova developer to change the notifications lights preferences.
+      This only works for Android.
+      @param ledARGB ledARGB integer value
+      @param ledOnMS ledOnMS integer value
+      @param ledOffMS ledOffMS integer value
+      */
     const setLights: (ledARGB: number, ledOnMS: number, ledOffMS: number) => void;
     /**
-      Allow Cordova developer to enable or change flag notifications for your mobile app messages
+      Allow Cordova developer to enable or change flag notifications for your mobile app messages.
+      This only works for Android.
       @param {number} flagValue Integer value of flag notification
       */
     const addFlags: (flagValue: number) => void;
