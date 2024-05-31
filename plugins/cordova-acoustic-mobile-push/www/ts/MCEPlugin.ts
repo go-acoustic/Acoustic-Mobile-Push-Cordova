@@ -45,7 +45,7 @@ namespace MCEPlugin {
   @param {SdkVersionCallback} callback The callback that handles the response
   */
     export const getPluginVersion = function (callback: SdkVersionCallback) {
-        callback("3.9.103");
+        callback("3.9.104");
     };
 
     /**
@@ -468,6 +468,74 @@ namespace MCEPlugin {
         // device.platform is not defined, but this is an Android-only function
         // if(device.platform == "Android") {
         cordova.exec(null, MCEPlugin.error, "MCEPlugin", "setLargeIcon", [drawableName]);
+        // }
+    };
+
+    /**
+      Allow Cordova developer to enable sound for notifications
+      @param {string} soundName Name of a raw type sound name in app bundle
+      */
+      export const setSound = function (soundName: string) {
+        // device.platform is not defined, but this is an Android-only function
+        // if(device.platform == "Android") {
+        cordova.exec(null, MCEPlugin.error, "MCEPlugin", "setSound", [soundName]);
+        // }
+    };
+
+    /**
+      Allow Cordova developer to enable vibration for notifications
+      @param {boolean} hasEnabled Enable vibration for notifications
+      */
+      export const setVibrateEnabled = function (hasEnabled: boolean) {
+        // device.platform is not defined, but this is an Android-only function
+        // if(device.platform == "Android") {
+        cordova.exec(null, MCEPlugin.error, "MCEPlugin", "setVibrateEnabled", [hasEnabled]);
+        // }
+    };
+
+    /**
+      Allow Cordova developer to change the notifications vibration pattern
+      @param {string} vibratePattern A comma seperated list of vibrartion patterns. Example "0,100,200,300"
+      */
+      export const setVibrationPattern = function (vibratePattern: string) {
+        // device.platform is not defined, but this is an Android-only function
+        // if(device.platform == "Android") {
+        cordova.exec(null, MCEPlugin.error, "MCEPlugin", "setVibrationPattern", [vibratePattern]);
+        // }
+    };
+
+    /**
+      Allow Cordova developer to enable notifications lights
+      @param {boolean} hasEnabled Enable notifications lights
+      */
+      export const setLightsEnabled = function (hasEnabled: boolean) {
+        // device.platform is not defined, but this is an Android-only function
+        // if(device.platform == "Android") {
+        cordova.exec(null, MCEPlugin.error, "MCEPlugin", "setLightsEnabled", [hasEnabled]);
+        // }
+    };
+
+      /**
+       * Allow Cordova developer to change the notifications lights preferences
+       * @param ledARGB ledARGB integer value 
+       * @param ledOnMS ledOnMS integer value
+       * @param ledOffMS ledOffMS integer value
+       */
+      export const setLights = function (ledARGB: number, ledOnMS: number, ledOffMS: number) {
+        // device.platform is not defined, but this is an Android-only function
+        // if(device.platform == "Android") {
+        cordova.exec(null, MCEPlugin.error, "MCEPlugin", "setLights", [ledARGB, ledOnMS, ledOffMS]);
+        // }
+    };
+
+    /**
+      Allow Cordova developer to enable or change flag notifications for your mobile app messages
+      @param {number} flagValue Integer value of flag notification
+      */
+      export const addFlags = function (flagValue: number) {
+        // device.platform is not defined, but this is an Android-only function
+        // if(device.platform == "Android") {
+        cordova.exec(null, MCEPlugin.error, "MCEPlugin", "addFlags", [flagValue]);
         // }
     };
 

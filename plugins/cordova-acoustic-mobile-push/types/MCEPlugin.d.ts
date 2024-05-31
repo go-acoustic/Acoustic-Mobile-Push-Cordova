@@ -138,6 +138,38 @@ declare namespace MCEPlugin {
       */
     const setLargeIcon: (drawableName: string) => void;
     /**
+      Allow Cordova developer to enable sound for notifications
+      @param {string} soundName Name of a raw type sound name in app bundle
+      */
+    const setSound: (soundName: string) => void;
+    /**
+      Allow Cordova developer to enable vibration for notifications
+      @param {boolean} hasEnabled Enable vibration for notifications
+      */
+    const setVibrateEnabled: (hasEnabled: boolean) => void;
+    /**
+      Allow Cordova developer to change the notifications vibration pattern
+      @param {string} vibratePattern A comma seperated list of vibrartion patterns. Example "0,100,200,300"
+      */
+    const setVibrationPattern: (vibratePattern: string) => void;
+    /**
+      Allow Cordova developer to enable notifications lights
+      @param {boolean} hasEnabled Enable notifications lights
+      */
+    const setLightsEnabled: (hasEnabled: boolean) => void;
+    /**
+     * Allow Cordova developer to change the notifications lights preferences
+     * @param ledARGB ledARGB integer value
+     * @param ledOnMS ledOnMS integer value
+     * @param ledOffMS ledOffMS integer value
+     */
+    const setLights: (ledARGB: number, ledOnMS: number, ledOffMS: number) => void;
+    /**
+      Allow Cordova developer to enable or change flag notifications for your mobile app messages
+      @param {number} flagValue Integer value of flag notification
+      */
+    const addFlags: (flagValue: number) => void;
+    /**
       Allow Cordova developer to register and respond to iOS static categories
       @param {CategoryCallback} callback The callback that handles the response
       @param {string} categoryName Name of category to respond to in iOS payload

@@ -22,8 +22,7 @@
  import co.acoustic.mobile.push.sdk.util.Iso8601;
  import co.acoustic.mobile.push.sdk.registration.RegistrationPreferences;
  import co.acoustic.mobile.push.sdk.js.format.AttributeJson;
- import co.acoustic.mobile.push.sdk.api.notification.DelayedNotificationAction;
- 
+
  import android.content.Context;
  
  import org.json.JSONArray;
@@ -31,9 +30,8 @@
  import org.json.JSONObject;
  
  import java.text.ParseException;
- 
- import java.util.Iterator;
- import java.util.Date;
+
+ import java.util.ArrayList;
  import java.util.LinkedList;
  import java.util.List;
  import java.util.concurrent.Executor;
@@ -91,6 +89,18 @@
                  setIconColor(context, parameters, callback);
              } else if (Methods.SetLargeIcon.NAME.equals(action)) {
                  setLargeIcon(context, parameters, callback);
+             } else if (Methods.SetSound.NAME.equals(action)) {
+                 setSound(context, parameters, callback);
+             } else if (Methods.SetVibrateEnabled.NAME.equals(action)) {
+                 setVibrateEnabled(context, parameters, callback);
+             } else if (Methods.SetVibrationPattern.NAME.equals(action)) {
+                 setVibrationPattern(context, parameters, callback);
+             } else if (Methods.SetLightsEnabled.NAME.equals(action)) {
+                 setLightsEnabled(context, parameters, callback);
+             } else if (Methods.SetLights.NAME.equals(action)) {
+                 setLights(context, parameters, callback);
+             } else if (Methods.AddFlags.NAME.equals(action)) {
+                 addFlags(context, parameters, callback);
              } else {
                  return false;
              }
@@ -294,6 +304,56 @@
          MceSdk.getNotificationsClient().getNotificationsPreference().setLargeIcon(context, iconId);
          callback.noResult();
      }
+
+     public static void setSound(Context context, JSONArray parameters, JsonCallback callback) throws JSONException{
+         String soundName = parameters.getString(Methods.SetSound.SOUND_NAME_INDEX);
+         int soundId = context
+                 .getResources()
+                 .getIdentifier(
+                         soundName,
+                         "raw",
+                         context.getPackageName());
+         MceSdk.getNotificationsClient().getNotificationsPreference().setSound(context, soundId);
+         callback.noResult();
+     }
+
+     public static void setVibrateEnabled(Context context, JSONArray parameters, JsonCallback callback) throws JSONException{
+         Boolean hasEnabled = Boolean.valueOf(parameters.getString(Methods.SetVibrateEnabled.VIBRATION_ENABLED_INDEX));
+         MceSdk.getNotificationsClient().getNotificationsPreference().setVibrateEnabled(context, hasEnabled);
+         callback.noResult();
+     }
+
+     public static void setVibrationPattern(Context context, JSONArray parameters, JsonCallback callback) throws JSONException{
+         String longsSTR = parameters.getString(Methods.SetVibrationPattern.VIBRATION_NAME_INDEX);
+         String[] longSTRArray = longsSTR.split(",");
+         long[] longs = new long[longSTRArray.length];
+         for (int i = 0;i < longSTRArray.length;i++) {
+             longs[i] = Integer.parseInt(longSTRArray[i]);
+         }
+         MceSdk.getNotificationsClient().getNotificationsPreference().setVibrationPattern(context, longs);
+         callback.noResult();
+     }
+
+     public static void setLightsEnabled(Context context, JSONArray parameters, JsonCallback callback) throws JSONException{
+         Boolean hasEnabled = Boolean.valueOf(parameters.getString(Methods.SetLightsEnabled.LIGHTS_ENABLED_INDEX));
+         MceSdk.getNotificationsClient().getNotificationsPreference().setLightsEnabled(context, hasEnabled);
+         callback.noResult();
+     }
+
+     public static void setLights(Context context, JSONArray parameters, JsonCallback callback) throws JSONException{
+         int ledARGB = Integer.parseInt(parameters.getString(Methods.SetLights.LED_ARGB));
+         int ledOnMS = Integer.parseInt(parameters.getString(Methods.SetLights.LED_OnMS));
+         int ledOffMS = Integer.parseInt(parameters.getString(Methods.SetLights.LED_OffMS));
+         int[] ints = { ledARGB, ledOnMS, ledOffMS };
+         MceSdk.getNotificationsClient().getNotificationsPreference().setLights(context, ints);
+         callback.noResult();
+     }
+
+     public static void addFlags(Context context, JSONArray parameters, JsonCallback callback) throws JSONException{
+         int flag = Integer.parseInt(parameters.getString(Methods.AddFlags.FLAG_NAME_INDEX));
+         MceSdk.getNotificationsClient().getNotificationsPreference().addFlags(context, flag);
+         callback.noResult();
+     }
  
      public interface Methods {
          interface SetActionNotYetRegisteredCallback {
@@ -398,6 +458,38 @@
          interface SetLargeIcon {
              String NAME = "setLargeIcon";
              int ICON_NAME_INDEX = 0;
+         }
+
+         interface SetSound {
+             String NAME = "setSound";
+             int SOUND_NAME_INDEX = 0;
+         }
+
+         interface SetVibrateEnabled {
+             String NAME = "setVibrateEnabled";
+             int VIBRATION_ENABLED_INDEX = 0;
+         }
+
+         interface SetVibrationPattern {
+             String NAME = "setVibrationPattern";
+             int VIBRATION_NAME_INDEX = 0;
+         }
+
+         interface SetLightsEnabled {
+             String NAME = "setLightsEnabled";
+             int LIGHTS_ENABLED_INDEX = 0;
+         }
+
+         interface SetLights {
+             String NAME = "setLights";
+             int LED_ARGB = 0;
+             int LED_OnMS = 1;
+             int LED_OffMS = 2;
+         }
+
+         interface AddFlags {
+             String NAME = "addFlags";
+             int FLAG_NAME_INDEX = 0;
          }
  
          interface SetBadge {
