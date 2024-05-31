@@ -87,6 +87,10 @@
                  setIcon(context, parameters, callback);
              } else if (Methods.SetBadge.NAME.equals(action)) {
              } else if (Methods.SetCategoryCallbacks.NAME.equals(action)) {
+             } else if (Methods.SetIconColor.NAME.equals(action)) {
+                 setIconColor(context, parameters, callback);
+             } else if (Methods.SetLargeIcon.NAME.equals(action)) {
+                 setLargeIcon(context, parameters, callback);
              } else {
                  return false;
              }
@@ -272,6 +276,24 @@
          MceSdk.getNotificationsClient().getNotificationsPreference().setIcon(context, iconId);
          callback.noResult();
      }
+
+     public static void setIconColor(Context context, JSONArray parameters, JsonCallback callback) throws JSONException{
+         int iconColor = Integer.parseInt(parameters.getString(Methods.SetIconColor.ICON_COLOR_INDEX));
+         MceSdk.getNotificationsClient().getNotificationsPreference().setIconColor(context, iconColor);
+         callback.noResult();
+     }
+
+     public static void setLargeIcon(Context context, JSONArray parameters, JsonCallback callback) throws JSONException{
+         String iconName = parameters.getString(Methods.SetLargeIcon.ICON_NAME_INDEX);
+         int iconId = context
+                 .getResources()
+                 .getIdentifier(
+                         iconName,
+                         "drawable",
+                         context.getPackageName());
+         MceSdk.getNotificationsClient().getNotificationsPreference().setLargeIcon(context, iconId);
+         callback.noResult();
+     }
  
      public interface Methods {
          interface SetActionNotYetRegisteredCallback {
@@ -365,6 +387,16 @@
  
          interface SetIcon {
              String NAME = "setIcon";
+             int ICON_NAME_INDEX = 0;
+         }
+
+         interface SetIconColor {
+             String NAME = "setIconColor";
+             int ICON_COLOR_INDEX = 0;
+         }
+
+         interface SetLargeIcon {
+             String NAME = "setLargeIcon";
              int ICON_NAME_INDEX = 0;
          }
  

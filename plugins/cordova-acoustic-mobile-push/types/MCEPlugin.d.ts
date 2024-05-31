@@ -128,6 +128,16 @@ declare namespace MCEPlugin {
       */
     const setIcon: (drawableName: string) => void;
     /**
+      Allow Cordova developer to change the Android icon color
+      @param {int} drawableName Color value in integer for icon color
+      */
+    const setIconColor: (drawableName: string) => void;
+    /**
+      Allow Cordova developer to set the Large Android icon
+      @param {string} drawableName Name of a drawable image in app bundle
+      */
+    const setLargeIcon: (drawableName: string) => void;
+    /**
       Allow Cordova developer to register and respond to iOS static categories
       @param {CategoryCallback} callback The callback that handles the response
       @param {string} categoryName Name of category to respond to in iOS payload

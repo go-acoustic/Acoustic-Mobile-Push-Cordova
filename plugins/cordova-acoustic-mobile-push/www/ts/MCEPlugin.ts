@@ -45,7 +45,7 @@ namespace MCEPlugin {
   @param {SdkVersionCallback} callback The callback that handles the response
   */
     export const getPluginVersion = function (callback: SdkVersionCallback) {
-        callback("3.9.102");
+        callback("3.9.103");
     };
 
     /**
@@ -446,6 +446,28 @@ namespace MCEPlugin {
         // device.platform is not defined, but this is an Android-only function
         // if(device.platform == "Android") {
         cordova.exec(null, MCEPlugin.error, "MCEPlugin", "setIcon", [drawableName]);
+        // }
+    };
+
+    /**
+      Allow Cordova developer to change the Android icon color
+      @param {int} drawableName Color value in integer for icon color
+      */
+      export const setIconColor = function (drawableName: string) {
+        // device.platform is not defined, but this is an Android-only function
+        // if(device.platform == "Android") {
+        cordova.exec(null, MCEPlugin.error, "MCEPlugin", "setIconColor", [drawableName]);
+        // }
+    };
+
+    /**
+      Allow Cordova developer to set the Large Android icon
+      @param {string} drawableName Name of a drawable image in app bundle
+      */
+      export const setLargeIcon = function (drawableName: string) {
+        // device.platform is not defined, but this is an Android-only function
+        // if(device.platform == "Android") {
+        cordova.exec(null, MCEPlugin.error, "MCEPlugin", "setLargeIcon", [drawableName]);
         // }
     };
 
