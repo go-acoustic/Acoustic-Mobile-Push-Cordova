@@ -22,32 +22,32 @@
 
     "Required Mobile-Push plugins": "<true/false>, enable or disable plugin",
     "cordova-acoustic-mobile-push-beta": true,
-    "cordova-acoustic-mobile-push-plugin-ios-notification-service-beta": false,
+    "cordova-acoustic-mobile-push-plugin-ios-notification-service-beta": true,
     "cordova-acoustic-mobile-push-plugin-inapp-beta": true,
     "cordova-acoustic-mobile-push-plugin-inbox-beta": true,
 
     "Optional Mobile-Push plugins": "<true/false>, enable or disable plugin",
     "cordova-acoustic-mobile-push-plugin-action-menu-beta": false,
-    "cordova-acoustic-mobile-push-plugin-beacon-beta": true,
-    "cordova-acoustic-mobile-push-plugin-calendar-beta": true,
-    "cordova-acoustic-mobile-push-plugin-displayweb-beta": true,
-    "cordova-acoustic-mobile-push-plugin-geofence-beta": true,
-    "cordova-acoustic-mobile-push-plugin-location-beta": true,
-    "cordova-acoustic-mobile-push-plugin-passbook-beta": true,
-    "cordova-acoustic-mobile-push-plugin-snooze-beta": true
+    "cordova-acoustic-mobile-push-plugin-beacon-beta": false,
+    "cordova-acoustic-mobile-push-plugin-calendar-beta": false,
+    "cordova-acoustic-mobile-push-plugin-displayweb-beta": false,
+    "cordova-acoustic-mobile-push-plugin-geofence-beta": false,
+    "cordova-acoustic-mobile-push-plugin-location-beta": false,
+    "cordova-acoustic-mobile-push-plugin-passbook-beta": false,
+    "cordova-acoustic-mobile-push-plugin-snooze-beta": false
   },
 
-  "customAction": "openInboxMessage sendEmail",
+  "customAction": "",
   "mceCanSyncOverride": true,
 
   "iOS": {
     "Please note: if you are using a Swift based Application Delegate you must include the product name and class name in AppDelegateClass, for example": "SwiftSample.AppDelegate",
     "appDelegateClass": "AppDelegate",
     "Please note": "you will need to update your baseUrl to the one supplied to you",
-    "baseUrl": "https://mobile-sdk-lib-us-0.brilliantcollector.com",
+    "baseUrl": "https://mobile-sdk-lib-XX-Y.brilliantcollector.com",
     "appKey": {
-      "dev": "apB9YG5Umw",
-      "prod": "apB9YG5Umw"
+      "dev": "INSERT YOUR DEV APPKEY HERE",
+      "prod": "INSERT YOUR PROD APPKEY HERE"
     },
     "Please note, this option can be used to assign a device a different UserId on reinstallation, the default is to use the same UserId on reinstallation if possible (false). If you want a different UserId on reinstallation set invalidateExistingUser to": true,
     "invalidateExistingUser": false,
@@ -77,12 +77,12 @@
               "syncRadius": 100000,
               
               "Specify how long to wait before syncing again on significant location change in seconds, default 5 minutes": "",
-              "syncInterval": 300
+              "syncInterval": 600
           },
           
           "Please note, the existince of the ibeacon key will enable iBeacon support, if iBeacon support is not desired, remove the key": "",
           "ibeacon": {
-              "UUID": "21A9A7F4-0DD8-46B7-9D4D-379F3C4AF77D"
+              "UUID": "INSERT-IBEACON-UUID-HERE"
           }
       },
     "When the autoInitialize value is set to true it will start user registration immediately, if you want to trigger user registration later at a specific point in your app, set this value to": false,
@@ -96,7 +96,7 @@
       "warn",
       "verbose"
     ],
-    "loglevel": "verbose",
+    "loglevel": "error",
     "Set logfile to true to write logs to the iTunes sync directory for debugging": "",
     "logfile": true,
     "Maximum size of log before it's rotated": "default is 10MB",
@@ -121,9 +121,9 @@
   },
   "android": {
     "Please note": "you will need to update your baseUrl to the one supplied to you",
-    "baseUrl": "https://mobile-sdk-lib-us-0.brilliantcollector.com",
+    "baseUrl": "https://mobile-sdk-lib-XX-Y.brilliantcollector.com",
     "appKey": {
-      "prod": "gcnslVYNku"
+      "prod": "INSERT APP KEY HERE"
     },
     "Set this to the google project number if you are using GCM or to an empty string if you are using FCM": "",
     "Use 'gcm' for GCM or 'fcm' for FCM": "",
@@ -150,7 +150,7 @@
       "debug",
       "verbose"
     ],
-    "loglevel": "verbose",
+    "loglevel": "error",
     "Please note, the log iteration files will be stored under": "<application cache folder on sdcard>/mce-cordova-sdk/logs/<installation time folder, format: yyyy-MM-dd-HH-mm-ss>",
     "logfile": false,
     "The number of log iteration files": "After reaching this number, the log files will be overwritten in order",
@@ -172,7 +172,7 @@
       "The sync key is only used to customize the iBeacon and Geofence syncing service, it is not required for those features": "",
       "sync": {
         "Specify how long to wait before syncing again on significant location change in seconds, default 5 minutes":"",
-        "syncInterval": 300,
+        "syncInterval": 600,
         "Location Sync radius is in meters, default 100km":"",
         "syncRadius": 100000,
         "Specify how long to wait before retrieving a new location from the device, default 5 minutes":"",
@@ -187,7 +187,7 @@
       "Please note, unlike iOS, the existence of the ibeacon key does not enable iBeacon support, iBeacon support is enabled only if iBeacons are nearby":"",
       "ibeacon": {
         "Please note: if this is not set, iBeacon events will not be sent": "This value should never be empty. Leave the default value if you don't want to use iBeacons",
-        "uuid": "21A9A7F4-0DD8-46B7-9D4D-379F3C4AF77Dn",
+        "uuid": "YOUR-IBEACONS-UUID",
         "Specify how much time the sdk will scan for iBeacons in every scan session while the application is in the foreground, default is 5 seconds": "",
         "beaconForegroundScanDuration": 5,
         "Specify how much time the sdk will wait between iBeacons scan sessions while the application is in the foreground, default is 30 seconds": "",
