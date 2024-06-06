@@ -31,7 +31,7 @@
     "license": "See license in license/license.txt",
     "name": "cordova-acoustic-mobile-push-plugin-ios-notification-service-beta",
     "peerDependencies": {
-        "cordova-acoustic-mobile-push": "npm:cordova-acoustic-mobile-push-beta@^3.9.108",
+        "cordova-acoustic-mobile-push": "npm:cordova-acoustic-mobile-push-beta@^3.9.109",
         "jquery": "^3.6.0",
         "jquery-mobile": "^1.5.0-alpha.1"
     },
@@ -42,5 +42,5 @@
     },
     "scripts": {
     },
-    "version": "3.9.108"
+    "version": "3.9.109"
 }
