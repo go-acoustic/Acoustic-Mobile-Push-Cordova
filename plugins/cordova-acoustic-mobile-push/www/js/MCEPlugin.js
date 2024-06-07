@@ -36,7 +36,7 @@ var MCEPlugin;
   @param {SdkVersionCallback} callback The callback that handles the response
   */
     MCEPlugin.getPluginVersion = function (callback) {
-        callback("3.9.110");
+        callback("3.9.111");
     };
     /**
   Allow Cordova developer to know when registration occurs.
