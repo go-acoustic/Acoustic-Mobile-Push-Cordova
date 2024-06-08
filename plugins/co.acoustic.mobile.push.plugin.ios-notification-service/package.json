@@ -1,7 +1,0 @@
-{
-  "name": "co.acoustic.mobile.push.plugin.ios-notification-service",
-  "version": "3.8.7",
-  "description": "iOS notification service for Acoustic Campaign Mobile Push SDKs",
-  "author": "Acoustic MCE",
-  "license": "Apache 2.0 License"
-}

@@ -1,5 +1,5 @@
 /*
- * Copyright © 2015, 2019 Acoustic, L.P. All rights reserved.
+ * Copyright (C) 2024 Acoustic, L.P. All rights reserved.
  *
  * NOTICE: This file contains material that is confidential and proprietary to
  * Acoustic, L.P. and/or other developers. No license is granted under any intellectual or
@@ -68,117 +68,145 @@ function setupLocationPage() {
     });
 
     $(document).on("pageshow", "#geofences", function (e, data) {
-        setTimeout(function () {
-            var map = new google.maps.Map(document.getElementById("map"), {
-                zoom: 15,
+        let map;
+
+        async function initMap() {
+            const { Map } = await google.maps.importLibrary("maps");
+            const { AdvancedMarkerElement } = await google.maps.importLibrary("marker");
+
+            map = new Map(document.getElementById("map"), {
+                center: { lat: -34.397, lng: 150.644 },
+                zoom: 8,
             });
-
-            var mappedCircles = {};
-
-            function updateGeofences(geolocate) {
-                var newGeofences = new Set();
-                MCEGeofencePlugin.geofencesNear(
-                    function (geofences) {
-                        geofences.forEach(function (geofence) {
-                            var key = JSON.stringify(geofence);
-                            newGeofences.add(key);
-                            if (!mappedCircles[key]) {
-                                mappedCircles[key] = new google.maps.Circle({
-                                    strokeColor: "#0000FF",
-                                    strokeOpacity: 0.8,
-                                    strokeWeight: 2,
-                                    fillColor: "#0000FF",
-                                    fillOpacity: 0.35,
-                                    map: map,
-                                    center: new google.maps.LatLng(
-                                        geofence.latitude,
-                                        geofence.longitude
-                                    ),
-                                    radius: geofence.radius,
-                                });
-                            }
-                        });
-
-                        var deleteMaps = [];
-                        for (key in mappedCircles) {
-                            if (!newGeofences.has(key)) {
-                                mappedCircles[key].setMap(null);
-                                deleteMaps.push(key);
-                            }
-                        }
-
-                        deleteMaps.forEach(function (map) {
-                            delete mappedCircles[map];
-                        });
-                    },
-                    geolocate.lat(),
-                    geolocate.lng(),
-                    1000
-                );
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(function(position) {
+                   var currLocation = new google.maps.LatLng(position.coords.latitude,position.coords.longitude);
+                   // plot the currLocation on Google Maps, or handle accordingly:
+                   new google.maps.Marker({ title: 'Current Location',
+                                            map: map,
+                                            position: currLocation });
+//               var currentLocation = new google.maps.Marker.AdvancedMarkerElement({
+//                                           position: currLocation,
+//                                           icon: "images/blue.png",
+//                                           map: map,
+//                                       });
+//                const blueImg = document.createElement("img");
+//                blueImg.src = "images/blue.png";
+//                const marker = new AdvancedMarkerElement({
+//                    map: map,
+//                    position: currLocation,
+//                    content: blueImg,
+//                  });
+                    map.setCenter(currLocation);
+                });
             }
+        }
 
-            var lastLocation;
+        initMap();
 
-            $(document).on("locationUpdate", function () {
-                updateGeofences(lastLocation);
+        var mappedCircles = {};
+        function updateGeofences(geolocate) {
+            var newGeofences = new Set();
+            MCEGeofencePlugin.geofencesNear(
+                function (geofences) {
+                    geofences.forEach(function (geofence) {
+                        var key = JSON.stringify(geofence);
+                        newGeofences.add(key);
+                        if (!mappedCircles[key]) {
+                            mappedCircles[key] = new google.maps.Circle({
+                                strokeColor: "#0000FF",
+                                strokeOpacity: 0.8,
+                                strokeWeight: 2,
+                                fillColor: "#0000FF",
+                                fillOpacity: 0.35,
+                                map: map,
+                                center: new google.maps.LatLng(
+                                    geofence.latitude,
+                                    geofence.longitude
+                                ),
+                                radius: geofence.radius,
+                            });
+                        }
+                    });
+
+                    var deleteMaps = [];
+                    for (key in mappedCircles) {
+                        if (!newGeofences.has(key)) {
+                            mappedCircles[key].setMap(null);
+                            deleteMaps.push(key);
+                        }
+                    }
+
+                    deleteMaps.forEach(function (map) {
+                        delete mappedCircles[map];
+                    });
+                },
+                geolocate.lat(),
+                geolocate.lng(),
+                1000
+            );
+        }
+
+        var lastLocation;
+        $(document).on("locationUpdate", function () {
+            updateGeofences(lastLocation);
+        });
+
+        navigator.geolocation.getCurrentPosition(function (position) {
+            var geolocate = new google.maps.LatLng(
+                position.coords.latitude,
+                position.coords.longitude
+            );
+            lastLocation = geolocate;
+            var currentLocation = new google.maps.Marker.AdvancedMarkerElement({
+                position: new google.maps.LatLng(
+                    position.coords.latitude,
+                    position.coords.longitude
+                ),
+                icon: "images/blue.png",
+                map: map,
             });
 
-            navigator.geolocation.getCurrentPosition(function (position) {
+            updateGeofences(geolocate);
+            map.setCenter(geolocate);
+
+            var autoCenter = true;
+            $("#gps_refresh").click(function () {
+                MCELocationPlugin.syncLocations();
+            });
+
+            $("#gps_button")
+                .css("opacity", 1)
+                .click(function () {
+                    autoCenter = !autoCenter;
+                    if (autoCenter) {
+                        $("#gps_button").css("opacity", 1);
+                        map.setCenter(lastLocation);
+                    } else {
+                        $("#gps_button").css("opacity", 0.5);
+                    }
+                });
+
+            map.addListener("drag", function () {
+                autoCenter = false;
+                $("#gps_button").css("opacity", 0.5);
+            });
+
+            navigator.geolocation.watchPosition(function (position) {
                 var geolocate = new google.maps.LatLng(
                     position.coords.latitude,
                     position.coords.longitude
                 );
                 lastLocation = geolocate;
-                var currentLocation = new google.maps.Marker({
-                    position: new google.maps.LatLng(
-                        position.coords.latitude,
-                        position.coords.longitude
-                    ),
-                    icon: "images/blue.png",
-                    map: map,
-                });
+                if (autoCenter) {
+                    map.setCenter(geolocate);
+                    map.setZoom(15);
+                }
+                currentLocation.setPosition(geolocate);
 
                 updateGeofences(geolocate);
-                map.setCenter(geolocate);
-
-                var autoCenter = true;
-                $("#gps_refresh").click(function () {
-                    MCELocationPlugin.syncLocations();
-                });
-
-                $("#gps_button")
-                    .css("opacity", 1)
-                    .click(function () {
-                        autoCenter = !autoCenter;
-                        if (autoCenter) {
-                            $("#gps_button").css("opacity", 1);
-                            map.setCenter(lastLocation);
-                        } else {
-                            $("#gps_button").css("opacity", 0.5);
-                        }
-                    });
-
-                map.addListener("drag", function () {
-                    autoCenter = false;
-                    $("#gps_button").css("opacity", 0.5);
-                });
-
-                navigator.geolocation.watchPosition(function (position) {
-                    var geolocate = new google.maps.LatLng(
-                        position.coords.latitude,
-                        position.coords.longitude
-                    );
-                    lastLocation = geolocate;
-                    if (autoCenter) {
-                        map.setCenter(geolocate);
-                        map.setZoom(15);
-                    }
-                    currentLocation.setPosition(geolocate);
-
-                    updateGeofences(geolocate);
-                });
             });
-        }, 250);
+        });
     });
 }
 
@@ -433,7 +461,9 @@ function setupCustomActionPage() {
 
 function guid() {
     function s4() {
-        return Math.floor((1 + Math.random()) * 0x10000)
+        const crypto = window.crypto || window.msCrypto;
+        var array = new Uint32Array(1);
+        return Math.floor((1 + crypto.getRandomValues(array)) * 0x10000)
             .toString(16)
             .substring(1);
     }
@@ -574,7 +604,7 @@ function setupInAppPage() {
             maxViews: 5,
             template: "video",
             content: {
-                action: { type: "url", value: "http://acoustic.co" },
+                action: { type: "url", value: "https://acoustic.co" },
                 title: "Canned Video Template Title",
                 text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque rhoncus, eros sed imperdiet finibus, purus nibh placerat leo, non fringilla massa tortor in tellus. Donec aliquet pharetra dui ac tincidunt. Ut eu mi at ligula varius suscipit. Vivamus quis quam nec urna sollicitudin egestas eu at elit. Nulla interdum non ligula in lobortis. Praesent lobortis justo at cursus molestie. Aliquam lectus velit, elementum non laoreet vitae, blandit tempus metus. Nam ultricies arcu vel lorem cursus aliquam. Nunc eget tincidunt ligula, quis suscipit libero. Integer velit nisi, lobortis at malesuada at, dictum vel nisi. Ut vulputate nunc mauris, nec porta nisi dignissim ac. Sed ut ante sapien. Quisque tempus felis id maximus congue. Aliquam quam eros, congue at augue et, varius scelerisque leo. Vivamus sed hendrerit erat. Mauris quis lacus sapien. Nullam elit quam, porttitor non nisl et, posuere volutpat enim. Praesent euismod at lorem et vulputate. Maecenas fermentum odio non arcu iaculis egestas. Praesent et augue quis neque elementum tincidunt. ",
                 video: "https://archive.org/download/BigBuckBunny_124/Content/big_buck_bunny_720p_surround.mp4",
@@ -940,8 +970,8 @@ function setupRegistrationPage() {
 
 function convertDateToAcousticDate(date) {
     var raw = (!isNaN(Date.parse(date))) ? new Date(date) : new Date();
-    console.log("RAW", raw, raw.getFullYear(), raw.getMonth(), raw.getDate()); 
-    return (raw.getFullYear() 
+    console.log("RAW", raw, raw.getFullYear(), raw.getMonth(), raw.getDate());
+    return (raw.getFullYear()
          + "-" + ((raw.getMonth() + 1) < 10 ? ("0" + (raw.getMonth() + 1)) : raw.getMonth())
          + "-" + ((raw.getDate() < 10) ? ("0" + raw.getDate()) : raw.getDate()));
 }

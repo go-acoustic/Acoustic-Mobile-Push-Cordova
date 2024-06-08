@@ -1,8 +1,0 @@
-{
-  "notification-actions": [
-    {
-      "type": "snooze",
-      "class": "co.acoustic.mobile.push.sdk.plugin.snooze.SnoozeAction"
-    }
-  ]
-}

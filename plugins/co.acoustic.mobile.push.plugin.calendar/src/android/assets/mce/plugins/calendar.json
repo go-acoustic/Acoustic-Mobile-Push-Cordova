@@ -1,8 +1,0 @@
-{
-  "notification-actions": [
-    {
-      "type": "calendar",
-      "class": "co.acoustic.mobile.push.sdk.plugin.calendar.AddToCalendarAction"
-    }
-  ]
-}

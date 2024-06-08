@@ -1,5 +1,5 @@
 <!-- 
-Copyright © 2015, 2019 Acoustic, L.P. All rights reserved.
+Copyright (C) 2024 Acoustic, L.P. All rights reserved.
 
 NOTICE: This file contains material that is confidential and proprietary to 
 Acoustic, L.P. and/or other developers. No license is granted under any intellectual or 
@@ -8,9 +8,10 @@ Acoustic, L.P. Any unauthorized copying or distribution of content from this fil
 -->
 
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
+    <title>Sample</title>
     <script src="js/jquery-1.11.1.min.js"></script>
     <script src="js/jquery.mobile-1.4.5.min.js"></script>
     <script src="js/jquery-ui-1.11.4.min.js"></script>
@@ -24,17 +25,18 @@ Acoustic, L.P. Any unauthorized copying or distribution of content from this fil
     <link rel="stylesheet" href="css/acoustic.css" />
     <link rel="stylesheet" href="css/jquery.mobile.structure-1.4.5.css" />
     <link rel="stylesheet" type="text/css" href="css/index.css" />
+    <link rel="icon" href="data:,">
 </head>
 
 <body>
     <div data-role="page" id="sample">
 
         <div class="ui-body">
-            <center>
-                <h4><img src="css/images/logo.png"></h4>
-                <h4><img src="css/images/campaign.png"></h4>
-                <h4>Acoustic Campaign Mobile Push Sample App</h4>
-            </center>
+            <div>
+                <h4 style="text-align: center;"><img src="css/images/logo.png" alt="Logo"></h4>
+                <h4 style="text-align: center;"><img src="css/images/campaign.png" alt="Product"></h4>
+                <h4 style="text-align: center;">Acoustic Campaign Mobile Push Sample App</h4>
+            </div>
             <div id='pluginVersion'>Plugin Version: <span></span></div>
             <div id='sdkVersion'>Native SDK Version: <span></span></div>
             <a data-transition="slide" id='registrationButton' href="#registration" data-role="button" data-icon="arrow-r" data-iconpos="right">Registration Details</a>
@@ -45,10 +47,9 @@ Acoustic, L.P. Any unauthorized copying or distribution of content from this fil
             <a data-transition="slide" id='attributesButton' href="#attributes" data-role="button" data-icon="arrow-r" data-iconpos="right">Send User Attributes</a>
             <a data-transition="slide" id='geofenceButton' href="#geofences" data-role="button" data-icon="arrow-r" data-iconpos="right">View Geofences</a>
             <a data-transition="slide" id='beaconButton' href="#beacons" data-role="button" data-icon="arrow-r" data-iconpos="right">View iBeacons</a>
-            <!-- <a data-transition="slide" id='testButton' href="/cdvtests/index.html" data-role="button" data-icon="arrow-r" data-iconpos="right">View test page</a> -->
         </div>
 
-        <div class='copyright'>Copyright (c) 2023 Acoustic. All rights reserved.</div>
+        <div class='copyright'>Copyright (C) 2024 Acoustic. All rights reserved.</div>
 
         <div data-role="header">
             <h1>Sample App</h1>
@@ -97,7 +98,7 @@ Acoustic, L.P. Any unauthorized copying or distribution of content from this fil
             <a href="#sample" data-direction="reverse" data-transition="slide">Sample</a>
             <h1>iBeacons</h1>
             <div class="ui-btn-right ui-btn">
-                <a id="beacon_refresh"><img width='22' height='22' src="images/inbox/refresh.png"></a>
+                <a id="beacon_refresh"><img width='22' height='22' src="images/inbox/refresh.png" alt="Refesh button"></a>
             </div>
         </div>
     </div>
@@ -115,8 +116,8 @@ Acoustic, L.P. Any unauthorized copying or distribution of content from this fil
             <a href="#sample" data-direction="reverse" data-transition="slide">Sample</a>
             <h1>Geofences</h1>
             <div class="ui-btn-right ui-btn">
-                <a id="gps_refresh"><img width='22' height='22' src="images/inbox/refresh.png"></a>
-                <a id="gps_button"><img width='22' height='22' src="images/gps.png"></a>
+                <a id="gps_refresh"><img width='22' height='22' src="images/inbox/refresh.png" alt="Refesh button"></a>
+                <a id="gps_button"><img width='22' height='22' src="images/gps.png" alt="GPS button"></a>
             </div>
         </div>
     </div>
@@ -128,7 +129,7 @@ Acoustic, L.P. Any unauthorized copying or distribution of content from this fil
         <div data-role="header">
             <a href="#sample" data-direction="reverse" data-transition="slide">Sample</a>
             <h1>Inbox</h1>
-            <a id="inbox_refresh_button"><img width='22' height='22' src="images/inbox/refresh.png"></a>
+            <a id="inbox_refresh_button"><img width='22' height='22' src="images/inbox/refresh.png" alt="Refesh button"></a>
         </div>
     </div>
 
@@ -136,9 +137,9 @@ Acoustic, L.P. Any unauthorized copying or distribution of content from this fil
         <div id='inboxMessageContent' class="ui-body"></div>
         <div data-role="header">
             <div id='buttons'>
-                <a id="delete_button"><img width='22' height='22' src="images/inbox/trash.png"></a>
-                <a id="down_button"><img width='22' height='11' src="images/inbox/chevron-down.png"></a>
-                <a id="up_button"><img width='22' height='11' src="images/inbox/chevron-up.png"></a>
+                <a id="delete_button"><img width='22' height='22' src="images/inbox/trash.png" alt="Delete button"></a>
+                <a id="down_button"><img width='22' height='11' src="images/inbox/chevron-down.png" alt="Down button"></a>
+                <a id="up_button"><img width='22' height='11' src="images/inbox/chevron-up.png" alt="Up button"></a>
             </div>
             <a href="#inbox" data-direction="reverse" data-transition="slide">Inbox</a>
             <h1></h1>
@@ -162,7 +163,7 @@ Acoustic, L.P. Any unauthorized copying or distribution of content from this fil
         <div data-role="header">
             <a href="#sample" data-direction="reverse" data-transition="slide">Sample</a>
             <h1>In App</h1>
-            <a id="inapp_refresh_button"><img width='22' height='22' src="images/inbox/refresh.png"></a>
+            <a id="inapp_refresh_button"><img width='22' height='22' src="images/inbox/refresh.png" alt="Refesh button"></a>
         </div>
     </div>
 
@@ -257,7 +258,14 @@ Acoustic, L.P. Any unauthorized copying or distribution of content from this fil
 
     <script type="text/javascript" src="cordova.js"></script>
     <script type="text/javascript" src="js/index.js"></script>
-    <script async defer src="https://maps.googleapis.com/maps/api/js?key= YOUR GOOGLE MAPS API KEY HERE"></script>
+    <script>
+      (g=>{var h,a,k,p="The Google Maps JavaScript API",c="google",l="importLibrary",q="__ib__",m=document,b=window;b=b[c]||(b[c]={});var d=b.maps||(b.maps={}),r=new Set,e=new URLSearchParams,u=()=>h||(h=new Promise(async(f,n)=>{await (a=m.createElement("script"));e.set("libraries",[...r]+"");for(k in g)e.set(k.replace(/[A-Z]/g,t=>"_"+t[0].toLowerCase()),g[k]);e.set("callback",c+".maps."+q);a.src=`https://maps.${c}apis.com/maps/api/js?`+e;d[q]=f;a.onerror=()=>h=n(Error(p+" could not load."));a.nonce=m.querySelector("script[nonce]")?.nonce||"";m.head.append(a)}));d[l]?console.warn(p+" only loads once. Ignoring:",g):d[l]=(f,...n)=>r.add(f)&&u().then(()=>d[l](f,...n))})({
+        key: "YOUR GOOGLE MAPS API KEY HERE",
+        v: "weekly",
+        // Use the 'v' parameter to indicate the version to use (weekly, beta, alpha, etc.).
+        // Add other bootstrap parameters as needed, using camel case.
+      });
+    </script>
 </body>
 
 </html>

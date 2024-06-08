@@ -1,0 +1,29 @@
+repositories{
+  jcenter()
+  google()
+  mavenCentral()
+  maven {
+    url "https://plugins.gradle.org/m2/"
+  }
+  maven {
+    url "https://maven.google.com"
+    name 'Google'
+  }
+  maven { url "https://s01.oss.sonatype.org/content/repositories/staging" }
+}
+
+dependencies {
+  implementation "androidx.appcompat:appcompat:" + project.ext.androidxLibVersion
+  implementation 'com.google.code.gson:gson:2.2.4'
+  implementation "io.github.go-acoustic:acoustic-mobile-push-android-sdk:" + project.ext.mobilePushVersion
+  implementation "com.google.android.gms:play-services-base:" + project.ext.playServicesBaseVersion
+  implementation "com.google.firebase:firebase-messaging:" + project.ext.firebaseMessagingVersion
+  implementation "com.google.firebase:firebase-core:" + project.ext.firebaseCoreVersion
+}
+
+android {
+  packagingOptions {
+    exclude 'META-INF/NOTICE'
+    exclude 'META-INF/LICENSE'
+  }
+}

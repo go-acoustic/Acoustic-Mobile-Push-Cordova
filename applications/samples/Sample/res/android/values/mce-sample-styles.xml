@@ -1,0 +1,17 @@
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.AppCompat.DayNight">
+        <!-- Customize your theme here. -->
+        <item name="android:textColor">@android:color/black</item>
+        <item name="android:background">@android:color/white</item>
+        <item name="android:textColorPrimaryDisableOnly">#DADBDD</item>
+
+    </style>
+
+    <style name="AppTheme.Location">
+        <item name="android:background">@android:color/transparent</item>
+    </style>
+
+
+</resources>
