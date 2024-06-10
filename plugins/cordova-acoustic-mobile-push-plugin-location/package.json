@@ -34,13 +34,13 @@
     "license": "See license in license/license.txt",
     "name": "cordova-acoustic-mobile-push-plugin-location",
     "peerDependencies": {
-        "cordova-acoustic-mobile-push": "^3.9.114"
+        "cordova-acoustic-mobile-push": "^3.9.115"
     },
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/aipoweredmarketer/ca-mce-cordova-sdk.git",
+        "url": "git+https://github.com/go-acoustic/Acoustic-Mobile-Push-Cordova.git",
         "directory": "plugins/cordova-acoustic-mobile-push-plugin-location"
     },
     
-    "version": "3.9.114"
+    "version": "3.9.115"
 }
