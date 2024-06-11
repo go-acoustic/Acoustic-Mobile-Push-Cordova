@@ -31,7 +31,7 @@
     "license": "See license in license/license.txt",
     "name": "cordova-acoustic-mobile-push-plugin-geofence",
     "peerDependencies": {
-        "cordova-acoustic-mobile-push": "^3.9.118"
+        "cordova-acoustic-mobile-push": "^3.9.119"
     },
     "repository": {
         "type": "git",
@@ -39,5 +39,5 @@
         "directory": "plugins/cordova-acoustic-mobile-push-plugin-geofence"
     },
     
-    "version": "3.9.118"
+    "version": "3.9.119"
 }

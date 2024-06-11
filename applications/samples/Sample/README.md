@@ -1,6 +1,14 @@
 # Sample_Cordova
 This project will use beta version of the libraries.
 
+## Update Config.xml
+```shell npm
+<widget android-packageName="co.acoustic.mobile.push.samples.android" id="co.acoustic.mobile.push.sample" ios-CFBundleIdentifier="INSERT.BUNDLE.ID.HERE" version="3.9.16" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+    <name>Sample</name>
+```
+1. Update `android-packageName` with your preferred Android package name.
+2. Update `ios-CFBundleIdentifier` to your preferred iOS Bundle Identifier.
+
 ## Setup Application
 1. Run the following command
 ```shell npm
@@ -68,7 +76,7 @@ node node_modules/cordova-acoustic-mobile-push/scripts/installPlugins.js
 ```text shell
 cordova build ios
 ```
-9. Launch Android app.
+9. Launch iOS app.
 ```text shell
 cordova run ios
 ```
