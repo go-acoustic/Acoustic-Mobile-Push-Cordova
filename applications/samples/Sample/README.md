@@ -76,7 +76,7 @@ node node_modules/cordova-acoustic-mobile-push-beta/scripts/installPlugins.js
 ```text shell
 cordova build ios
 ```
-9. Launch Android app.
+9. Launch iOS app.
 ```text shell
 cordova run ios
 ```
