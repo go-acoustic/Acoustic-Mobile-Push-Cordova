@@ -18,16 +18,6 @@ Campaign plugin has been published to NPM for Cordova apps. Add the plugin with 
 npm i cordova-acoustic-mobile-push-beta
 ```
 
-2. Edit `App.js` to include the following two lines after the existing import statements:
-
-```javascript
-import { NativeModules } from 'react-native';
-const { RNAcousticMobilePush } = NativeModules;
-RNAcousticMobilePush.requestPushPermission();
-```
-
-Alternatively, you can import the SDK into the component you need.
-
 ## Update CampaignConfig.json
 
 After the plugin is installed, `CampaignConfig.json` file will be created if not found on the root of the project. Example screenshot of the file and the json properties:
