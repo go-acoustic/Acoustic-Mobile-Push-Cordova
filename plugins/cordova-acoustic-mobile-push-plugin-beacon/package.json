@@ -31,7 +31,7 @@
     "license": "See license in license/license.txt",
     "name": "cordova-acoustic-mobile-push-plugin-beacon",
     "peerDependencies": {
-        "cordova-acoustic-mobile-push": "^3.9.119"
+        "cordova-acoustic-mobile-push": "^3.9.121"
     },
     "repository": {
         "type": "git",
@@ -39,5 +39,5 @@
         "directory": "plugins/cordova-acoustic-mobile-push-plugin-beacon"
     },
     
-    "version": "3.9.119"
+    "version": "3.9.121"
 }
