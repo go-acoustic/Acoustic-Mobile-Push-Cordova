@@ -9,19 +9,17 @@
  */
 
  package co.acoustic.mobile.push.sdk.js;
- import android.annotation.SuppressLint;
  import android.content.Context;
  import android.content.Intent;
  import android.os.Build;
  import android.os.Bundle;
- import co.acoustic.mobile.push.sdk.api.MceApplication;
+ 
  import co.acoustic.mobile.push.sdk.api.MceSdk;
  import co.acoustic.mobile.push.sdk.api.notification.NotificationDetails;
  import co.acoustic.mobile.push.sdk.api.notification.MceNotificationAction;
  import co.acoustic.mobile.push.sdk.util.Logger;
  import org.json.JSONException;
  import org.json.JSONObject;
- import co.acoustic.mobile.push.sdk.js.MceJsonApi;
  
  import java.util.Map;
  
@@ -30,7 +28,7 @@
     private static final String TAG = "JsonNotificationAction";
  
      public enum Key {
-         type, name, attribution, mailingId, payload
+         TYPE, NAME, ATTRIBUTION, MAILING_ID, PAYLOAD
      }
  
      private final JsonCallback callback;
@@ -44,34 +42,34 @@
      }
  
      @Override
-     @SuppressLint("MissingPermission") // Permission needed for action_close_system_dialogs in S
-     @SuppressWarnings("deprecation")
      public void handleAction(Context context, String type, String name, String attribution, String mailingId, Map<String, String> payload, boolean fromNotification) {
          try {
              JSONObject actionJSON = new JSONObject();
              if(payload != null) {
-                 for(String key : payload.keySet()) {
-                     Object value = payload.get(key);
+                 for(Map.Entry<String, String> entry : payload.entrySet()) {
+                     Object value = payload.get(entry.getKey());
                      if(value != null) {
                          String valueStr = (String)value;
                          if(valueStr.startsWith("{") && valueStr.endsWith("}")) {
                              try {
                                  value = new JSONObject(valueStr);
-                             } catch(JSONException jsone) {}
+                             } catch(JSONException jsone) {
+                                 Logger.e(TAG, "Error JsonNotificationAction.handleAction", jsone);
+                             }
                          }
                      }
-                     actionJSON.put(key,value);
+                     actionJSON.put(entry.getKey(),value);
                  }
              }
-             actionJSON.put(Key.type.name(), type);
-             actionJSON.put(Key.name.name(), name);
+             actionJSON.put(Key.TYPE.name(), type);
+             actionJSON.put(Key.NAME.name(), name);
              if(attribution != null) {
-                 actionJSON.put(Key.attribution.name(), attribution);
+                 actionJSON.put(Key.ATTRIBUTION.name(), attribution);
              }
              if(mailingId != null) {
-                 actionJSON.put(Key.mailingId.name(), mailingId);
+                 actionJSON.put(Key.MAILING_ID.name(), mailingId);
              }
-             if(callback != null && MceJsonApi.running) {
+             if(callback != null && MceJsonApi.getRunning()) {
                  Logger.v(TAG, "App is open, sending action to app");
                  callback.success(actionJSON, true);
              } else {

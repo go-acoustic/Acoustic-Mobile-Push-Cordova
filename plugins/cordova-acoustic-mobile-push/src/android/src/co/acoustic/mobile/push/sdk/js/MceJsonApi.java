@@ -22,7 +22,7 @@
  import co.acoustic.mobile.push.sdk.util.Iso8601;
  import co.acoustic.mobile.push.sdk.registration.RegistrationPreferences;
  import co.acoustic.mobile.push.sdk.js.format.AttributeJson;
-
+ 
  import android.content.Context;
  
  import org.json.JSONArray;
@@ -30,16 +30,15 @@
  import org.json.JSONObject;
  
  import java.text.ParseException;
-
- import java.util.ArrayList;
+ 
  import java.util.LinkedList;
  import java.util.List;
  import java.util.concurrent.Executor;
  
  public class MceJsonApi {
-     public static boolean running;
+     private static volatile boolean running = false;
  
-    private static final String TAG = "MceJsonApi";
+     private static final String TAG = "MceJsonApi";
  
      public static boolean execute(String action, JSONArray parameters, Context context, JsonCallback callback, Executor executor) throws JSONException {
          try {
@@ -84,7 +83,9 @@
              } else if (Methods.SetIcon.NAME.equals(action)) {
                  setIcon(context, parameters, callback);
              } else if (Methods.SetBadge.NAME.equals(action)) {
+                 // Do nothing now
              } else if (Methods.SetCategoryCallbacks.NAME.equals(action)) {
+                 // Do nothing now
              } else if (Methods.SetIconColor.NAME.equals(action)) {
                  setIconColor(context, parameters, callback);
              } else if (Methods.SetLargeIcon.NAME.equals(action)) {
@@ -111,6 +112,14 @@
              Logger.e(TAG, "JSON ERROR", jsone);
              throw jsone;
          }
+     }
+ 
+     public static void setRunning(boolean value) {
+         MceJsonApi.running = value;
+     }
+ 
+     public static boolean getRunning() {
+         return MceJsonApi.running;
      }
  
      public static void setActionNotYetRegisteredCallback(Context context, JsonCallback callback) {
@@ -149,7 +158,7 @@
          if(state) {
              JsonMceBroadcastReceiver.setSdkRegisteredCallback(context, callback);
          } else {
-             JsonMceBroadcastReceiver.setSdkRegisteredCallback(context, null);            
+             JsonMceBroadcastReceiver.setSdkRegisteredCallback(context, null);
          }
      }
  
@@ -180,9 +189,7 @@
      }
  
      public static void setActionCallback(Context context, JsonCallback callback, JSONArray parameters) throws JSONException {
-         boolean state = parameters.getBoolean(Methods.SetActionCallback.STATE_INDEX);
          String type = parameters.getString(Methods.SetActionCallback.TYPE_INDEX);
-         
          Logger.d(TAG, "Callbacks Registration: Action registration: " + type + " setting to new action callback: " + callback );
          MceNotificationActionRegistry.registerNotificationAction(context, type, new JsonNotificationAction(callback));
      }
@@ -246,9 +253,9 @@
  
              JSONObject response = new JSONObject();
              response.put("operation", "update");
-             response.put("domain", user ? "user" : "channel");
+             response.put("domain", Boolean.TRUE.equals(user) ? "user" : "channel");
              response.put("attributes", attributesJson);
-             response.put("error", "The operation couldn’t be completed. (Duplicate " + (user ? "user" : "channel") + " attribute value updated error 101.)");
+             response.put("error", "The operation could’t be completed. (Duplicate " + (Boolean.TRUE.equals(user) ? "user" : "channel") + " attribute value updated error 101.)");
              JsonMceBroadcastReceiver.attributeCallbackFailure(context, response);
          }
      }
@@ -267,7 +274,7 @@
      }
  
      public static void addEventQueue(Context context, JSONArray parameters) throws JSONException, ParseException {
-         JSONObject eventJSON = parameters.getJSONObject(Methods.AddEventQueue.EVENT_INDEX);
+         JSONObject eventJSON = parameters.getJSONObject(Methods.Event.EVENT_INDEX);
          boolean flush = true;
          if(parameters.length() > Methods.AddEventQueue.FLUSH_INDEX && parameters.get(Methods.AddEventQueue.FLUSH_INDEX) instanceof Boolean) {
              flush = parameters.getBoolean(Methods.AddEventQueue.FLUSH_INDEX);
@@ -286,13 +293,13 @@
          MceSdk.getNotificationsClient().getNotificationsPreference().setIcon(context, iconId);
          callback.noResult();
      }
-
+ 
      public static void setIconColor(Context context, JSONArray parameters, JsonCallback callback) throws JSONException{
          int iconColor = Integer.parseInt(parameters.getString(Methods.SetIconColor.ICON_COLOR_INDEX));
          MceSdk.getNotificationsClient().getNotificationsPreference().setIconColor(context, iconColor);
          callback.noResult();
      }
-
+ 
      public static void setLargeIcon(Context context, JSONArray parameters, JsonCallback callback) throws JSONException{
          String iconName = parameters.getString(Methods.SetLargeIcon.ICON_NAME_INDEX);
          int iconId = context
@@ -304,7 +311,7 @@
          MceSdk.getNotificationsClient().getNotificationsPreference().setLargeIcon(context, iconId);
          callback.noResult();
      }
-
+ 
      public static void setSound(Context context, JSONArray parameters, JsonCallback callback) throws JSONException{
          String soundName = parameters.getString(Methods.SetSound.SOUND_NAME_INDEX);
          int soundId = context
@@ -316,13 +323,13 @@
          MceSdk.getNotificationsClient().getNotificationsPreference().setSound(context, soundId);
          callback.noResult();
      }
-
+ 
      public static void setVibrateEnabled(Context context, JSONArray parameters, JsonCallback callback) throws JSONException{
          Boolean hasEnabled = Boolean.valueOf(parameters.getString(Methods.SetVibrateEnabled.VIBRATION_ENABLED_INDEX));
          MceSdk.getNotificationsClient().getNotificationsPreference().setVibrateEnabled(context, hasEnabled);
          callback.noResult();
      }
-
+ 
      public static void setVibrationPattern(Context context, JSONArray parameters, JsonCallback callback) throws JSONException{
          String longsSTR = parameters.getString(Methods.SetVibrationPattern.VIBRATION_NAME_INDEX);
          String[] longSTRArray = longsSTR.split(",");
@@ -333,22 +340,22 @@
          MceSdk.getNotificationsClient().getNotificationsPreference().setVibrationPattern(context, longs);
          callback.noResult();
      }
-
+ 
      public static void setLightsEnabled(Context context, JSONArray parameters, JsonCallback callback) throws JSONException{
          Boolean hasEnabled = Boolean.valueOf(parameters.getString(Methods.SetLightsEnabled.LIGHTS_ENABLED_INDEX));
          MceSdk.getNotificationsClient().getNotificationsPreference().setLightsEnabled(context, hasEnabled);
          callback.noResult();
      }
-
+ 
      public static void setLights(Context context, JSONArray parameters, JsonCallback callback) throws JSONException{
          int ledARGB = Integer.parseInt(parameters.getString(Methods.SetLights.LED_ARGB));
-         int ledOnMS = Integer.parseInt(parameters.getString(Methods.SetLights.LED_OnMS));
-         int ledOffMS = Integer.parseInt(parameters.getString(Methods.SetLights.LED_OffMS));
+         int ledOnMS = Integer.parseInt(parameters.getString(Methods.SetLights.LED_ON_MS));
+         int ledOffMS = Integer.parseInt(parameters.getString(Methods.SetLights.LED_OFF_MS));
          int[] ints = { ledARGB, ledOnMS, ledOffMS };
          MceSdk.getNotificationsClient().getNotificationsPreference().setLights(context, ints);
          callback.noResult();
      }
-
+ 
      public static void addFlags(Context context, JSONArray parameters, JsonCallback callback) throws JSONException{
          int flag = Integer.parseInt(parameters.getString(Methods.AddFlags.FLAG_NAME_INDEX));
          MceSdk.getNotificationsClient().getNotificationsPreference().addFlags(context, flag);
@@ -449,44 +456,44 @@
              String NAME = "setIcon";
              int ICON_NAME_INDEX = 0;
          }
-
+ 
          interface SetIconColor {
              String NAME = "setIconColor";
              int ICON_COLOR_INDEX = 0;
          }
-
+ 
          interface SetLargeIcon {
              String NAME = "setLargeIcon";
              int ICON_NAME_INDEX = 0;
          }
-
+ 
          interface SetSound {
              String NAME = "setSound";
              int SOUND_NAME_INDEX = 0;
          }
-
+ 
          interface SetVibrateEnabled {
              String NAME = "setVibrateEnabled";
              int VIBRATION_ENABLED_INDEX = 0;
          }
-
+ 
          interface SetVibrationPattern {
              String NAME = "setVibrationPattern";
              int VIBRATION_NAME_INDEX = 0;
          }
-
+ 
          interface SetLightsEnabled {
              String NAME = "setLightsEnabled";
              int LIGHTS_ENABLED_INDEX = 0;
          }
-
+ 
          interface SetLights {
              String NAME = "setLights";
              int LED_ARGB = 0;
-             int LED_OnMS = 1;
-             int LED_OffMS = 2;
+             int LED_ON_MS = 1;
+             int LED_OFF_MS = 2;
          }
-
+ 
          interface AddFlags {
              String NAME = "addFlags";
              int FLAG_NAME_INDEX = 0;
@@ -501,4 +508,3 @@
          }
      }
  }
- 

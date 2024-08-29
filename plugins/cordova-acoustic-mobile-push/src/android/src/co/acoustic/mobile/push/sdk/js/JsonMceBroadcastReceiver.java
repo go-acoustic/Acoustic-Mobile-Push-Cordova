@@ -10,16 +10,13 @@
 
  package co.acoustic.mobile.push.sdk.js;
 
- import android.content.pm.PackageManager;
  import android.content.Context;
  import android.content.Intent;
  import android.os.Bundle;
  import android.location.Location;
- import android.content.pm.ResolveInfo;
  
  import co.acoustic.mobile.push.sdk.api.attribute.StringAttribute;
  import co.acoustic.mobile.push.sdk.api.attribute.Attribute;
- import co.acoustic.mobile.push.sdk.api.MceApplication;
  import co.acoustic.mobile.push.sdk.api.MceBroadcastReceiver;
  import co.acoustic.mobile.push.sdk.api.MceSdk;
  import co.acoustic.mobile.push.sdk.api.attribute.AttributesOperation;
@@ -59,7 +56,7 @@
      private static JsonCallback actionNotRegisteredCallback;
  
      public static void attributeCallbackFailure(Context context, JSONObject response) {
-         if(attributesOperationCallback != null && MceJsonApi.running) {
+         if(attributesOperationCallback != null && MceJsonApi.getRunning()) {
              callbackFailure(attributesOperationCallback, response);
          } else {
              synchronized (ATTRIBUTES_OPERATION_CALLBACK_NAME) {
@@ -247,18 +244,7 @@
  
      @Override
      public void onSdkRegistered(Context context) {
-         sendCordovaChannelAttribute(context);
-         try {
-             if(sdkRegisteredCallback != null && MceJsonApi.running) {
-                 callbackSuccess(sdkRegisteredCallback, RegistrationDetailsJson.toJson(MceSdk.getRegistrationClient().getRegistrationDetails(context)));
-             } else {
-                 synchronized (SDK_REGISTERED_CALLBACK_NAME) {
-                     JsonCallbacksRegistry.register(context, SDK_REGISTERED_CALLBACK_NAME, true, RegistrationDetailsJson.toJson(MceSdk.getRegistrationClient().getRegistrationDetails(context)).toString());
-                 }
-             }
-         } catch(JSONException jsone) {
-             Logger.e(TAG, "Failed to generate sdk registered JSON");
-         }
+         onSdkRegistrationHelper(context);
      }
  
      void sendCordovaChannelAttribute(Context context) {
@@ -275,25 +261,18 @@
  
      @Override
      public void onSdkRegistrationChanged(Context context) {
-         sendCordovaChannelAttribute(context);
-         try {
-             if(sdkRegisteredCallback != null && MceJsonApi.running) {
-                 callbackSuccess(sdkRegisteredCallback, RegistrationDetailsJson.toJson(MceSdk.getRegistrationClient().getRegistrationDetails(context)));
-             } else {
-                 synchronized (SDK_REGISTERED_CALLBACK_NAME) {
-                     JsonCallbacksRegistry.register(context, SDK_REGISTERED_CALLBACK_NAME, true, RegistrationDetailsJson.toJson(MceSdk.getRegistrationClient().getRegistrationDetails(context)).toString());
-                 }
-             }
-         } catch(JSONException jsone) {
-             Logger.e(TAG, "Failed to generate sdk registered JSON");
-         }
+         onSdkRegistrationHelper(context);
      }
  
      @Override
      public void onSdkRegistrationUpdated(Context context) {
+         onSdkRegistrationHelper(context);
+     }
+ 
+     public void onSdkRegistrationHelper(Context context) {
          sendCordovaChannelAttribute(context);
          try {
-             if(sdkRegisteredCallback != null && MceJsonApi.running) {
+             if(sdkRegisteredCallback != null && MceJsonApi.getRunning()) {
                  callbackSuccess(sdkRegisteredCallback, RegistrationDetailsJson.toJson(MceSdk.getRegistrationClient().getRegistrationDetails(context)));
              } else {
                  synchronized (SDK_REGISTERED_CALLBACK_NAME) {
@@ -337,7 +316,7 @@
      @Override
      public void onAttributesOperation(Context context, AttributesOperation attributesOperation) {
          try {
-             if(attributesOperationCallback != null && MceJsonApi.running) {
+             if(attributesOperationCallback != null && MceJsonApi.getRunning()) {
                  callbackSuccess(attributesOperationCallback, AttributesOperationJson.toCordovaJSON(attributesOperation));
              } else {
                  synchronized (ATTRIBUTES_OPERATION_CALLBACK_NAME) {
@@ -352,7 +331,7 @@
      @Override
      public void onEventsSend(Context context, List<Event> events) {
          try{
-             if(sendEventCallback != null && MceJsonApi.running) {
+             if(sendEventCallback != null && MceJsonApi.getRunning()) {
                  callbackSuccess(sendEventCallback, EventJson.toJSONArray(events));
              } else {
                  synchronized (SEND_EVENT_CALLBACK_NAME) {
@@ -360,7 +339,7 @@
                  }
              }
          } catch (JSONException jsone) {
-             Logger.e(TAG, "Failed to generate eventsn JSON");
+             Logger.e(TAG, "Failed to generate events JSON");
          }
      }
  

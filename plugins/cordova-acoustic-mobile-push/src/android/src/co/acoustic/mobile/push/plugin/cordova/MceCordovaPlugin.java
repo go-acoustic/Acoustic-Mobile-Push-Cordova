@@ -10,6 +10,7 @@
 
  package co.acoustic.mobile.push.plugin.cordova;
 
+ import co.acoustic.mobile.push.sdk.Preferences;
  import co.acoustic.mobile.push.sdk.js.JsonMceBroadcastReceiver;
  import co.acoustic.mobile.push.sdk.js.MceJsonApi;
  import co.acoustic.mobile.push.sdk.js.MceJsonApplication;
@@ -25,9 +26,7 @@
  import android.content.Context;
  
  public class MceCordovaPlugin extends CordovaPlugin {
-    private static final String PREFS_NAME = "mcecordova";
      private static final String FIRST_LOAD = "firstload";
- 
      private static final String TAG = "MceCordovaPlugin";
  
      @Override
@@ -42,7 +41,7 @@
          boolean executed = MceJsonApi.execute(action, args, this.cordova.getActivity().getApplicationContext(), callback, cordova.getThreadPool());
          if(!executed) {
              PluginResult result = new PluginResult(PluginResult.Status.INVALID_ACTION, action);
-             if (callbackContext != null) {
+             if(callbackContext != null) {
                  callbackContext.sendPluginResult(result);
              }
              return false;
@@ -54,7 +53,7 @@
      @Override
      public void onStop() {
          Logger.d(TAG, "onStop");
-         MceJsonApi.running = false;
+         MceJsonApi.setRunning(false);
          super.onStop();
      }
  
@@ -66,11 +65,11 @@
      }
  
      void start() {
-         MceJsonApi.running = true;
+         MceJsonApi.setRunning(true);
          Context context = this.cordova.getActivity().getApplicationContext();
-         boolean firstLoad = context.getSharedPreferences(PREFS_NAME, 0).getBoolean(FIRST_LOAD, true);
+         boolean firstLoad = Preferences.getBoolean(context, FIRST_LOAD, true);
          if(firstLoad) {
-             context.getSharedPreferences(PREFS_NAME, 0).edit().putBoolean(FIRST_LOAD, false).apply();
+             Preferences.setBoolean(context,FIRST_LOAD, false);
          } else {
              JsonMceBroadcastReceiver.sendRegisteredCallbacks(cordova.getActivity().getApplicationContext());
              MceJsonApplication.sendRegisteredActionCallbacks(cordova.getActivity().getApplicationContext());

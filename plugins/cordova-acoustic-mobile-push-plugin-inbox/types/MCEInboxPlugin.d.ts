@@ -1,3 +1,4 @@
+import { StringObject } from "cordova-acoustic-mobile-push/www/js/MCEPluginTypes";
 import { InboxListCallback, InboxMessageCallback } from "./MCEInboxPluginTypes";
 /**
 Acoustic MCE Inbox Cordova Plugin
