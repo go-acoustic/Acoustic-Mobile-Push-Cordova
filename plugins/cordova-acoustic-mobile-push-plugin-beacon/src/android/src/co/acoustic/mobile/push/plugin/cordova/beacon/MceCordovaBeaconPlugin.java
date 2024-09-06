@@ -1,5 +1,5 @@
 /*
- * Copyright © 2011, 2019 Acoustic, L.P. All rights reserved.
+ * Copyright (C) 2024 Acoustic, L.P. All rights reserved.
  *
  * NOTICE: This file contains material that is confidential and proprietary to
  * Acoustic, L.P. and/or other developers. No license is granted under any intellectual or
@@ -8,46 +8,47 @@
  * prohibited.
  */
 
-package co.acoustic.mobile.push.plugin.cordova.beacon;
+ package co.acoustic.mobile.push.plugin.cordova.beacon;
 
-import co.acoustic.mobile.push.plugin.cordova.CordovaJsonCallback;
-import co.acoustic.mobile.push.sdk.js.beacon.MceJsonApi;
-import co.acoustic.mobile.push.sdk.util.Logger;
-
-import org.apache.cordova.CallbackContext;
-import org.apache.cordova.CordovaPlugin;
-import org.apache.cordova.PluginResult;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-
-public class MceCordovaBeaconPlugin extends CordovaPlugin {
-    static final String TAG = "MceCordovaBeaconPlugin";
-
-   @Override
-    public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
-        CordovaJsonCallback callback = new CordovaJsonCallback(callbackContext);
-        boolean executed = MceJsonApi.execute(action, args, this.cordova.getActivity().getApplicationContext(), callback, cordova.getThreadPool());
-        if(!executed) {
-            PluginResult result = new PluginResult(PluginResult.Status.INVALID_ACTION, action);
-            callbackContext.sendPluginResult(result);
-            return false;
-        } else {
-            return true;
-        }
-    }
-
+ import co.acoustic.mobile.push.plugin.cordova.CordovaJsonCallback;
+ import co.acoustic.mobile.push.sdk.js.beacon.MceJsonApi;
+ import co.acoustic.mobile.push.sdk.util.Logger;
+ 
+ import org.apache.cordova.CallbackContext;
+ import org.apache.cordova.CordovaPlugin;
+ import org.apache.cordova.PluginResult;
+ 
+ import org.json.JSONArray;
+ import org.json.JSONException;
+ 
+ public class MceCordovaBeaconPlugin extends CordovaPlugin {
+     static final String TAG = "MceCordovaBeaconPlugin";
+ 
     @Override
-    public void onStop() {
-        Logger.d(TAG, "onStop");
-        MceJsonApi.setRunning(false);
-        super.onStop();
-    }
-
-    @Override
-    public void onStart() {
-        Logger.d(TAG, "onStart");
-        super.onStart();
-        MceJsonApi.setRunning(true);
-    }
-}
+     public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
+         CordovaJsonCallback callback = new CordovaJsonCallback(callbackContext);
+         boolean executed = MceJsonApi.execute(action, args, this.cordova.getActivity().getApplicationContext(), callback, cordova.getThreadPool());
+         if(!executed) {
+             PluginResult result = new PluginResult(PluginResult.Status.INVALID_ACTION, action);
+             callbackContext.sendPluginResult(result);
+             return false;
+         } else {
+             return true;
+         }
+     }
+ 
+     @Override
+     public void onStop() {
+         Logger.d(TAG, "onStop");
+         co.acoustic.mobile.push.sdk.js.MceJsonApi.setRunning(false);
+         super.onStop();
+     }
+ 
+     @Override
+     public void onStart() {
+         Logger.d(TAG, "onStart");
+         super.onStart();
+         co.acoustic.mobile.push.sdk.js.MceJsonApi.setRunning(true);
+     }
+ }
+ 

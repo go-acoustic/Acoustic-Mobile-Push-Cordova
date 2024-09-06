@@ -19,6 +19,8 @@ dependencies {
   implementation "com.google.android.gms:play-services-base:" + project.ext.playServicesBaseVersion
   implementation "com.google.firebase:firebase-messaging:" + project.ext.firebaseMessagingVersion
   implementation "com.google.firebase:firebase-core:" + project.ext.firebaseCoreVersion
+  // Used for security
+  implementation "androidx.security:security-crypto:" + project.ext.securityCryptoVersion
 }
 
 android {

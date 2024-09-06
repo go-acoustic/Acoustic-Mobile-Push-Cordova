@@ -554,6 +554,8 @@ function addGradlePropertiesToApp(appPath) {
 		playServicesLocationVersion = "21.0.1"
 		firebaseCoreVersion = "19.0.2"
 		firebaseMessagingVersion = "22.0.0"
+		// This version supports 21 minimal
+    securityCryptoVersion = "1.1.0-alpha06"
 	}
 }`
 
