@@ -44,7 +44,7 @@ public class MceCordovaLocationPlugin extends CordovaPlugin {
     @Override
     public void onStop() {
         Logger.d(TAG, "onStop");
-        MceJsonApi.running = false;
+        MceJsonApi.setRunning(false);
         super.onStop();
     }
 
@@ -52,6 +52,6 @@ public class MceCordovaLocationPlugin extends CordovaPlugin {
     public void onStart() {
         Logger.d(TAG, "onStart");
         super.onStart();
-        MceJsonApi.running = true;
+        MceJsonApi.setRunning(true);
     }
 }

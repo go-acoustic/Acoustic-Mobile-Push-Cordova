@@ -23,6 +23,7 @@ import co.acoustic.mobile.push.sdk.api.notification.NotificationDetails;
 import co.acoustic.mobile.push.sdk.beacons.IBeacon;
 import co.acoustic.mobile.push.sdk.beacons.IBeaconsJson;
 import co.acoustic.mobile.push.sdk.js.JsonCallbacksRegistry;
+import co.acoustic.mobile.push.sdk.js.MceJsonApi;
 import co.acoustic.mobile.push.sdk.util.Logger;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -175,7 +176,7 @@ public class JsonMceBroadcastReceiver extends MceBroadcastReceiver{
                 Logger.i(TAG, "iBeacon Entry, sending to cordova");
                 try{
                     JSONObject details = IBeaconsJson.iBeaconToJSON(beacon);
-                    if(beaconEnterCallback != null && MceJsonApi.running) {
+                    if(beaconEnterCallback != null && MceJsonApi.getRunning()) {
                         callbackSuccess(beaconEnterCallback, details);
                     } else {
                         synchronized (SEND_ENTER_CALLBACK_NAME) {
@@ -192,7 +193,7 @@ public class JsonMceBroadcastReceiver extends MceBroadcastReceiver{
                 Logger.i(TAG, "iBeacon Exit, sending to cordova");
                 try{
                     JSONObject details = IBeaconsJson.iBeaconToJSON(beacon);
-                    if(beaconExitCallback != null && MceJsonApi.running) {
+                    if(beaconExitCallback != null && MceJsonApi.getRunning()) {
                         callbackSuccess(beaconExitCallback, details);
                     } else {
                         synchronized (SEND_EXIT_CALLBACK_NAME) {

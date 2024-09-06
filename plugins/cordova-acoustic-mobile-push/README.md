@@ -174,3 +174,79 @@ node node_modules/react-native-acoustic-mobile-push/postinstall.js ./
 
 ## Building the sample app
 [Instructions](./applications/samples/Sample/README.md)
+
+## Building on a new sample Cordova application
+1. Create your Cordova application based from https://cordova.apache.org/docs/en/latest/guide/cli/index.html
+```Text shell
+cordova create hello com.example.hello HelloWorld
+```
+
+2. Move into application and add supported platforms for iOS and Android
+```Text shell
+cd hello
+cordova platform add ios
+cordova platform add android
+```
+
+3. Additional setup for iOS, edit config.xml and adjust or add new minimal deployment target for iOS from iOS 11.0 to iOS 13.0 which is required for this plugin.
+```Text shell
+<platform name="ios">
+    <preference name="deployment-target" value="13.0" />
+</platform>
+```
+**Example config.xml**
+```Text shell
+<?xml version='1.0' encoding='utf-8'?>
+<widget id="co.acoustic.mobile.push.samples.android" version="1.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+    <name>HelloCordova</name>
+    <description>Sample Apache Cordova App</description>
+    <author email="dev@cordova.apache.org" href="https://cordova.apache.org">
+        Apache Cordova Team
+    </author>
+    <content src="index.html" />
+    <allow-intent href="http://*/*" />
+    <allow-intent href="https://*/*" />
+    <platform name="ios">
+        <preference name="deployment-target" value="13.0" />
+    </platform>
+</widget>
+```
+
+4. Build app
+```Text shell
+cordova build
+```
+
+5. Add https://www.npmjs.com/package/cordova-acoustic-mobile-push-beta plugin
+```Text shell
+npm i cordova-acoustic-mobile-push-beta
+```
+
+6. Android setup, copy your **google-services.json** file with your Google-provided FCM credentials to your android project folder: **platforms/android/app/google-services.json**.
+
+7. Android setup, edit **CampaignConfig.json** file in **android** section and fill in the **baseUrl** and **appKey** provided by your account team.
+
+8. iOS setup, open your **platforms/ios/HelloWorld.xcworkspace** with Xcode
+
+9. iOS setup, fix up the **bundle ID** and signing to use a **bundle ID** and profile with appropriate **capabilities**.
+
+10. iOS setup, add the **Push Notification capability** to your project: 
+* Go to Signing & Capabilities
+* Click **+Capability**
+* Select **Push Notification**
+
+11. iOS setup, turn on the Location Updates background mode to your project: 
+* Go to **Signing & Capabilities**
+* check **Location Updates** checkbox
+
+12. iOS setup, edit **CampaignConfig.json** file in iOS section and fill in the **baseUrl** and **appKey** provided by your account team.
+
+13. iOS setup, run which will setup all the plugin options selected in **CampaignConfig.json** file
+```Text shell
+node node_modules/cordova-acoustic-mobile-push-beta/scripts/installPlugins.js
+```
+
+14. iOS setup, run cordova to build with new plugins installed
+```Text shell
+cordova build 
+```

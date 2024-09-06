@@ -78,7 +78,7 @@
              if(mailingId != null) {
                  actionJSON.put(Key.mailingId.name(), mailingId);
              }
-             if(callback != null && MceJsonApi.running) {
+             if(callback != null && MceJsonApi.getRunning()) {
                  callback.success(actionJSON, true);
              } else {
                  JsonCallbacksRegistry.register(context, "notification." + type, true, actionJSON.toString());

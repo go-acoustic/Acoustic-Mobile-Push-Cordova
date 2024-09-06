@@ -21,6 +21,7 @@ import co.acoustic.mobile.push.sdk.api.attribute.AttributesOperation;
 import co.acoustic.mobile.push.sdk.api.event.Event;
 import co.acoustic.mobile.push.sdk.api.notification.NotificationDetails;
 import co.acoustic.mobile.push.sdk.js.JsonCallbacksRegistry;
+import co.acoustic.mobile.push.sdk.js.MceJsonApi;
 import co.acoustic.mobile.push.sdk.location.MceLocationJson;
 import co.acoustic.mobile.push.sdk.util.Logger;
 import org.json.JSONArray;
@@ -173,7 +174,7 @@ public class JsonMceBroadcastReceiver extends MceBroadcastReceiver{
         
                 try{
                     JSONObject details = MceLocationJson.locationToJSON(location);
-                    if(geofenceEnterCallback != null && MceJsonApi.running) {
+                    if(geofenceEnterCallback != null && MceJsonApi.getRunning()) {
                         callbackSuccess(geofenceEnterCallback, details);
                     } else {
                         synchronized (SEND_ENTER_CALLBACK_NAME) {
@@ -189,7 +190,7 @@ public class JsonMceBroadcastReceiver extends MceBroadcastReceiver{
                 Logger.i(TAG, "Geofence Exit, sending to cordova");
                 try{
                     JSONObject details = MceLocationJson.locationToJSON(location);
-                    if(geofenceExitCallback != null && MceJsonApi.running) {
+                    if(geofenceExitCallback != null && MceJsonApi.getRunning()) {
                         callbackSuccess(geofenceExitCallback, details);
                     } else {
                         synchronized (SEND_EXIT_CALLBACK_NAME) {
