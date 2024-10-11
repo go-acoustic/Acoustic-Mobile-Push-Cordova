@@ -23,7 +23,7 @@
     {
         const NSInteger toolbarHeight = 44;
         UIScreen * screen = [UIScreen mainScreen];
-        NSInteger statusHeight = [UIApplication sharedApplication].statusBarFrame.size.height;
+        NSInteger statusHeight = MCESdk.sharedInstance.getAppWindow.windowScene.statusBarManager.statusBarFrame.size.height;
         NSInteger webVerticalOffset = statusHeight + toolbarHeight;
         
         CGRect toolbarFrame = screen.bounds;

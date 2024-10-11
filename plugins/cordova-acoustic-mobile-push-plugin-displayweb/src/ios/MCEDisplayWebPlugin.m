@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014, 2019 Acoustic, L.P. All rights reserved.
+ * Copyright (C) 2024 Acoustic, L.P. All rights reserved.
  *
  * NOTICE: This file contains material that is confidential and proprietary to
  * Acoustic, L.P. and/or other developers. No license is granted under any intellectual or
@@ -27,7 +27,7 @@
 {
     WebViewController * viewController = [[WebViewController alloc] initWithURL:[NSURL URLWithString:action[@"value"][@"url"]]];
     viewController.payload=payload;
-    UIWindow * window = [[UIApplication sharedApplication] keyWindow];
+    UIWindow * window = [[MCESdk sharedInstance] getAppWindow];
     [window.rootViewController presentViewController:viewController animated:TRUE completion:nil];
 }
 
