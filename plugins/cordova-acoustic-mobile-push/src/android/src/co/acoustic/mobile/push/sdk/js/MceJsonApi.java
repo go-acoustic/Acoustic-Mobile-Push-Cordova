@@ -217,7 +217,7 @@
          callback.success(RegistrationDetailsJson.toIsRegisteredResponse(context, MceSdk.getRegistrationClient().getRegistrationDetails(context)), false);
      }
  
-     private static void checkDuplicateSetAttribute(Context context, Boolean user, List<Attribute> attributes) throws JSONException {
+     private static void checkDuplicateSetAttribute(Context context, Boolean user, List<Attribute> attributes) throws JSONException, ParseException {
          List<Attribute> duplicateAttributes = new LinkedList<>();
          StoredAttributeDatabase.Helper helper = StoredAttributeDatabase.getHelper(context);
          for(Attribute attribute: attributes) {
@@ -234,11 +234,7 @@
                      long date;
                      Object obj = attribute.getValue();
                      if(obj instanceof String) {
-                         try {
-                             date = Iso8601.toDate(String.valueOf(obj)).getTime();
-                         } catch (ParseException e) {
-                             throw new JSONException("Failed to parse date "+obj+" "+e.getMessage());
-                         }
+                         date = Iso8601.toDate(String.valueOf(obj)).getTime();
                      } else {
                          date = (Long)obj;
                      }
@@ -260,7 +256,7 @@
          }
      }
  
-     public static void queueUpdateUserAttributes(Context context, JSONArray parameters) throws JSONException {
+     public static void queueUpdateUserAttributes(Context context, JSONArray parameters) throws JSONException, ParseException {
          JSONObject attributesJSONDictionary = parameters.getJSONObject(Methods.QueueUpdateUserAttributes.ATTRIBUTES_INDEX);
  
          List<Attribute> attributes = AttributeJson.fromJSONDictionary(attributesJSONDictionary);

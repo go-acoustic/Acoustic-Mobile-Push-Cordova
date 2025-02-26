@@ -61,7 +61,7 @@ public class AttributesOperationJson {
         return attributesOperationJSON;
     }
 
-    public static JSONObject toCordovaJSON(AttributesOperation attributesOperation) throws JSONException {
+    public static JSONObject toCordovaJSON(AttributesOperation attributesOperation) throws JSONException, ParseException {
         JSONObject attributesOperationJSON = new JSONObject();
         Operation operation = getOperation(attributesOperation.getType());
         attributesOperationJSON.put(Key.operation.name(), operation.name());
@@ -74,11 +74,7 @@ public class AttributesOperationJson {
                         long date;
                         Object obj = attribute.getValue();
                         if(obj instanceof String) {
-                            try {
-                                date = Iso8601.toDate(String.valueOf(obj)).getTime();
-                            } catch (ParseException e) {
-                                throw new JSONException("Failed to parse date "+obj+" "+e.getMessage());
-                            }
+                            date = Iso8601.toDate(String.valueOf(obj)).getTime();
                         } else {
                             date = (Long)obj;
                         }

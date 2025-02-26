@@ -174,34 +174,28 @@ public class JsonMceBroadcastReceiver extends MceBroadcastReceiver{
             if(locationEventType == LocationEventType.enter)
             {
                 Logger.i(TAG, "iBeacon Entry, sending to cordova");
-                try{
-                    JSONObject details = IBeaconsJson.iBeaconToJSON(beacon);
-                    if(beaconEnterCallback != null && MceJsonApi.getRunning()) {
-                        callbackSuccess(beaconEnterCallback, details);
-                    } else {
-                        synchronized (SEND_ENTER_CALLBACK_NAME) {
-                            JsonCallbacksRegistry.register(context, SEND_ENTER_CALLBACK_NAME, true, details.toString());
-                        }
+                JSONObject details = null;
+                details = IBeaconsJson.iBeaconToJSON(beacon);
+                if(beaconEnterCallback != null && MceJsonApi.getRunning()) {
+                    callbackSuccess(beaconEnterCallback, details);
+                } else {
+                    synchronized (SEND_ENTER_CALLBACK_NAME) {
+                        JsonCallbacksRegistry.register(context, SEND_ENTER_CALLBACK_NAME, true, details.toString());
                     }
-                } catch (JSONException jsone) {
-                    Logger.e(TAG, "Failed to generate beacon entry JSON");
                 }
             }
 
             if(locationEventType == LocationEventType.exit)
             {
                 Logger.i(TAG, "iBeacon Exit, sending to cordova");
-                try{
-                    JSONObject details = IBeaconsJson.iBeaconToJSON(beacon);
-                    if(beaconExitCallback != null && MceJsonApi.getRunning()) {
-                        callbackSuccess(beaconExitCallback, details);
-                    } else {
-                        synchronized (SEND_EXIT_CALLBACK_NAME) {
-                            JsonCallbacksRegistry.register(context, SEND_EXIT_CALLBACK_NAME, true, details.toString());
-                        }
+                JSONObject details = null;
+                details = IBeaconsJson.iBeaconToJSON(beacon);
+                if(beaconExitCallback != null && MceJsonApi.getRunning()) {
+                    callbackSuccess(beaconExitCallback, details);
+                } else {
+                    synchronized (SEND_EXIT_CALLBACK_NAME) {
+                        JsonCallbacksRegistry.register(context, SEND_EXIT_CALLBACK_NAME, true, details.toString());
                     }
-                } catch (JSONException jsone) {
-                    Logger.e(TAG, "Failed to generate beacon exit JSON");
                 }
             }
         }

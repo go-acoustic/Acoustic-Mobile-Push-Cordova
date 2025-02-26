@@ -32,7 +32,8 @@
  import org.json.JSONArray;
  import org.json.JSONException;
  import org.json.JSONObject;
- 
+
+ import java.text.ParseException;
  import java.util.LinkedList;
  import java.util.Date;
  import java.util.List;
@@ -254,7 +255,7 @@
          try {
              Logger.d(TAG, "Sending cordova channel attribute");
              MceSdkInternal.getQueuedAttributesClient().updateChannelAttributes(context, attributes);
-         } catch (JSONException jsone) {
+         } catch (Exception e) {
              Logger.d(TAG, "Couldn't create channel attribute");
          }
      }
@@ -325,6 +326,8 @@
              }
          } catch (JSONException jsone) {
              Logger.e(TAG, "Failed to generate attributes operation JSON");
+         } catch (ParseException e) {
+             throw new RuntimeException(e);
          }
      }
  
@@ -340,6 +343,8 @@
              }
          } catch (JSONException jsone) {
              Logger.e(TAG, "Failed to generate events JSON");
+         } catch (ParseException e) {
+             throw new RuntimeException(e);
          }
      }
  

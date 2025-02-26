@@ -181,7 +181,7 @@ public class JsonMceBroadcastReceiver extends MceBroadcastReceiver{
                             JsonCallbacksRegistry.register(context, SEND_ENTER_CALLBACK_NAME, true, details.toString());
                         }
                     }
-                } catch (JSONException jsone) {
+                } catch (Exception e) {
                     Logger.e(TAG, "Failed to generate geofence entry JSON");
                 }
             }
@@ -197,7 +197,7 @@ public class JsonMceBroadcastReceiver extends MceBroadcastReceiver{
                             JsonCallbacksRegistry.register(context, SEND_EXIT_CALLBACK_NAME, true, details.toString());
                         }
                     }
-                } catch (JSONException jsone) {
+                } catch (Exception e) {
                     Logger.e(TAG, "Failed to generate geofence exit JSON");
                 }
             }

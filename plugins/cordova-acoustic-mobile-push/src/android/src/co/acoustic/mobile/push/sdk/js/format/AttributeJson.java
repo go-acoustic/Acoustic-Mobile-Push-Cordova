@@ -44,7 +44,7 @@ public class AttributeJson {
         return attributeJSON;
     }
 
-    public static Attribute fromJSON(JSONObject attributeJSON) throws JSONException{
+    public static Attribute fromJSON(JSONObject attributeJSON) throws JSONException, ParseException {
         String key = attributeJSON.getString(Key.key.name());
         String type = attributeJSON.getString(Key.type.name());
         if(StringAttribute.TYPE.equals(type)) {
@@ -66,11 +66,7 @@ public class AttributeJson {
             long date;
             Object obj = attributeJSON.get(co.acoustic.mobile.push.sdk.attributes.AttributeJson.Key.value.name());
             if (obj instanceof String) {
-                try {
-                    date = Iso8601.toDate(String.valueOf(obj)).getTime();
-                } catch (ParseException e) {
-                    throw new JSONException("Failed to parse date " + obj + " " + e.getMessage());
-                }
+                date = Iso8601.toDate(String.valueOf(obj)).getTime();
             } else {
                 date = (Long) obj;
             }
@@ -102,7 +98,7 @@ public class AttributeJson {
         return attributesJSONArray;
     }
 
-    public static JSONObject toJSONDictionary(List<Attribute> attributes) throws JSONException{
+    public static JSONObject toJSONDictionary(List<Attribute> attributes) throws JSONException, ParseException {
         if(attributes == null) {
             return new JSONObject();
         }
@@ -113,11 +109,7 @@ public class AttributeJson {
                 long date;
                 Object obj = attribute.getValue();
                 if (obj instanceof String) {
-                    try {
-                        date = Iso8601.toDate(String.valueOf(obj)).getTime();
-                    } catch (ParseException e) {
-                        throw new JSONException("Failed to parse date " + obj + " " + e.getMessage());
-                    }
+                    date = Iso8601.toDate(String.valueOf(obj)).getTime();
                 } else {
                     date = (Long) obj;
                 }
@@ -131,7 +123,7 @@ public class AttributeJson {
         return attributesJSONDictionary;
     }
 
-    public static List<Attribute> fromJSONArray(JSONArray attributesJSONArray) throws JSONException {
+    public static List<Attribute> fromJSONArray(JSONArray attributesJSONArray) throws JSONException, ParseException {
         if(attributesJSONArray == null) {
             return new LinkedList<Attribute>();
         }

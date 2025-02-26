@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024 Acoustic, L.P. All rights reserved.
+ * Copyright (C) 2025 Acoustic, L.P. All rights reserved.
  *
  * NOTICE: This file contains material that is confidential and proprietary to
  * Acoustic, L.P. and/or other developers. No license is granted under any intellectual or
@@ -49,26 +49,32 @@ function addOrReplaceMobilePushConfigFile(currentAppWorkingDirectory) {
  * @param {*} pluginPath Path to plugin.
  * @param {*} campaignConfigFile CampaignConfig.json file.
  */
-function readAndSaveMceConfig(currentAppWorkingDirectory, pluginPath, jsonData) {
+function readAndSaveMceConfig(currentAppWorkingDirectory, pluginPath, campaignConfigFile) {
 	try {
-	  if (jsonData.android && jsonData.iOS) {
-			if (jsonData.android) {
-				const androidConfig = JSON.stringify(jsonData.android, null, 2);
+	  if (campaignConfigFile.android && campaignConfigFile.iOS) {
+			if (campaignConfigFile.android && hasAndroidPlatform(currentAppWorkingDirectory)) {
+				addGradlePropertiesToApp(currentAppWorkingDirectory);
+
+				const androidConfig = JSON.stringify(campaignConfigFile.android, null, 2);
 				const androidDestinationPath = path.join(pluginPath, 'postinstall/android/MceConfig.json');
 				saveConfig(androidConfig, androidDestinationPath);
+			} else {
+				logMessageError('Skipped Android install:platform is not installed!');
 			}
   
-			if (jsonData.iOS) {
-				const iosConfig = JSON.stringify(jsonData.iOS, null, 2);
+			if (campaignConfigFile.iOS && hasIosPlatform(currentAppWorkingDirectory)) {
+				const iosConfig = JSON.stringify(campaignConfigFile.iOS, null, 2);
 				const iosDestinationPath = path.join(pluginPath, 'postinstall/ios/MceConfig.json');
 				saveConfig(iosConfig, iosDestinationPath);
+			} else {
+				logMessageError('Skipped iOS install:platform is not installed!');
 			}
 	  } else {
 			logMessageError(`No "android/ios" object found in the ${campaignConfigFile} file.`);
 		}
 
-		if (jsonData.plugins) {
-			managePlugins(currentAppWorkingDirectory, pluginPath, jsonData);
+		if (campaignConfigFile.plugins) {
+			managePlugins(currentAppWorkingDirectory, pluginPath, campaignConfigFile);
 		} else {
 			logMessageError("Plugins section missing from Campaign");
 		}
@@ -111,33 +117,42 @@ function managePlugins(currentAppWorkingDirectory, pluginPath, configData) {
 			pluginName = `${pluginName}-beta`
 		}
 		let packagePluginPath = path.join(currentAppWorkingDirectory, 'node_modules', pluginName);
-		// Android
-		// updateConfigXMLPreference(currentAppWorkingDirectory, "androidAppkey", configData.android.appKey.prod);
-		// iOS
-		// updateConfigXMLPreference(currentAppWorkingDirectory, "iOSAppkey", configData.iOS.appKey.dev);
-		// updateConfigXMLPreference(currentAppWorkingDirectory, "iOSProdkey", configData.iOS.appKey.prod);
-		// updateConfigXMLPreference(currentAppWorkingDirectory, "serverUrl", configData.iOS.baseUrl);
-		// updateConfigXMLPreference(currentAppWorkingDirectory, "logLevel", configData.iOS.logLevel);
-		customAction       = configData.customAction;
-		androidAppkey      = configData.android.appKey.prod;
-		iOSAppkey          = configData.iOS.appKey.dev;
-		iOSProdkey         = configData.iOS.appKey.prod;
-		serverUrl          = configData.iOS.baseUrl;
-		logLevel           = configData.iOS.loglevel;
-		mceCanSyncOverride = configData.mceCanSyncOverride;
 
 		logMessageTitle(`Install base ${pluginName}`);
-		// Update iOS
-		updatePluginXMLPodName(packagePluginPath, configData.plugins.useRelease, configData);
+
+		// iOS
+		if (hasIosPlatform(currentAppWorkingDirectory)) {
+			updateConfigXMLPreference(currentAppWorkingDirectory, "iOSAppkey", configData.iOS.appKey.dev);
+			updateConfigXMLPreference(currentAppWorkingDirectory, "iOSProdkey", configData.iOS.appKey.prod);
+			updateConfigXMLPreference(currentAppWorkingDirectory, "serverUrl", configData.iOS.baseUrl);
+			updateConfigXMLPreference(currentAppWorkingDirectory, "logLevel", configData.iOS.logLevel);
+			updatePluginXMLPodName(packagePluginPath, configData.plugins.useRelease, configData);
+		}
+
 		// Update Android
-		updateBuildExtrasGradle(packagePluginPath, configData);
-		addGoogleServices(currentAppWorkingDirectory, configData);
-		updateBuildGradleMobilePushVersion(currentAppWorkingDirectory, configData);
-		logMessageTitle(`cd "${currentAppWorkingDirectory}" && cordova plugin add ${pluginName} --variable CUSTOM_ACTIONS="${customAction}" --variable ANDROID_APPKEY="${androidAppkey}" --variable IOS_DEV_APPKEY="${iOSAppkey}" --variable IOS_PROD_APPKEY="${iOSProdkey}" --variable SERVER_URL="${serverUrl}" --variable LOGLEVEL="${logLevel}" --variable MCE_CAN_SYNC_OVERRIDE="${mceCanSyncOverride}" --force`);
-		execSync(`cd "${currentAppWorkingDirectory}" && cordova plugin add ${pluginName} --variable CUSTOM_ACTIONS="${customAction}" --variable ANDROID_APPKEY="${androidAppkey}" --variable IOS_DEV_APPKEY="${iOSAppkey}" --variable IOS_PROD_APPKEY="${iOSProdkey}" --variable SERVER_URL="${serverUrl}" --variable LOGLEVEL="${logLevel}" --variable MCE_CAN_SYNC_OVERRIDE="${mceCanSyncOverride}" --force`, { stdio: 'inherit', cwd: process.cwd() });
+		if (hasAndroidPlatform(currentAppWorkingDirectory)) {
+			updateBuildExtrasGradle(packagePluginPath, configData);
+			addGoogleServices(currentAppWorkingDirectory, configData);
+			updateBuildGradleMobilePushVersion(currentAppWorkingDirectory, configData);
+
+			customAction       = configData.customAction;
+			androidAppkey      = configData.android.appKey.prod;
+			iOSAppkey          = configData.iOS.appKey.dev;
+			iOSProdkey         = configData.iOS.appKey.prod;
+			serverUrl          = configData.iOS.baseUrl;
+			logLevel           = configData.iOS.loglevel;
+			mceCanSyncOverride = configData.mceCanSyncOverride;
+			logMessageTitle(`cd "${currentAppWorkingDirectory}" && cordova plugin add ${pluginName} --variable CUSTOM_ACTIONS="${customAction}" --variable ANDROID_APPKEY="${androidAppkey}" --variable IOS_DEV_APPKEY="${iOSAppkey}" --variable IOS_PROD_APPKEY="${iOSProdkey}" --variable SERVER_URL="${serverUrl}" --variable LOGLEVEL="${logLevel}" --variable MCE_CAN_SYNC_OVERRIDE="${mceCanSyncOverride}" --force`);
+			execSync(`cd "${currentAppWorkingDirectory}" && cordova plugin add ${pluginName} --variable CUSTOM_ACTIONS="${customAction}" --variable ANDROID_APPKEY="${androidAppkey}" --variable IOS_DEV_APPKEY="${iOSAppkey}" --variable IOS_PROD_APPKEY="${iOSProdkey}" --variable SERVER_URL="${serverUrl}" --variable LOGLEVEL="${logLevel}" --variable MCE_CAN_SYNC_OVERRIDE="${mceCanSyncOverride}" --force`, { stdio: 'inherit', cwd: process.cwd() });
+		}
 	} catch (error) {
 		console.error(`Failed to manage plugin ${plugin}:`, error);
 	} finally {
+		if (!hasIosPlatform(currentAppWorkingDirectory) && !hasAndroidPlatform(currentAppWorkingDirectory)) {
+			logMessageError(`Error not installing any additional plugin until you add a platform iOS or Android.`);
+			return;
+		}
+
 		Object.entries(configData.plugins).forEach(([plugin, isEnabled]) => {
 			if (plugin === 'cordova-acoustic-mobile-push' || plugin === 'cordova-acoustic-mobile-push-beta') {
 				return;
@@ -157,22 +172,38 @@ function managePlugins(currentAppWorkingDirectory, pluginPath, configData) {
 				if (isEnabled == true && !installed) {
 					logMessageInfo(`Adding ${plugin}...`);
 					if (plugin.includes('cordova-acoustic-mobile-push-plugin-location')) {
-						syncRadius   = configData.android.location.sync.syncRadius;// or configData.iOS.location.sync.syncRadius
-						syncInterval = configData.android.location.sync.syncInterval;// or configData.iOS.location.sync.syncInterval
-						if(cordovaPluginInstalled) {
-							runExecSync(`cd "${currentAppWorkingDirectory}" && cordova plugin rm ${plugin} --variable SYNC_RADIUS="${syncRadius}" --variable SYNC_INTERVAL="${syncInterval}"`);
-							// runExecSync(`cd "${currentAppWorkingDirectory}" && npm uninstall ${plugin} --ignore-scripts`);
+						syncRadius   = ""
+						syncInterval = ""
+						if (hasIosPlatform(currentAppWorkingDirectory)) {
+							syncRadius   = configData.iOS.location.sync.syncRadius;
+							syncInterval = configData.iOS.location.sync.syncInterval;
+						} else if (hasAndroidPlatform(currentAppWorkingDirectory)) {
+							syncRadius   = configData.android.location.sync.syncRadius;
+							syncInterval = configData.android.location.sync.syncInterval;
 						}
-						runExecSync(`cd "${currentAppWorkingDirectory}" && npm install ${plugin} --ignore-scripts`);
-						runExecSync(`cd "${currentAppWorkingDirectory}" && cordova plugin add ${plugin} --variable SYNC_RADIUS="${syncRadius}" --variable SYNC_INTERVAL="${syncInterval}"`);
-						update = true;
+						if (hasIosPlatform(currentAppWorkingDirectory) || hasAndroidPlatform(currentAppWorkingDirectory)) {
+							if(cordovaPluginInstalled) {
+								runExecSync(`cd "${currentAppWorkingDirectory}" && cordova plugin rm ${plugin} --variable SYNC_RADIUS="${syncRadius}" --variable SYNC_INTERVAL="${syncInterval}"`);
+								// runExecSync(`cd "${currentAppWorkingDirectory}" && npm uninstall ${plugin} --ignore-scripts`);
+							}
+							runExecSync(`cd "${currentAppWorkingDirectory}" && npm install ${plugin} --ignore-scripts`);
+							runExecSync(`cd "${currentAppWorkingDirectory}" && cordova plugin add ${plugin} --variable SYNC_RADIUS="${syncRadius}" --variable SYNC_INTERVAL="${syncInterval}"`);
+							update = true;
+						}
 					} else if (plugin.includes('cordova-acoustic-mobile-push-plugin-beacon')) {
-						myUuid = configData.android.location.ibeacon.uuid;// or configData.iOS.location.ibeacon.UUID
-						if (cordovaPluginInstalled) {
-							runExecSync(`cd "${currentAppWorkingDirectory}" && cordova plugin rm ${plugin} --variable UUID="${myUuid}"`);
+						myUuid = ""
+						if (hasIosPlatform(currentAppWorkingDirectory)) {
+							myUuid = configData.iOS.location.ibeacon.UUID;
+						} else if (hasAndroidPlatform(currentAppWorkingDirectory)) {
+							myUuid = configData.android.location.ibeacon.uuid;
 						}
-						runExecSync(`cd "${currentAppWorkingDirectory}" && cordova plugin add ${plugin} --variable UUID="${myUuid}"`);
-						update = true;
+						if (hasIosPlatform(currentAppWorkingDirectory) || hasAndroidPlatform(currentAppWorkingDirectory)) {
+							if (cordovaPluginInstalled) {
+								runExecSync(`cd "${currentAppWorkingDirectory}" && cordova plugin rm ${plugin} --variable UUID="${myUuid}"`);
+							}
+							runExecSync(`cd "${currentAppWorkingDirectory}" && cordova plugin add ${plugin} --variable UUID="${myUuid}"`);
+							update = true;
+						}
 					} else {
 						if (cordovaPluginInstalled) {
 							runExecSync(`cd "${currentAppWorkingDirectory}" && cordova plugin rm ${plugin}`);
@@ -193,13 +224,19 @@ function managePlugins(currentAppWorkingDirectory, pluginPath, configData) {
 
 			if (update) {
 				packagePluginPath = path.join(currentAppWorkingDirectory, 'node_modules', plugin);
-				// Update podfile to use
-				updatePluginXMLPodName(packagePluginPath, configData.plugins.useRelease, configData);
-				// Update gradle for beta/release version
-				if (!plugin.includes('cordova-acoustic-mobile-push-plugin-ios-notification-service') &&
-					!plugin.includes('cordova-acoustic-mobile-push-plugin-action-menu') &&
-					!plugin.includes('cordova-acoustic-mobile-push-plugin-passbook')) {
-					updateBuildExtrasGradle(packagePluginPath, configData);
+				// Update iOS
+				if (hasIosPlatform(currentAppWorkingDirectory)) {
+					// Update podfile to use
+					updatePluginXMLPodName(packagePluginPath, configData.plugins.useRelease, configData);
+				}
+				// Update Android
+				if (hasAndroidPlatform(currentAppWorkingDirectory)) {
+					// Update gradle for beta/release version
+					if (!plugin.includes('cordova-acoustic-mobile-push-plugin-ios-notification-service') &&
+						!plugin.includes('cordova-acoustic-mobile-push-plugin-action-menu') &&
+						!plugin.includes('cordova-acoustic-mobile-push-plugin-passbook')) {
+						updateBuildExtrasGradle(packagePluginPath, configData);
+					}
 				}
 			}
 		});
@@ -226,8 +263,12 @@ function readMceConfig(campaignConfigFile) {
  * @param {*} configData CampaignConfig.json data.
  */
 function updateMceConfig(currentAppWorkingDirectory, pluginPath, configData) {
-	updateMceConfigHelper(currentAppWorkingDirectory, pluginPath, configData, 'android');
-	updateMceConfigHelper(currentAppWorkingDirectory, pluginPath, configData, 'ios');
+	if (hasAndroidPlatform(currentAppWorkingDirectory)) {
+		updateMceConfigHelper(currentAppWorkingDirectory, pluginPath, configData, 'android');
+	}
+	if (hasIosPlatform(currentAppWorkingDirectory)) {
+		updateMceConfigHelper(currentAppWorkingDirectory, pluginPath, configData, 'ios');
+	}
 }
 
 /**
@@ -371,12 +412,13 @@ function runExecSync(cmdToRun) {
  */
 function updateConfigXMLPreference(currentAppWorkingDirectory, nam, val) {
 	try {
-		let appName = currentAppWorkingDirectory.substring(currentAppWorkingDirectory.lastIndexOf('/') + 1);
+		const mainConfigXMLData = readXMLToJson(`${currentAppWorkingDirectory}/config.xml`);
+		let appName = mainConfigXMLData.widget.name[0];
 		let configPathEnd = (`platforms/ios/${appName}/config.xml`);
 		let configPath = path.join(currentAppWorkingDirectory, configPathEnd);
 		let configContent = fs.readFileSync(configPath, 'utf8');
 		const preferenceToAdd = `<preference name="${nam}" value="${val}" />`;
-		const regx = new RegExp(`\\<preference\\s*name="` + nam + `"\\s*value="true"\\s*/>`, 'gi');
+		const regx = new RegExp(`\\<preference\\s*name="` + nam + `"\\s*value="[\\w\\s\\d\\:\\/\\-\\.]*"\\s*/>`, 'gi');
 
 		if (regx.test(configContent)) {
 			configContent = configContent.replace(regx, preferenceToAdd);
@@ -555,7 +597,7 @@ function addGradlePropertiesToApp(appPath) {
 		firebaseCoreVersion = "19.0.2"
 		firebaseMessagingVersion = "22.0.0"
 		// This version supports 21 minimal
-    securityCryptoVersion = "1.1.0-alpha06"
+		securityCryptoVersion = "1.1.0-alpha06"
 	}
 }`
 
@@ -616,7 +658,7 @@ function updateBuildGradleMobilePushVersion(appPath, configData) {
 		}
 		
 		fs.writeFileSync(appGradlePath, gradleContent, 'utf8');
-		logMessageInfo('Updated ${appGradlePath}');
+		logMessageInfo(`Updated ${appGradlePath}`);
 	} catch (error) {
 		logMessageError(`Error updating ${appGradlePath}:`, error);
 	}
@@ -694,6 +736,40 @@ function getLatestAndroidVersion() {
 }
 
 /**
+ * Used to review if Android platform is installed.
+ * 
+ * @param {*} appPath Path of the application being integrated.
+ * @returns If has Android platform in Cordova project.
+ */
+function hasAndroidPlatform(appPath) {
+	let androidPath = path.join(appPath, "platforms/android");
+	return hasDirectory(androidPath);
+}
+
+/**
+ * Used to review if iOS platform is installed.
+ * 
+ * @param {*} appPath Path of the application being integrated.
+ * @returns If has iOS platform in Cordova project.
+ */
+function hasIosPlatform(appPath) {
+	let iosPath = path.join(appPath, "platforms/ios");
+	return hasDirectory(iosPath);
+}
+
+/**
+ * Helper to determine if directory exists.
+ * 
+ * @returns If contains directory.
+ */
+function hasDirectory(folderPath) {
+	if (fs.existsSync(folderPath)) {
+		return true;
+	}
+	return false;
+}
+
+/**
  * Start install of sdk on application.
  */
 function startInstall() {
@@ -709,8 +785,6 @@ function startInstall() {
 	const pluginPath = initPaths.pluginPath;
 	const defaultConfigFile = initPaths.defaultConfigFile;
 	const appConfigFile = initPaths.appConfigFile;
-
-	addGradlePropertiesToApp(currentAppWorkingDirectory);
 
 	// Read and save corresponding ios/android json sections to postinstall folders, in the plugin project
 	const configData = readMceConfig(appConfigFile);

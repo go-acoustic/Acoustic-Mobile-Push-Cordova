@@ -31,7 +31,7 @@
     "license": "See license in license/license.txt",
     "name": "cordova-acoustic-mobile-push-plugin-displayweb-beta",
     "peerDependencies": {
-        "cordova-acoustic-mobile-push": "npm:cordova-acoustic-mobile-push-beta@^3.9.125"
+        "cordova-acoustic-mobile-push": "npm:cordova-acoustic-mobile-push-beta@^3.9.126"
     },
     "repository": {
         "type": "git",
@@ -39,5 +39,5 @@
         "directory": "plugins/cordova-acoustic-mobile-push-plugin-displayweb"
     },
     
-    "version": "3.9.125"
+    "version": "3.9.126"
 }
