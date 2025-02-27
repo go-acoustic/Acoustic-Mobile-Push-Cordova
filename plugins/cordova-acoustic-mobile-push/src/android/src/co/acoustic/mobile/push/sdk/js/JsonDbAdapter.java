@@ -25,23 +25,16 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class JsonDbAdapter {
-   private static final String TAG = "JsonDbAdapter";
+    public static final String CALLBACKS_TABLE = "callbacks";
+    private static final String TAG = "JsonDbAdapter";
     private static final int DATABASE_VERSION = 2;
     private static final String DATABASE_NAME = "json";
-
-    public static final String CALLBACKS_TABLE = "callbacks";
     private static final String CALLBACK_ID_COL = "idcol";
     private static final String CALLBACK_NAME_COL = "name";
     private static final String CALLBACK_SUCCESS_COL = "success";
     private static final String CALLBACK_PARAMETER_COL = "parameter";
-
     private static final String CALLBACKS_TABLE_CREATE = "create table if not exists "+CALLBACKS_TABLE+" ("+CALLBACK_ID_COL+" integer primary key autoincrement, "+CALLBACK_NAME_COL+" text not null, "+CALLBACK_SUCCESS_COL+" integer, "+CALLBACK_PARAMETER_COL+" text)";
-
-
-
-
     private static DatabaseHelper instance;
-
 
     private static synchronized DatabaseHelper getHelper(Context context) {
         if (instance == null) {
@@ -55,9 +48,10 @@ public class JsonDbAdapter {
         return instance;
     }
 
-
-
     public static SdkDatabase getSQLiteDb(Context context)  {
+        if (context == null || getHelper(context) == null) {
+            return null;
+        }
         return getHelper(context).getWritableDatabase();
     }
 
@@ -65,10 +59,10 @@ public class JsonDbAdapter {
     }
 
     public static class DatabaseHelper {
-        protected final SdkDatabaseOpenHelper databaseHelper;
+        protected final SdkDatabaseOpenHelper sdkDatabaseOpenHelper;
 
         DatabaseHelper(Context context) {
-            databaseHelper = DbAdapter.getDatabaseImpl(context).createOpenHelper(context, DATABASE_NAME, DATABASE_VERSION, new SdkDatabaseOpenHelper.LifeCycleListener() {
+            sdkDatabaseOpenHelper = DbAdapter.getDatabaseImpl(context).createOpenHelper(context, DATABASE_NAME, DATABASE_VERSION, new SdkDatabaseOpenHelper.LifeCycleListener() {
                 @Override
                 public void onCreate(SdkDatabase database) {
                     Logger.d(TAG, "Creating JSON database");
@@ -84,35 +78,30 @@ public class JsonDbAdapter {
 
                 @Override
                 public void onDowngrade(SdkDatabase database, int oldVersion, int newVersion) {
-
                 }
 
                 @Override
                 public void onConfigure(SdkDatabase database) {
-
                 }
             });
         }
 
         public SdkDatabase getWritableDatabase() {
-            return databaseHelper.getWritableDatabase();
+            return sdkDatabaseOpenHelper.getWritableDatabase();
         }
 
         public SdkDatabaseQueryBuilder createQueryBuilder() {
-            return databaseHelper.createQueryBuilder();
+            return sdkDatabaseOpenHelper.createQueryBuilder();
         }
-
     }
 
     static class ContentUriData {
         private final String authority;
-        private static final String authoritySuffix = ".MCE_JSON_PROVIDER";
+        private static final String AUTHORITY_SUFFIX = ".MCE_JSON_PROVIDER";
 
         ContentUriData(Context context) {
-            authority = context.getPackageName() + authoritySuffix;
+            authority = context.getPackageName() + AUTHORITY_SUFFIX;
         }
-
-
 
         Uri getCallbacksURI() {
             return Uri.parse("content://" + authority + "/"+CALLBACKS_TABLE);

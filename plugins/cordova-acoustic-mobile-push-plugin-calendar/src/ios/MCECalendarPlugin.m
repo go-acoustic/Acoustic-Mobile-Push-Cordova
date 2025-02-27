@@ -1,5 +1,5 @@
 /*
- * Copyright © 2011, 2019 Acoustic, L.P. All rights reserved.
+ * Copyright (C) 2024 Acoustic, L.P. All rights reserved.
  *
  * NOTICE: This file contains material that is confidential and proprietary to
  * Acoustic, L.P. and/or other developers. No license is granted under any intellectual or
@@ -75,7 +75,7 @@
                 controller.eventStore = store;
                 controller.editViewDelegate = self;
 
-                UIWindow * window = [[UIApplication sharedApplication] keyWindow];
+                UIWindow * window = [[MCESdk sharedInstance] getAppWindow];
                 [window.rootViewController presentViewController:controller animated:TRUE completion:nil];
             });
         }
@@ -112,7 +112,7 @@
         default:
             break;
     }
-    UIWindow * window = [[UIApplication sharedApplication] keyWindow];
+    UIWindow * window = [[MCESdk sharedInstance] getAppWindow];
     [window.rootViewController dismissViewControllerAnimated:YES completion:nil];
 }
 

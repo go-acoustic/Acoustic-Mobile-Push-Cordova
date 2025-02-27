@@ -1,5 +1,5 @@
 /*
- * Copyright © 2011, 2019 Acoustic, L.P. All rights reserved.
+ * Copyright (C) 2024 Acoustic, L.P. All rights reserved.
  *
  * NOTICE: This file contains material that is confidential and proprietary to
  * Acoustic, L.P. and/or other developers. No license is granted under any intellectual or
@@ -17,8 +17,10 @@ import co.acoustic.mobile.push.sdk.util.Logger;
 import java.util.List;
 
 public class JsonCallbacksRegistry {
-
    private static final String TAG = "JsonCallbacksRegistry";
+
+   private JsonCallbacksRegistry() {
+   }
 
     public static void register(Context context, String callbackName, boolean success, String parameterAsString) {
         Logger.d(TAG, "Registering callback for "+callbackName+": "+parameterAsString + "("+success+")");
@@ -26,8 +28,7 @@ public class JsonCallbacksRegistry {
     }
 
     public static List<RegisteredCallback> getRegisteredCallbacks(Context context, String callbackName) {
-        List<RegisteredCallback> registeredCallbacks = JsonDbAdapter.getRegisteredCallbacks(context, callbackName);
-        return registeredCallbacks;
+        return JsonDbAdapter.getRegisteredCallbacks(context, callbackName);
     }
 
     public static void deleteCallbacks(Context context, List<RegisteredCallback> callbacks) {

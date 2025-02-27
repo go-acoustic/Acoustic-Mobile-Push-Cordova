@@ -27,7 +27,6 @@
  import java.util.concurrent.Executor;
  
  public class MceJsonApi {
-     public static boolean running;
     private static final String TAG = "MceJsonApi";
  
      public static boolean execute(String action, JSONArray parameters, Context context, JsonCallback callback, Executor executor) throws JSONException {

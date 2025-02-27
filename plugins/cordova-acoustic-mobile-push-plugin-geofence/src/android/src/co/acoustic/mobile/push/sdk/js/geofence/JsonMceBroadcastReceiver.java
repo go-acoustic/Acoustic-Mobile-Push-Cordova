@@ -1,5 +1,5 @@
 /*
- * Copyright © 2011, 2019 Acoustic, L.P. All rights reserved.
+ * Copyright (C) 2024 Acoustic, L.P. All rights reserved.
  *
  * NOTICE: This file contains material that is confidential and proprietary to
  * Acoustic, L.P. and/or other developers. No license is granted under any intellectual or
@@ -21,6 +21,7 @@ import co.acoustic.mobile.push.sdk.api.attribute.AttributesOperation;
 import co.acoustic.mobile.push.sdk.api.event.Event;
 import co.acoustic.mobile.push.sdk.api.notification.NotificationDetails;
 import co.acoustic.mobile.push.sdk.js.JsonCallbacksRegistry;
+import co.acoustic.mobile.push.sdk.js.MceJsonApi;
 import co.acoustic.mobile.push.sdk.location.MceLocationJson;
 import co.acoustic.mobile.push.sdk.util.Logger;
 import org.json.JSONArray;
@@ -173,14 +174,14 @@ public class JsonMceBroadcastReceiver extends MceBroadcastReceiver{
         
                 try{
                     JSONObject details = MceLocationJson.locationToJSON(location);
-                    if(geofenceEnterCallback != null && MceJsonApi.running) {
+                    if(geofenceEnterCallback != null && MceJsonApi.getRunning()) {
                         callbackSuccess(geofenceEnterCallback, details);
                     } else {
                         synchronized (SEND_ENTER_CALLBACK_NAME) {
                             JsonCallbacksRegistry.register(context, SEND_ENTER_CALLBACK_NAME, true, details.toString());
                         }
                     }
-                } catch (JSONException jsone) {
+                } catch (Exception e) {
                     Logger.e(TAG, "Failed to generate geofence entry JSON");
                 }
             }
@@ -189,14 +190,14 @@ public class JsonMceBroadcastReceiver extends MceBroadcastReceiver{
                 Logger.i(TAG, "Geofence Exit, sending to cordova");
                 try{
                     JSONObject details = MceLocationJson.locationToJSON(location);
-                    if(geofenceExitCallback != null && MceJsonApi.running) {
+                    if(geofenceExitCallback != null && MceJsonApi.getRunning()) {
                         callbackSuccess(geofenceExitCallback, details);
                     } else {
                         synchronized (SEND_EXIT_CALLBACK_NAME) {
                             JsonCallbacksRegistry.register(context, SEND_EXIT_CALLBACK_NAME, true, details.toString());
                         }
                     }
-                } catch (JSONException jsone) {
+                } catch (Exception e) {
                     Logger.e(TAG, "Failed to generate geofence exit JSON");
                 }
             }

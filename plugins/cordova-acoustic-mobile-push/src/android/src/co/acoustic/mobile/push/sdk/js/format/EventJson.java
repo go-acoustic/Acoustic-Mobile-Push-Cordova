@@ -25,7 +25,7 @@ public class EventJson {
         type, name, attribution, mailingId, timestamp, attributes
     }
 
-    public static JSONObject toJSON(Event event) throws JSONException {
+    public static JSONObject toJSON(Event event) throws JSONException, ParseException {
         JSONObject eventJSON = new JSONObject();
         eventJSON.put(Key.type.name(), event.getType());
         eventJSON.put(Key.name.name(), event.getName());
@@ -50,7 +50,7 @@ public class EventJson {
         return new Event(type, name, date, attributes, attribution, mailingId);
     }
 
-    public static JSONArray toJSONArray(List<Event> events) throws JSONException {
+    public static JSONArray toJSONArray(List<Event> events) throws JSONException, ParseException {
         if(events == null) {
             return null;
         }
@@ -61,7 +61,7 @@ public class EventJson {
         return eventsJSONArray;
     }
 
-    public static JSONArray toJSONArray(Event[] events) throws JSONException {
+    public static JSONArray toJSONArray(Event[] events) throws JSONException, ParseException {
         if(events == null) {
             return null;
         }

@@ -1,5 +1,5 @@
 /*
- * Copyright © 2011, 2019 Acoustic, L.P. All rights reserved.
+ * Copyright (C) 2024 Acoustic, L.P. All rights reserved.
  *
  * NOTICE: This file contains material that is confidential and proprietary to
  * Acoustic, L.P. and/or other developers. No license is granted under any intellectual or
@@ -21,6 +21,7 @@ import co.acoustic.mobile.push.sdk.api.attribute.AttributesOperation;
 import co.acoustic.mobile.push.sdk.api.event.Event;
 import co.acoustic.mobile.push.sdk.api.notification.NotificationDetails;
 import co.acoustic.mobile.push.sdk.js.JsonCallbacksRegistry;
+import co.acoustic.mobile.push.sdk.js.MceJsonApi;
 import co.acoustic.mobile.push.sdk.util.Logger;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -54,7 +55,7 @@ public class JsonMceBroadcastReceiver extends MceBroadcastReceiver{
     {
         Logger.i(TAG, "Location Update, sending to cordova");
     
-        if(locationUpdatedCallback != null && MceJsonApi.running) {
+        if(locationUpdatedCallback != null && MceJsonApi.getRunning()) {
             callbackSuccess(locationUpdatedCallback);
         } else {
             synchronized (SEND_LOCATION_UPDATED_CALLBACK_NAME) {
@@ -67,7 +68,7 @@ public class JsonMceBroadcastReceiver extends MceBroadcastReceiver{
     {
         Logger.i(TAG, "Location Auth Update, sending to cordova");
         
-            if(locationAuthCallback != null && MceJsonApi.running) {
+            if(locationAuthCallback != null && MceJsonApi.getRunning()) {
                 callbackSuccess(locationAuthCallback);
             } else {
                 synchronized (SEND_LOCATION_AUTH_CALLBACK_NAME) {
