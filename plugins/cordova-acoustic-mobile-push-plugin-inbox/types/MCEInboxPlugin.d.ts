@@ -1,4 +1,3 @@
-import { StringObject } from "cordova-acoustic-mobile-push/www/js/MCEPluginTypes";
 import { InboxListCallback, InboxMessageCallback } from "./MCEInboxPluginTypes";
 /**
 Acoustic MCE Inbox Cordova Plugin
@@ -24,7 +23,7 @@ declare namespace MCEInboxPlugin {
     Allows Cordova Inbox Plugin to call out to action registry to handle rich message actions.
     @param {Object} action is normally in the format &#123; "type": &lt;type&gt;, "value": &lt;value&gt; &#125; but can be whatever is sent in the "notification-action" or the "category-actions" section of the payload
     */
-    const executeInboxAction: (action: StringObject, inboxMessageId: string) => void;
+    const executeInboxAction: (action: any, inboxMessageId: string) => void;
     /**
     Allows Cordova Inbox Plugin to delete a message from the database cache and server.
     @param {string} inboxMessageId Unique identifier for inbox message
