@@ -590,14 +590,14 @@ function addGradlePropertiesToApp(appPath) {
 	project.ext {
 		// The following are only a few examples of the types of properties you can define.
 		// Sdk and tools
-		mobilePushVersion = "3.9.22"
+		mobilePushVersion = "3.10.122"
 		androidxLibVersion = "1.6.0"
 		playServicesBaseVersion = "18.3.0"
 		playServicesLocationVersion = "21.0.1"
 		firebaseCoreVersion = "19.0.2"
 		firebaseMessagingVersion = "22.0.0"
 		// This version supports 21 minimal
-		securityCryptoVersion = "1.1.0-alpha06"
+		securityCryptoVersion = "1.1.0"
 	}
 }`
 
