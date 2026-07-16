@@ -1,72 +1,125 @@
-name: Publish to npm
+# Publish the 12 cordova-acoustic-mobile-push* packages to npm using
+# npm Trusted Publishers (OIDC).
+#
+# Note for maintainers: this file is the SOURCE for the public repo's
+# `.github/workflows/publish.yml`. The release pipeline copies it there under
+# that name on every production publish (see Jenkinsfile packageRelease()) —
+# edits made directly in the public repo are overwritten. In this (private)
+# repo the workflow is inert: the repository guard below only matches the
+# public repo.
+#
+# Flow:
+#   1. Jenkins builds, tests, bumps the lockstep version, and pushes a bare
+#      semver tag (e.g. 3.9.137) to go-acoustic/Acoustic-Mobile-Push-Cordova.
+#   2. Jenkins creates a GitHub Release for that tag with all 12 `npm pack`
+#      tarballs attached in a single `gh release create` call.
+#   3. This workflow triggers on the tag push, polls the release until all 12
+#      tarball assets are attached, downloads them, and publishes each to npm
+#      via OIDC — no npm token stored in GitHub.
+#
+# Prerequisites:
+#   - Each of the 12 cordova-acoustic-mobile-push* packages configured with
+#     GitHub as a Trusted Publisher on npmjs.com:
+#       repository: go-acoustic/Acoustic-Mobile-Push-Cordova
+#       workflow:   publish.yml
+#   - Jenkins must push the tag AND create the release with all tarballs
+#     attached before this workflow times out.
+#   - npm CLI >= 11.5.1 for Trusted Publishers support (upgraded below).
+#
+# Troubleshooting:
+#   - "Timeout waiting for tarballs": Jenkins did not attach all 12 assets to
+#     the GitHub Release in time.
+#   - "npm publish failed" / ENEEDAUTH: verify Trusted Publishers config on
+#     npmjs.com for the specific package that failed.
+#
+# Note: unlike publish.yml (beta, private repo), provenance attestation
+# (--provenance) IS used here — it requires a public repository, which this
+# workflow only ever runs in (see the repository guard below). See
+# cordova-acoustic-connect's publish.public.yml for the same pattern.
+
+name: Publish to npm (Trusted Publishers)
 
 on:
-  release:
-    types: [created]
+  push:
+    tags-ignore:
+      - '*-beta'  # Only bare semver tags from the release pipeline
+  workflow_dispatch:
+
+permissions:
+  id-token: write  # Required for OIDC Trusted Publishers
+  contents: read
 
 jobs:
   publish:
     runs-on: ubuntu-latest
+    # Only publish from the public repository — inert everywhere else.
+    if: github.repository == 'go-acoustic/Acoustic-Mobile-Push-Cordova'
     timeout-minutes: 25
 
-    permissions:
-      contents: read
-      id-token: write  # Required for OIDC
-
     steps:
-      - name: Checkout code
+      - name: Checkout
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
+
+      - name: Validate release tag
+        env:
+          TAG: ${{ github.ref_name }}
+        run: |
+          set -euo pipefail
+          if [[ ! "$TAG" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "ERROR: '${TAG}' is not a bare semver tag — aborting." >&2
+            exit 1
+          fi
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '20'
           registry-url: 'https://registry.npmjs.org'
 
-      - name: Get release information
-        id: release-info
-        env:
-          GH_TOKEN: ${{ github.token }}
+      - name: Upgrade npm for Trusted Publishers
+        timeout-minutes: 3
         run: |
-          RELEASE_INFO=$(gh api repos/${{ github.repository }}/releases/tags/${{ github.event.release.tag_name }})
-          echo "release_info<<EOF" >> $GITHUB_OUTPUT
-          echo "$RELEASE_INFO" >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
+          set -euo pipefail
+          echo "Current npm version: $(npm --version)"
+          # Pinned to major 11, not @latest — npm 12 requires Node >=22 and
+          # breaks under Node 20 with EBADENGINE.
+          npm install -g npm@11
+          echo "Upgraded npm version: $(npm --version)"
 
-      # Wait for all tarballs to be uploaded (prevents race condition)
-      - name: Wait for all tarballs to be uploaded
-        id: wait-for-tarballs
+      - name: Wait for and download tarballs from release
         timeout-minutes: 10
         env:
           GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ github.ref_name }}
+          REPO: ${{ github.repository }}
         run: |
+          set -euo pipefail
+          EXPECTED_PACKAGES=12
           MAX_RETRIES=60
           RETRY_DELAY=10
           attempt=1
-
-          # Extract expected package count from release body metadata
-          RELEASE_INFO='${{ steps.release-info.outputs.release_info }}'
-          EXPECTED_PACKAGES=$(echo "$RELEASE_INFO" | jq -r '.body' | grep -oP '(?<=EXPECTED_PACKAGES:\s)\d+' || echo "1")
-
-          echo "Expecting $EXPECTED_PACKAGES package(s)"
+          mkdir -p tarballs
 
           while [ $attempt -le $MAX_RETRIES ]; do
-            echo "Attempt $attempt/$MAX_RETRIES - Checking for tarballs..."
+            echo "Attempt $attempt/$MAX_RETRIES — checking for tarballs on release ${RELEASE_TAG}..."
 
-            RELEASE_INFO=$(gh api repos/${{ github.repository }}/releases/tags/${{ github.event.release.tag_name }})
-            CURRENT_ASSET_COUNT=$(echo "$RELEASE_INFO" | jq '(.assets // []) | [.[] | select(.name | endswith(".tgz"))] | length')
+            # Separate gh and jq so a 404 (release not yet created) falls back to an
+            # empty asset list and the retry loop continues instead of exiting.
+            RELEASE_JSON=$(gh release view "$RELEASE_TAG" --repo "$REPO" --json assets 2>/dev/null) \
+              || RELEASE_JSON='{"assets":[]}'
+            ASSET_COUNT=$(echo "$RELEASE_JSON" \
+              | jq '[(.assets // [])[] | select(.name | endswith(".tgz"))] | length')
 
-            echo "Found $CURRENT_ASSET_COUNT of $EXPECTED_PACKAGES expected packages"
+            echo "Found $ASSET_COUNT of $EXPECTED_PACKAGES expected packages"
 
-            if [ "$CURRENT_ASSET_COUNT" -ge "$EXPECTED_PACKAGES" ]; then
-              echo "✅ All $EXPECTED_PACKAGES packages are now available"
+            if [ "$ASSET_COUNT" -ge "$EXPECTED_PACKAGES" ]; then
+              echo "All packages available — downloading."
+              (cd tarballs && gh release download "$RELEASE_TAG" --repo "$REPO" --pattern "*.tgz" --clobber)
               break
             fi
 
             if [ $attempt -eq $MAX_RETRIES ]; then
-              echo "❌ Timeout: Only $CURRENT_ASSET_COUNT of $EXPECTED_PACKAGES packages uploaded after $((MAX_RETRIES * RETRY_DELAY)) seconds"
+              echo "Timeout: only $ASSET_COUNT of $EXPECTED_PACKAGES packages attached to release ${RELEASE_TAG} after $((MAX_RETRIES * RETRY_DELAY))s" >&2
               exit 1
             fi
 
@@ -74,62 +127,52 @@ jobs:
             attempt=$((attempt + 1))
           done
 
-      - name: Download tarballs from release
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          mkdir -p tarballs
-          cd tarballs
-
-          gh release download ${{ github.event.release.tag_name }} \
-            --repo ${{ github.repository }} \
-            --pattern "*.tgz"
+          # The wait loop above only checks ASSET_COUNT >= EXPECTED_PACKAGES before
+          # downloading, so a release with stale extra tarballs (e.g. a leftover
+          # asset from a prior release) would silently download and publish them
+          # too. Assert the downloaded count is exactly right before proceeding.
+          DOWNLOADED_COUNT=$(ls tarballs/*.tgz | wc -l | tr -d ' ')
+          if [ "$DOWNLOADED_COUNT" -ne "$EXPECTED_PACKAGES" ]; then
+            echo "ERROR: expected exactly $EXPECTED_PACKAGES tarballs but downloaded $DOWNLOADED_COUNT:" >&2
+            ls -lh tarballs/*.tgz >&2
+            exit 1
+          fi
 
           echo "Downloaded tarballs:"
-          ls -lh *.tgz
+          ls -lh tarballs/*.tgz
 
-      - name: Publish packages to npm with provenance
+      - name: Publish packages to npm
         id: publish
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          # Public repo — provenance attestation enabled (npm >= 11.5.1).
+          NPM_CONFIG_PROVENANCE: true
         run: |
-          set +e  # Don't exit on error
+          set +e  # Don't abort the loop on the first failed package.
 
           SUCCESS_COUNT=0
           FAILURE_COUNT=0
           PUBLISHED_PACKAGES=""
           FAILED_PACKAGES=""
 
-          # Change to tarballs directory to avoid path confusion
           cd tarballs
-
           for tarball in *.tgz; do
             echo "----------------------------------------"
             echo "Publishing: $tarball"
 
-            # Publish with provenance (public packages only)
-            if npm publish "$tarball" \
-              --provenance \
-              --access public \
-              2>&1 | tee publish_output.txt; then
-
-              echo "✅ Successfully published: $tarball"
+            if npm publish "$tarball" --access public --tag latest --provenance --verbose; then
+              echo "✅ Published: $tarball"
               SUCCESS_COUNT=$((SUCCESS_COUNT + 1))
-              PUBLISHED_PACKAGES="${PUBLISHED_PACKAGES}✅ $tarball\n"
+              PUBLISHED_PACKAGES="${PUBLISHED_PACKAGES}✅ ${tarball}\n"
             else
               echo "❌ Failed to publish: $tarball"
               FAILURE_COUNT=$((FAILURE_COUNT + 1))
-              FAILED_PACKAGES="${FAILED_PACKAGES}❌ $tarball\n"
-              cat publish_output.txt
+              FAILED_PACKAGES="${FAILED_PACKAGES}❌ ${tarball}\n"
             fi
           done
 
           echo "----------------------------------------"
-          echo "📊 Publishing Summary:"
-          echo "  ✅ Successful: $SUCCESS_COUNT"
-          echo "  ❌ Failed: $FAILURE_COUNT"
+          echo "Publishing summary: $SUCCESS_COUNT succeeded, $FAILURE_COUNT failed"
 
-          # Save results to output for summary
           {
             echo "success_count=$SUCCESS_COUNT"
             echo "failure_count=$FAILURE_COUNT"
@@ -141,29 +184,45 @@ jobs:
             echo "EOF"
           } >> "$GITHUB_OUTPUT"
 
-          # Exit with error if any packages failed
-          if [ $FAILURE_COUNT -gt 0 ]; then
+          # Fail the job if any package failed, so run status accurately
+          # reflects the outcome instead of always reporting success.
+          if [ "$FAILURE_COUNT" -gt 0 ]; then
             exit 1
           fi
 
-      - name: Create job summary
+      - name: Job summary
         if: always()
+        env:
+          RELEASE_TAG: ${{ github.ref_name }}
+          SUCCESS_COUNT: ${{ steps.publish.outputs.success_count }}
+          FAILURE_COUNT: ${{ steps.publish.outputs.failure_count }}
+          PUBLISHED_LIST: ${{ steps.publish.outputs.published_list }}
+          FAILED_LIST: ${{ steps.publish.outputs.failed_list }}
         run: |
-          echo "# 📦 npm Publishing Results" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**Release:** ${{ github.event.release.tag_name }}" >> $GITHUB_STEP_SUMMARY
-          echo "**Repository:** ${{ github.repository }}" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-
-          if [ "${{ steps.publish.outputs.success_count }}" != "" ]; then
-            echo "## ✅ Successfully Published (${{ steps.publish.outputs.success_count }})" >> $GITHUB_STEP_SUMMARY
-            echo "" >> $GITHUB_STEP_SUMMARY
-            echo "${{ steps.publish.outputs.published_list }}" >> $GITHUB_STEP_SUMMARY
-          fi
-
-          if [ "${{ steps.publish.outputs.failure_count }}" != "0" ] && [ "${{ steps.publish.outputs.failure_count }}" != "" ]; then
-            echo "" >> $GITHUB_STEP_SUMMARY
-            echo "## ❌ Failed to Publish (${{ steps.publish.outputs.failure_count }})" >> $GITHUB_STEP_SUMMARY
-            echo "" >> $GITHUB_STEP_SUMMARY
-            echo "${{ steps.publish.outputs.failed_list }}" >> $GITHUB_STEP_SUMMARY
-          fi
+          {
+            echo "# npm publish results"
+            echo ""
+            echo "**Tag:** \`${RELEASE_TAG}\`"
+            echo ""
+            if [ "$FAILURE_COUNT" != "" ] && [ "$FAILURE_COUNT" -gt 0 ]; then
+              echo "## ❌ ${FAILURE_COUNT} of $((SUCCESS_COUNT + FAILURE_COUNT)) packages failed to publish"
+            elif [ "$SUCCESS_COUNT" != "" ]; then
+              echo "## ✅ All ${SUCCESS_COUNT} packages published successfully"
+            else
+              echo "## ⚠️ Publish step did not run to completion — see job logs"
+            fi
+            echo ""
+            if [ "$PUBLISHED_LIST" != "" ]; then
+              echo "### Published"
+              echo ""
+              echo "$PUBLISHED_LIST"
+              echo ""
+            fi
+            if [ "$FAILED_LIST" != "" ]; then
+              echo "### Failed"
+              echo ""
+              echo "$FAILED_LIST"
+              echo ""
+            fi
+            echo "Published via [npm Trusted Publishers](https://docs.npmjs.com/trusted-publishers) with provenance."
+          } >> "$GITHUB_STEP_SUMMARY"
