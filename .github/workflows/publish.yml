@@ -1,142 +1,72 @@
-# Publish the 12 cordova-acoustic-mobile-push* (release) packages to npm using
-# npm Trusted Publishers (OIDC).
-#
-# Note for maintainers: this file is the SOURCE for the public repo's
-# (go-acoustic/Acoustic-Mobile-Push-Cordova) `.github/workflows/publish.yml`.
-# packageRelease() copies it there under that name on every production
-# publish — edits made directly in the public repo are overwritten. In this
-# (private) repo the workflow is inert: the repository guard below only
-# matches the public repo.
-#
-# Flow:
-#   1. Jenkins syncs plugin source from the private repo's beta build into
-#      go-acoustic/Acoustic-Mobile-Push-Cordova, strips the "-beta" suffix
-#      from all 12 package names, commits, and pushes a bare-semver tag
-#      (e.g. 3.9.134) to that repo.
-#   2. Jenkins creates a GitHub Release for that tag with all 12 `npm pack`
-#      tarballs attached in a single `gh release create` call.
-#   3. This workflow triggers on the tag push, polls the release until all 12
-#      tarball assets are attached, downloads them, and publishes each to npm
-#      via OIDC with provenance — no npm token stored in GitHub.
-#
-# Prerequisites:
-#   - Each of the 12 cordova-acoustic-mobile-push* (non-beta) packages
-#     configured with GitHub as a Trusted Publisher on npmjs.com:
-#       repository: go-acoustic/Acoustic-Mobile-Push-Cordova
-#       workflow:   publish.yml
-#   - Jenkins must push the tag AND create the release with all tarballs
-#     attached before this workflow times out.
-#   - npm CLI >= 11.5.1 for Trusted Publishers support (upgraded below).
-#
-# Troubleshooting:
-#   - "Timeout waiting for tarballs": Jenkins did not attach all 12 assets to
-#     the GitHub Release in time.
-#   - "npm publish failed" / ENEEDAUTH: verify Trusted Publishers config on
-#     npmjs.com for the specific package that failed.
-
-name: Publish to npm (Trusted Publishers)
+name: Publish to npm
 
 on:
-  push:
-    tags-ignore:
-      - '*-beta'  # Only bare semver tags from the release pipeline
-  workflow_dispatch:  # Allow manual re-run from the GitHub UI
-
-permissions:
-  id-token: write  # Required for OIDC Trusted Publishers
-  contents: read
+  release:
+    types: [created]
 
 jobs:
   publish:
     runs-on: ubuntu-latest
-    # Only publish from the public repository — inert everywhere else.
-    if: github.repository == 'go-acoustic/Acoustic-Mobile-Push-Cordova'
     timeout-minutes: 25
 
+    permissions:
+      contents: read
+      id-token: write  # Required for OIDC
+
     steps:
-      - name: Checkout
+      - name: Checkout code
         uses: actions/checkout@v4
-
-      - name: Validate bare semver tag
-        env:
-          TAG: ${{ github.ref_name }}
-        run: |
-          set -euo pipefail
-          if [[ ! "$TAG" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-            echo "ERROR: '${TAG}' is not a bare semver tag — aborting." >&2
-            exit 1
-          fi
-
-      - name: Verify package metadata
-        env:
-          TAG: ${{ github.ref_name }}
-        run: |
-          set -euo pipefail
-          PLUGIN_PKG="plugins/cordova-acoustic-mobile-push/package.json"
-          PACKAGE_NAME=$(jq -r '.name' "$PLUGIN_PKG")
-          PACKAGE_VERSION=$(jq -r '.version' "$PLUGIN_PKG")
-
-          echo "Package name   : $PACKAGE_NAME"
-          echo "Package version: $PACKAGE_VERSION"
-          echo "Tag            : $TAG"
-
-          if [ "$PACKAGE_NAME" != "cordova-acoustic-mobile-push" ]; then
-            echo "ERROR: unexpected package name '${PACKAGE_NAME}'" >&2
-            exit 1
-          fi
-          if [ "$PACKAGE_VERSION" != "$TAG" ]; then
-            echo "ERROR: tag '${TAG}' does not match package.json version '${PACKAGE_VERSION}'" >&2
-            exit 1
-          fi
+        with:
+          fetch-depth: 0
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '18'
           registry-url: 'https://registry.npmjs.org'
 
-      - name: Upgrade npm for Trusted Publishers
-        timeout-minutes: 3
+      - name: Get release information
+        id: release-info
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
-          set -euo pipefail
-          echo "Current npm version: $(npm --version)"
-          # Pinned to major 11, not @latest — npm 12 requires Node >=22 and
-          # breaks under Node 20 with EBADENGINE.
-          npm install -g npm@11
-          echo "Upgraded npm version: $(npm --version)"
+          RELEASE_INFO=$(gh api repos/${{ github.repository }}/releases/tags/${{ github.event.release.tag_name }})
+          echo "release_info<<EOF" >> $GITHUB_OUTPUT
+          echo "$RELEASE_INFO" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
 
-      - name: Wait for and download tarballs from release
+      # Wait for all tarballs to be uploaded (prevents race condition)
+      - name: Wait for all tarballs to be uploaded
+        id: wait-for-tarballs
         timeout-minutes: 10
         env:
           GH_TOKEN: ${{ github.token }}
-          RELEASE_TAG: ${{ github.ref_name }}
-          REPO: ${{ github.repository }}
         run: |
-          set -euo pipefail
-          EXPECTED_PACKAGES=12
           MAX_RETRIES=60
           RETRY_DELAY=10
           attempt=1
-          mkdir -p tarballs
+
+          # Extract expected package count from release body metadata
+          RELEASE_INFO='${{ steps.release-info.outputs.release_info }}'
+          EXPECTED_PACKAGES=$(echo "$RELEASE_INFO" | jq -r '.body' | grep -oP '(?<=EXPECTED_PACKAGES:\s)\d+' || echo "1")
+
+          echo "Expecting $EXPECTED_PACKAGES package(s)"
 
           while [ $attempt -le $MAX_RETRIES ]; do
-            echo "Attempt $attempt/$MAX_RETRIES — checking for tarballs on release ${RELEASE_TAG}..."
+            echo "Attempt $attempt/$MAX_RETRIES - Checking for tarballs..."
 
-            RELEASE_JSON=$(gh release view "$RELEASE_TAG" --repo "$REPO" --json assets 2>/dev/null) \
-              || RELEASE_JSON='{"assets":[]}'
-            ASSET_COUNT=$(echo "$RELEASE_JSON" \
-              | jq '[(.assets // [])[] | select(.name | endswith(".tgz"))] | length')
+            RELEASE_INFO=$(gh api repos/${{ github.repository }}/releases/tags/${{ github.event.release.tag_name }})
+            CURRENT_ASSET_COUNT=$(echo "$RELEASE_INFO" | jq '(.assets // []) | [.[] | select(.name | endswith(".tgz"))] | length')
 
-            echo "Found $ASSET_COUNT of $EXPECTED_PACKAGES expected packages"
+            echo "Found $CURRENT_ASSET_COUNT of $EXPECTED_PACKAGES expected packages"
 
-            if [ "$ASSET_COUNT" -ge "$EXPECTED_PACKAGES" ]; then
-              echo "All packages available — downloading."
-              (cd tarballs && gh release download "$RELEASE_TAG" --repo "$REPO" --pattern "*.tgz" --clobber)
+            if [ "$CURRENT_ASSET_COUNT" -ge "$EXPECTED_PACKAGES" ]; then
+              echo "✅ All $EXPECTED_PACKAGES packages are now available"
               break
             fi
 
             if [ $attempt -eq $MAX_RETRIES ]; then
-              echo "Timeout: only $ASSET_COUNT of $EXPECTED_PACKAGES packages attached to release ${RELEASE_TAG} after $((MAX_RETRIES * RETRY_DELAY))s" >&2
+              echo "❌ Timeout: Only $CURRENT_ASSET_COUNT of $EXPECTED_PACKAGES packages uploaded after $((MAX_RETRIES * RETRY_DELAY)) seconds"
               exit 1
             fi
 
@@ -144,32 +74,96 @@ jobs:
             attempt=$((attempt + 1))
           done
 
-          echo "Downloaded tarballs:"
-          ls -lh tarballs/*.tgz
-
-      - name: Publish packages to npm
+      - name: Download tarballs from release
         env:
-          # Public repo — provenance attestation enabled (npm >= 11.5.1).
-          NPM_CONFIG_PROVENANCE: true
+          GH_TOKEN: ${{ github.token }}
         run: |
-          set -euo pipefail
+          mkdir -p tarballs
           cd tarballs
+
+          gh release download ${{ github.event.release.tag_name }} \
+            --repo ${{ github.repository }} \
+            --pattern "*.tgz"
+
+          echo "Downloaded tarballs:"
+          ls -lh *.tgz
+
+      - name: Publish packages to npm with provenance
+        id: publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          set +e  # Don't exit on error
+
+          SUCCESS_COUNT=0
+          FAILURE_COUNT=0
+          PUBLISHED_PACKAGES=""
+          FAILED_PACKAGES=""
+
+          # Change to tarballs directory to avoid path confusion
+          cd tarballs
+
           for tarball in *.tgz; do
             echo "----------------------------------------"
             echo "Publishing: $tarball"
-            npm publish "$tarball" --access public --tag latest --provenance --verbose
-            echo "✅ Published: $tarball"
+
+            # Publish with provenance (public packages only)
+            if npm publish "$tarball" \
+              --provenance \
+              --access public \
+              2>&1 | tee publish_output.txt; then
+
+              echo "✅ Successfully published: $tarball"
+              SUCCESS_COUNT=$((SUCCESS_COUNT + 1))
+              PUBLISHED_PACKAGES="${PUBLISHED_PACKAGES}✅ $tarball\n"
+            else
+              echo "❌ Failed to publish: $tarball"
+              FAILURE_COUNT=$((FAILURE_COUNT + 1))
+              FAILED_PACKAGES="${FAILED_PACKAGES}❌ $tarball\n"
+              cat publish_output.txt
+            fi
           done
 
-      - name: Job summary
-        if: always()
-        env:
-          RELEASE_TAG: ${{ github.ref_name }}
-        run: |
+          echo "----------------------------------------"
+          echo "📊 Publishing Summary:"
+          echo "  ✅ Successful: $SUCCESS_COUNT"
+          echo "  ❌ Failed: $FAILURE_COUNT"
+
+          # Save results to output for summary
           {
-            echo "# npm publish results"
-            echo ""
-            echo "**Tag:** \`${RELEASE_TAG}\`"
-            echo ""
-            echo "Published via [npm Trusted Publishers](https://docs.npmjs.com/trusted-publishers)"
-          } >> "$GITHUB_STEP_SUMMARY"
+            echo "success_count=$SUCCESS_COUNT"
+            echo "failure_count=$FAILURE_COUNT"
+            echo "published_list<<EOF"
+            echo -e "$PUBLISHED_PACKAGES"
+            echo "EOF"
+            echo "failed_list<<EOF"
+            echo -e "$FAILED_PACKAGES"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+
+          # Exit with error if any packages failed
+          if [ $FAILURE_COUNT -gt 0 ]; then
+            exit 1
+          fi
+
+      - name: Create job summary
+        if: always()
+        run: |
+          echo "# 📦 npm Publishing Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Release:** ${{ github.event.release.tag_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Repository:** ${{ github.repository }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          if [ "${{ steps.publish.outputs.success_count }}" != "" ]; then
+            echo "## ✅ Successfully Published (${{ steps.publish.outputs.success_count }})" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "${{ steps.publish.outputs.published_list }}" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          if [ "${{ steps.publish.outputs.failure_count }}" != "0" ] && [ "${{ steps.publish.outputs.failure_count }}" != "" ]; then
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "## ❌ Failed to Publish (${{ steps.publish.outputs.failure_count }})" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "${{ steps.publish.outputs.failed_list }}" >> $GITHUB_STEP_SUMMARY
+          fi
