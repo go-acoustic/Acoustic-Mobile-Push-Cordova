@@ -12,14 +12,14 @@ export interface Geofence {
 @callback GeofencesNearCallback
 @param geofences {Array.<Geofence>} List of geofences
  */
-export type GeofencesNearCallback = (geofences: Geofence[]) => void;
+export declare type GeofencesNearCallback = (geofences: Geofence[]) => void;
 /**
 @callback GeofenceCallback
 @param geofence {Geofence} Geofence entered or exited.
  */
-export type GeofenceCallback = (geofence: Geofence) => void;
+export declare type GeofenceCallback = (geofence: Geofence) => void;
 /**
 @callback GeofenceEnabledCallback
 @param {boolean} status True if geofences are enabled, false otherwise.
 */
-export type GeofenceEnabledCallback = (status: boolean) => void;
+export declare type GeofenceEnabledCallback = (status: boolean) => void;

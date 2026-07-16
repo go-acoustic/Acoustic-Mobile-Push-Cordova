@@ -47,16 +47,19 @@ public class MceJsonApplication extends MceApplication {
         super.onCreate();
 
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            ApplicationInfo app;
             try {
-                app = getPackageManager().getApplicationInfo(getApplicationContext().getPackageName(), PackageManager.GET_META_DATA);
+                ApplicationInfo app = getPackageManager().getApplicationInfo(getApplicationContext().getPackageName(), PackageManager.GET_META_DATA);
                 Bundle metadata = app.metaData;
+                if (metadata == null) {
+                    Logger.w(TAG, "No application meta-data found; skipping notification channel setup");
+                    return;
+                }
                 CharSequence name = metadata.getString("channelName");
                 String description = metadata.getString("channelDescription");
                 String channel_id = metadata.getString("channelId");
                 createNotificationChannel(getApplicationContext(), name, description, channel_id);
             } catch (PackageManager.NameNotFoundException e) {
-                throw new RuntimeException(e);
+                Logger.e(TAG, "Failed to read application meta-data for notification channel setup", e);
             }
         }
     }
@@ -64,13 +67,35 @@ public class MceJsonApplication extends MceApplication {
     private static void createNotificationChannel(Context context, CharSequence name, String description, String channel_id) {
         NotificationManager notificationManager =
                 (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+        if (notificationManager == null) {
+            Logger.w(TAG, "NotificationManager unavailable; skipping notification channel setup");
+            return;
+        }
+        if (channel_id == null || channel_id.isEmpty()) {
+            Logger.w(TAG, "channelId meta-data missing; skipping notification channel setup");
+            return;
+        }
         NotificationChannel channel = notificationManager.getNotificationChannel(channel_id);
         if(channel == null) {
             int importance = NotificationManager.IMPORTANCE_HIGH;
             channel = new NotificationChannel(channel_id, name, importance);
             channel.setDescription(description);
-            NotificationsPreference notificationsPreference = MceSdk.getNotificationsClient().getNotificationsPreference();
-            notificationsPreference.setNotificationChannelId(context, channel_id);
+            // Persisting the channel id in the SDK preferences must never crash app startup.
+            // On some devices EncryptedSharedPreferences initialization can fail, which older
+            // native SDK versions surface as a NullPointerException from Preferences.getEditor.
+            try {
+                NotificationsPreference notificationsPreference =
+                        MceSdk.getNotificationsClient() != null
+                                ? MceSdk.getNotificationsClient().getNotificationsPreference()
+                                : null;
+                if (notificationsPreference != null) {
+                    notificationsPreference.setNotificationChannelId(context, channel_id);
+                } else {
+                    Logger.w(TAG, "Notifications subsystem not ready; channel created without persisted channel id");
+                }
+            } catch (Exception e) {
+                Logger.e(TAG, "Failed to persist notification channel id in SDK preferences", e);
+            }
             notificationManager.createNotificationChannel(channel);
         }
     }

@@ -22,12 +22,12 @@ export interface InboxMessage {
 @callback InboxListCallback
 @param {Array.<InboxMessage>} messages Messages in Inbox
 */
-export type InboxListCallback = (messages: InboxMessage[]) => void;
+export declare type InboxListCallback = (messages: InboxMessage[]) => void;
 /**
 @callback InboxMessageCallback
 @param {InboxMessage} message Inbox message contents
 */
-export type InboxMessageCallback = (message: InboxMessage) => void;
+export declare type InboxMessageCallback = (message: InboxMessage) => void;
 export interface InboxRegistryMap {
     [key: string]: InboxRegistry;
 }

@@ -16,7 +16,9 @@
  import co.acoustic.mobile.push.sdk.attributes.StoredAttributeDatabase;
  import co.acoustic.mobile.push.sdk.api.MceSdk;
  import co.acoustic.mobile.push.sdk.api.notification.MceNotificationActionRegistry;
+ import co.acoustic.mobile.push.sdk.api.notification.NotificationsPreference;
  import co.acoustic.mobile.push.sdk.js.format.RegistrationDetailsJson;
+ import co.acoustic.mobile.push.sdk.api.registration.RegistrationDetails;
  import co.acoustic.mobile.push.sdk.util.Logger;
  import co.acoustic.mobile.push.sdk.api.MceApplication;
  import co.acoustic.mobile.push.sdk.util.Iso8601;
@@ -194,6 +196,23 @@
          MceNotificationActionRegistry.registerNotificationAction(context, type, new JsonNotificationAction(callback));
      }
  
+     /**
+      * Returns the SDK notifications preference, or null if the notifications subsystem is not
+      * ready. Guards against a null client/preference so callers never dereference null when the
+      * native SDK has not finished initializing.
+      */
+     private static NotificationsPreference notificationsPreferenceOrNull() {
+         try {
+             if (MceSdk.getNotificationsClient() == null) {
+                 return null;
+             }
+             return MceSdk.getNotificationsClient().getNotificationsPreference();
+         } catch (Exception e) {
+             Logger.e(TAG, "Failed to obtain notifications preference", e);
+             return null;
+         }
+     }
+
      public static void getRegistrationDetails(Context context, JsonCallback callback) throws JSONException {
          callback.success(RegistrationDetailsJson.toJson(MceSdk.getRegistrationClient().getRegistrationDetails(context)), false);
      }
@@ -209,7 +228,8 @@
      }
  
      public static void isSdkRegistered(Context context, JsonCallback callback) {
-         boolean registered = MceSdk.getRegistrationClient().getRegistrationDetails(context).getChannelId() != null;
+         RegistrationDetails details = MceSdk.getRegistrationClient().getRegistrationDetails(context);
+         boolean registered = details != null && details.getChannelId() != null;
          callback.success(registered, false);
      }
  
@@ -286,13 +306,23 @@
                          iconName,
                          "drawable",
                          context.getPackageName());
-         MceSdk.getNotificationsClient().getNotificationsPreference().setIcon(context, iconId);
+         NotificationsPreference pref = notificationsPreferenceOrNull();
+         if (pref != null) {
+             pref.setIcon(context, iconId);
+         } else {
+             Logger.w(TAG, "Notifications preference unavailable; skipping setIcon");
+         }
          callback.noResult();
      }
  
      public static void setIconColor(Context context, JSONArray parameters, JsonCallback callback) throws JSONException{
          int iconColor = Integer.parseInt(parameters.getString(Methods.SetIconColor.ICON_COLOR_INDEX));
-         MceSdk.getNotificationsClient().getNotificationsPreference().setIconColor(context, iconColor);
+         NotificationsPreference pref = notificationsPreferenceOrNull();
+         if (pref != null) {
+             pref.setIconColor(context, iconColor);
+         } else {
+             Logger.w(TAG, "Notifications preference unavailable; skipping setIconColor");
+         }
          callback.noResult();
      }
  
@@ -304,7 +334,12 @@
                          iconName,
                          "drawable",
                          context.getPackageName());
-         MceSdk.getNotificationsClient().getNotificationsPreference().setLargeIcon(context, iconId);
+         NotificationsPreference pref = notificationsPreferenceOrNull();
+         if (pref != null) {
+             pref.setLargeIcon(context, iconId);
+         } else {
+             Logger.w(TAG, "Notifications preference unavailable; skipping setLargeIcon");
+         }
          callback.noResult();
      }
  
@@ -316,13 +351,23 @@
                          soundName,
                          "raw",
                          context.getPackageName());
-         MceSdk.getNotificationsClient().getNotificationsPreference().setSound(context, soundId);
+         NotificationsPreference pref = notificationsPreferenceOrNull();
+         if (pref != null) {
+             pref.setSound(context, soundId);
+         } else {
+             Logger.w(TAG, "Notifications preference unavailable; skipping setSound");
+         }
          callback.noResult();
      }
  
      public static void setVibrateEnabled(Context context, JSONArray parameters, JsonCallback callback) throws JSONException{
          Boolean hasEnabled = Boolean.valueOf(parameters.getString(Methods.SetVibrateEnabled.VIBRATION_ENABLED_INDEX));
-         MceSdk.getNotificationsClient().getNotificationsPreference().setVibrateEnabled(context, hasEnabled);
+         NotificationsPreference pref = notificationsPreferenceOrNull();
+         if (pref != null) {
+             pref.setVibrateEnabled(context, hasEnabled);
+         } else {
+             Logger.w(TAG, "Notifications preference unavailable; skipping setVibrateEnabled");
+         }
          callback.noResult();
      }
  
@@ -333,13 +378,23 @@
          for (int i = 0;i < longSTRArray.length;i++) {
              longs[i] = Integer.parseInt(longSTRArray[i]);
          }
-         MceSdk.getNotificationsClient().getNotificationsPreference().setVibrationPattern(context, longs);
+         NotificationsPreference pref = notificationsPreferenceOrNull();
+         if (pref != null) {
+             pref.setVibrationPattern(context, longs);
+         } else {
+             Logger.w(TAG, "Notifications preference unavailable; skipping setVibrationPattern");
+         }
          callback.noResult();
      }
  
      public static void setLightsEnabled(Context context, JSONArray parameters, JsonCallback callback) throws JSONException{
          Boolean hasEnabled = Boolean.valueOf(parameters.getString(Methods.SetLightsEnabled.LIGHTS_ENABLED_INDEX));
-         MceSdk.getNotificationsClient().getNotificationsPreference().setLightsEnabled(context, hasEnabled);
+         NotificationsPreference pref = notificationsPreferenceOrNull();
+         if (pref != null) {
+             pref.setLightsEnabled(context, hasEnabled);
+         } else {
+             Logger.w(TAG, "Notifications preference unavailable; skipping setLightsEnabled");
+         }
          callback.noResult();
      }
  
@@ -348,13 +403,23 @@
          int ledOnMS = Integer.parseInt(parameters.getString(Methods.SetLights.LED_ON_MS));
          int ledOffMS = Integer.parseInt(parameters.getString(Methods.SetLights.LED_OFF_MS));
          int[] ints = { ledARGB, ledOnMS, ledOffMS };
-         MceSdk.getNotificationsClient().getNotificationsPreference().setLights(context, ints);
+         NotificationsPreference pref = notificationsPreferenceOrNull();
+         if (pref != null) {
+             pref.setLights(context, ints);
+         } else {
+             Logger.w(TAG, "Notifications preference unavailable; skipping setLights");
+         }
          callback.noResult();
      }
  
      public static void addFlags(Context context, JSONArray parameters, JsonCallback callback) throws JSONException{
          int flag = Integer.parseInt(parameters.getString(Methods.AddFlags.FLAG_NAME_INDEX));
-         MceSdk.getNotificationsClient().getNotificationsPreference().addFlags(context, flag);
+         NotificationsPreference pref = notificationsPreferenceOrNull();
+         if (pref != null) {
+             pref.addFlags(context, flag);
+         } else {
+             Logger.w(TAG, "Notifications preference unavailable; skipping addFlags");
+         }
          callback.noResult();
      }
  
