@@ -4,7 +4,7 @@
   "iOS Version": "<x.xx.xxx>, native iOS SDK version, empty value will retrieve lastest version",
   "iOSVersion": "",
   "Android Version": "<x.xx.xxx>, native Android SDK version. Pinned to the validated version; empty value will retrieve the latest version.",
-  "androidVersion": "3.10.122",
+  "androidVersion": "3.10.126",
   "Add Google Services to Android": "<true/false>",
   "addGoogleServicesToAndroid": true,
   "com.google.gms:google-services version used": "<x.xx.xxx>",
