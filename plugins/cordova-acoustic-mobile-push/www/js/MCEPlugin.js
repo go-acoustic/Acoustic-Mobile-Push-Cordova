@@ -36,7 +36,7 @@ var MCEPlugin;
   @param {SdkVersionCallback} callback The callback that handles the response
   */
     MCEPlugin.getPluginVersion = function (callback) {
-        callback("3.9.149");
+        callback("3.9.150");
     };
     /**
   Allow Cordova developer to know when registration occurs.
@@ -201,7 +201,17 @@ var MCEPlugin;
       @param {RegisteredCallback} callback The callback that handles the response
       */
     MCEPlugin.isRegistered = function (callback) {
-        cordova.exec(callback, MCEPlugin.error, "MCEPlugin", "isRegistered", []);
+        cordova.exec(
+        // iOS calls back with (mobilepushRegistered, providerRegistered, providerName). Android calls back with one
+        // object {acousticRegistered, providerRegistered, providerName}, which is unpacked here to match iOS.
+        function (first, providerRegistered, providerName) {
+            if (first !== null && typeof first === "object") {
+                callback(first.acousticRegistered, first.providerRegistered, String(first.providerName).toUpperCase());
+            }
+            else {
+                callback(first, providerRegistered, providerName);
+            }
+        }, MCEPlugin.error, "MCEPlugin", "isRegistered", []);
     };
     /**
     Internal function to translate a dictionary of attributes with dates into integers so they can be processed by SDK
@@ -470,11 +480,11 @@ var MCEPlugin;
         return promise;
     };
     MCEPlugin.replaceImages = function () {
-        $("img").each(function (index, item) {
+        jQuery("img").each(function (index, item) {
             var replaceImage = item;
             var originalSource = replaceImage.getAttribute("originalSource") || replaceImage.src;
             MCEPlugin.bestImage(originalSource, function (image) {
-                $(replaceImage).css(MCEPlugin.imageCSS(image));
+                jQuery(replaceImage).css(MCEPlugin.imageCSS(image));
                 replaceImage.setAttribute("originalSource", originalSource);
                 replaceImage.src = image.src;
             });

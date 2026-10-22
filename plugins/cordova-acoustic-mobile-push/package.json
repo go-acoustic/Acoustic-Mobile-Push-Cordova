@@ -44,7 +44,7 @@
         "postinstall": "node scripts/postinstall.js $INIT_CWD",
         "test": "echo \"Error: no test specified\" && exit 1"
     },
-    "version": "3.9.149",
+    "version": "3.9.150",
     "dependencies": {
         "chalk": "^4.1.2",
         "ncp": "^2.0.0",

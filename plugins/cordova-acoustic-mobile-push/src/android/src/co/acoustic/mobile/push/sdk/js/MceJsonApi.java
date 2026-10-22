@@ -74,7 +74,7 @@
                  getSdkVersion(callback);
              } else if (Methods.IsSdkRegistered.NAME.equals(action)) {
                  isSdkRegistered(context, callback);
-             } else if (Methods.IsChannelRegistered.NAME.equals(action)) {
+             } else if (Methods.IsChannelRegistered.NAME.equals(action) || Methods.IsRegistered.NAME.equals(action)) {
                  isChannelRegistered(context, callback);
              } else if (Methods.QueueUpdateUserAttributes.NAME.equals(action)) {
                  queueUpdateUserAttributes(context, parameters);
@@ -492,6 +492,10 @@
  
          interface IsChannelRegistered {
              String NAME = "isChannelRegistered";
+         }
+
+         interface IsRegistered {
+             String NAME = "isRegistered";
          }
  
          interface QueueUpdateUserAttributes {

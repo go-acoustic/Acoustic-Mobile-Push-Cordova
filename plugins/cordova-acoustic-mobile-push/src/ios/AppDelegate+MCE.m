@@ -15,6 +15,21 @@
 #import <AcousticMobilePush/AcousticMobilePush.h>
 #import "MCEEventCallbackQueue.h"
 
+// Capacitor does not use the Cordova AppDelegate, so the category below would never be attached to the
+// application's real delegate (a Swift class). To support Capacitor we hook -[UIApplication setDelegate:]
+// and, when the delegate is not a Cordova AppDelegate, copy the category methods onto the delegate's class.
+// This runs before UIKit caches which delegate selectors are implemented.
+static IMP mceOriginalSetDelegate = NULL;
+
+static void mceSetDelegate(id application, SEL cmd, id delegate)
+{
+    if(delegate && ![delegate isKindOfClass:[AppDelegate class]])
+    {
+        [AppDelegate mceInjectIntoDelegateClass:[delegate class]];
+    }
+    ((void (*)(id, SEL, id))mceOriginalSetDelegate)(application, cmd, delegate);
+}
+
 @implementation AppDelegate (mce)
 
 -(void)updateUserAttributeFailure:(NSNotification*)notification
@@ -145,7 +160,67 @@
 {
     Method original = class_getInstanceMethod(self, @selector(application:didFinishLaunchingWithOptions:));
     Method swizzled = class_getInstanceMethod(self, @selector(mceApplication:didFinishLaunchingWithOptions:));
-    method_exchangeImplementations(original, swizzled);
+    if(original && swizzled)
+    {
+        method_exchangeImplementations(original, swizzled);
+    }
+
+    Method setDelegate = class_getInstanceMethod([UIApplication class], @selector(setDelegate:));
+    if(setDelegate && !mceOriginalSetDelegate)
+    {
+        mceOriginalSetDelegate = method_setImplementation(setDelegate, (IMP)mceSetDelegate);
+    }
+}
+
++ (void)mceInjectIntoDelegateClass:(Class)target
+{
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        // Capacitor apps that already forward the APNs token through Capacitor's notifications
+        // implement these methods themselves, so we listen to those notifications instead.
+        BOOL delegateHandlesToken = [target instancesRespondToSelector:@selector(application:didRegisterForRemoteNotificationsWithDeviceToken:)];
+
+        NSSet * skip = [NSSet setWithObjects:@"viewController", @"setViewController:", @"dealloc", @".cxx_destruct",
+                        @"application:didFinishLaunchingWithOptions:", nil];
+        unsigned int count = 0;
+        Method * methods = class_copyMethodList(self, &count);
+        for(unsigned int i = 0; i < count; i++)
+        {
+            SEL name = method_getName(methods[i]);
+            if([skip containsObject:NSStringFromSelector(name)])
+            {
+                continue;
+            }
+            // class_addMethod does nothing when the delegate already implements the selector
+            class_addMethod(target, name, method_getImplementation(methods[i]), method_getTypeEncoding(methods[i]));
+        }
+        free(methods);
+
+        Method original = class_getInstanceMethod(target, @selector(application:didFinishLaunchingWithOptions:));
+        Method swizzled = class_getInstanceMethod(target, @selector(mceApplication:didFinishLaunchingWithOptions:));
+        if(original && swizzled)
+        {
+            method_exchangeImplementations(original, swizzled);
+        }
+        else
+        {
+            NSLog(@"MCE: %@ does not implement application:didFinishLaunchingWithOptions:, SDK will not start", target);
+        }
+
+        if(delegateHandlesToken)
+        {
+            NSNotificationCenter * center = [NSNotificationCenter defaultCenter];
+            [center addObserverForName:@"CapacitorDidRegisterForRemoteNotificationsNotification" object:nil queue:NSOperationQueue.mainQueue usingBlock:^(NSNotification * note) {
+                if([note.object isKindOfClass:[NSData class]])
+                {
+                    [[MCESdk sharedInstance] registerDeviceToken:note.object];
+                }
+            }];
+            [center addObserverForName:@"CapacitorDidFailToRegisterForRemoteNotificationsNotification" object:nil queue:NSOperationQueue.mainQueue usingBlock:^(NSNotification * note) {
+                [[MCESdk sharedInstance] deviceTokenRegistrationFailed];
+            }];
+        }
+    });
 }
 
 - (BOOL)mceApplication:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
@@ -169,7 +244,16 @@
     [center addObserver:self selector:@selector(deleteUserAttributeFailure:) name:DeleteUserAttributesError object:nil];
     [center addObserver:self selector:@selector(deleteUserAttributeSuccess:) name:DeleteUserAttributesSuccess object:nil];
     
-    [[MCESdk sharedInstance] handleApplicationLaunchWithConfig:MCEManualConfiguration.xmlSettings];
+    // Cordova passes the settings through config.xml. Capacitor does not, so fall back to MceConfig.json
+    // in the app bundle, which the SDK loads itself.
+    if([MCEManualConfiguration settingForKey:@"baseUrl"] == nil && [[NSBundle mainBundle] pathForResource:@"MceConfig" ofType:@"json"])
+    {
+        [[MCESdk sharedInstance] handleApplicationLaunch];
+    }
+    else
+    {
+        [[MCESdk sharedInstance] handleApplicationLaunchWithConfig:MCEManualConfiguration.xmlSettings];
+    }
     return YES;
 }
 

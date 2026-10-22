@@ -418,7 +418,7 @@
 {
     NSNumber * acousticRegistered = [NSNumber numberWithBool: MCERegistrationDetails.sharedInstance.mceRegistered];
     NSNumber * providerRegistered = [NSNumber numberWithBool: MCERegistrationDetails.sharedInstance.apsRegistered];
-    CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsMultipart:@[ acousticRegistered, providerRegistered, @"APNS"]];
+    CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsMultipart:@[ acousticRegistered, providerRegistered, @"APNS"]];
     [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
 }
 

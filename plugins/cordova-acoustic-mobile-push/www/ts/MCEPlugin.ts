@@ -45,7 +45,7 @@ namespace MCEPlugin {
   @param {SdkVersionCallback} callback The callback that handles the response
   */
     export const getPluginVersion = function (callback: SdkVersionCallback) {
-        callback("3.9.149");
+        callback("3.9.150");
     };
 
     /**
@@ -359,7 +359,19 @@ namespace MCEPlugin {
       */
     export const isRegistered = function (callback: RegisteredCallback) {
         cordova.exec(
-            callback as CordovaCallback,
+            // iOS calls back with (mobilepushRegistered, providerRegistered, providerName). Android calls back with one
+            // object {acousticRegistered, providerRegistered, providerName}, which is unpacked here to match iOS.
+            function (first: any, providerRegistered?: boolean, providerName?: any) {
+                if (first !== null && typeof first === "object") {
+                    callback(
+                        first.acousticRegistered,
+                        first.providerRegistered,
+                        String(first.providerName).toUpperCase() as any
+                    );
+                } else {
+                    callback(first, providerRegistered as boolean, providerName);
+                }
+            } as CordovaCallback,
             MCEPlugin.error,
             "MCEPlugin",
             "isRegistered",
@@ -686,13 +698,13 @@ namespace MCEPlugin {
     };
 
     export const replaceImages = function () {
-        $("img").each(function (index, item) {
+        jQuery("img").each(function (index, item) {
             var replaceImage = item as HTMLImageElement;
             var originalSource =
                 replaceImage.getAttribute("originalSource") || replaceImage.src;
 
             MCEPlugin.bestImage(originalSource, (image) => {
-                $(replaceImage).css(MCEPlugin.imageCSS(image));
+                jQuery(replaceImage).css(MCEPlugin.imageCSS(image));
                 replaceImage.setAttribute("originalSource", originalSource);
                 replaceImage.src = image.src;
             });

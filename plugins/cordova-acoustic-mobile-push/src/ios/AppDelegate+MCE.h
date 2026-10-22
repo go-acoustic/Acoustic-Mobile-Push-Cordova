@@ -8,7 +8,12 @@
  * prohibited.
  */
 
+// Capacitor with Swift Package Manager ships AppDelegate.h inside the Cordova framework
+#if __has_include(<Cordova/AppDelegate.h>)
+#import <Cordova/AppDelegate.h>
+#else
 #import "AppDelegate.h"
+#endif
 #import "MCEPlugin.h"
 
 @interface AppDelegate (mce)
@@ -18,6 +23,8 @@
 - (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo fetchCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler;
 - (void)application:(UIApplication *)application didReceiveLocalNotification:(UILocalNotification *)notification;
 - (void)application:(UIApplication *)application handleActionWithIdentifier:(NSString *)identifier forLocalNotification:(UILocalNotification *)notification completionHandler:(void (^)())completionHandler;
+
++ (void)mceInjectIntoDelegateClass:(Class)target;
 
 -(void)action:(NSDictionary*)action payload:(NSDictionary*)payload;
 -(void)setPlugin:(MCEPlugin*)sender;

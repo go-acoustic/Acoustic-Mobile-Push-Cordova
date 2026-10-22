@@ -12,4 +12,5 @@
 
 @interface MCEManualConfiguration: NSObject
 +(NSDictionary*) xmlSettings;
++(id) settingForKey:(NSString*)key;
 @end
