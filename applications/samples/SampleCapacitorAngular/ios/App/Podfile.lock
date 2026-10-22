@@ -1,0 +1,41 @@
+PODS:
+  - AcousticMobilePushDebug (3.10.10)
+  - Capacitor (8.5.3):
+    - CapacitorCordova
+  - CapacitorCordova (8.5.3)
+  - CapacitorLocalNotifications (8.3.1):
+    - Capacitor
+  - CordovaPluginsStatic (8.5.3):
+    - AcousticMobilePushDebug
+    - CapacitorCordova
+
+DEPENDENCIES:
+  - "Capacitor (from `../../node_modules/@capacitor/ios`)"
+  - "CapacitorCordova (from `../../node_modules/@capacitor/ios`)"
+  - "CapacitorLocalNotifications (from `../../node_modules/@capacitor/local-notifications`)"
+  - CordovaPluginsStatic (from `../capacitor-cordova-ios-plugins`)
+
+SPEC REPOS:
+  trunk:
+    - AcousticMobilePushDebug
+
+EXTERNAL SOURCES:
+  Capacitor:
+    :path: "../../node_modules/@capacitor/ios"
+  CapacitorCordova:
+    :path: "../../node_modules/@capacitor/ios"
+  CapacitorLocalNotifications:
+    :path: "../../node_modules/@capacitor/local-notifications"
+  CordovaPluginsStatic:
+    :path: "../capacitor-cordova-ios-plugins"
+
+SPEC CHECKSUMS:
+  AcousticMobilePushDebug: 7dd0c14be349cdb30e6ada74ad14f97c0bdbb145
+  Capacitor: 2f67eaeb8ed79909cd35b5e7439a5c2a9ca58e0f
+  CapacitorCordova: 0b7326439c7a09fc5d20eced5e0dab986327a493
+  CapacitorLocalNotifications: e0747a329ddde3074d52dc74a003688af90e42be
+  CordovaPluginsStatic: e81e30ea1bb1699ff6d30bdf11f5fcdb350172ec
+
+PODFILE CHECKSUM: 0d28144465206c5e8ad2f2e194b5d1aaf6e1f9e2
+
+COCOAPODS: 1.16.2

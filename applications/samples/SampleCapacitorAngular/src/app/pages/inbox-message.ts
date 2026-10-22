@@ -1,0 +1,85 @@
+/*
+ * Copyright (C) 2026 Acoustic, L.P. All rights reserved.
+ *
+ * NOTICE: This file contains material that is confidential and proprietary to
+ * Acoustic, L.P. and/or other developers. No license is granted under any
+ * intellectual or industrial property rights of Acoustic, L.P. except as may
+ * be provided in an agreement with Acoustic, L.P. Any unauthorized copying or
+ * distribution of content from this file is prohibited.
+ */
+
+import { Component, OnInit, inject, input, signal } from '@angular/core';
+import {
+    IonBackButton,
+    IonButton,
+    IonButtons,
+    IonContent,
+    IonHeader,
+    IonIcon,
+    IonTitle,
+    IonToolbar,
+    NavController,
+} from '@ionic/angular/standalone';
+import { addIcons } from 'ionicons';
+import { trashOutline } from 'ionicons/icons';
+import { AcousticService } from '../acoustic/acoustic.service';
+import { InboxMessage } from '../acoustic/acoustic-campaign';
+
+@Component({
+    selector: 'app-inbox-message',
+    imports: [IonBackButton, IonButton, IonButtons, IonContent, IonHeader, IonIcon, IonTitle, IonToolbar],
+    template: `
+        <ion-header>
+            <ion-toolbar>
+                <ion-buttons slot="start"><ion-back-button defaultHref="/inbox" text="Inbox" /></ion-buttons>
+                <ion-title>{{ title() }}</ion-title>
+                <ion-buttons slot="end">
+                    <ion-button (click)="delete()"><ion-icon slot="icon-only" name="trash-outline" /></ion-button>
+                </ion-buttons>
+            </ion-toolbar>
+        </ion-header>
+        <ion-content [scrollY]="false">
+            <iframe sandbox="allow-same-origin" [srcdoc]="html()" style="border: 0; width: 100%; height: 100%"></iframe>
+        </ion-content>
+    `,
+})
+export class InboxMessagePage implements OnInit {
+    private readonly acoustic = inject(AcousticService);
+    private readonly nav = inject(NavController);
+    /** Bound from the route parameter `:id`. */
+    readonly id = input.required<string>();
+    protected readonly html = signal('');
+    protected readonly title = signal('');
+    private message?: InboxMessage;
+
+    constructor() {
+        addIcons({ trashOutline });
+    }
+
+    async ngOnInit() {
+        if (!(await this.acoustic.ready)) {
+            return;
+        }
+        const api = this.acoustic.api;
+        this.message = await api.fetchInboxMessageId(this.id());
+        this.title.set(this.message['content']?.messagePreview?.subject ?? '');
+        this.html.set(this.message['content']?.messageDetails?.richContent ?? '');
+        await api.readInboxMessage(this.id());
+        await api.queueAddEvent({
+            type: 'inbox',
+            name: 'messageOpened',
+            timestamp: new Date(),
+            attributes: {
+                richContentId: this.message.richContentId,
+                inboxMessageId: this.message.inboxMessageId,
+                attribution: this.message.attribution,
+                mailingId: this.message.mailingId,
+            },
+        });
+    }
+
+    protected async delete() {
+        await this.acoustic.api.deleteInboxMessage(this.id());
+        this.nav.navigateBack('/inbox');
+    }
+}

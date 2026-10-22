@@ -10,7 +10,7 @@
 
 // Applies the native project changes that the Cordova hooks make for a Cordova app, to a
 // Capacitor app (Capacitor runs no Cordova hooks and passes no --variable values).
-// See CAPACITOR.md in the repository root. Safe to run more than once.
+// See documentation/CAPACITOR.md in the Acoustic-Mobile-Push-Cordova repository. Safe to run more than once.
 //
 // Usage (from the Capacitor project root):
 //   node node_modules/cordova-acoustic-mobile-push-beta/scripts/capacitorSetup.js \
@@ -435,7 +435,7 @@ function main() {
 	setupIos(opts);
 	console.log(`${opts.dryRun ? '[dry run] ' : ''}Acoustic Mobile Push Capacitor setup\n${report.join('\n')}`);
 	if (report.some(l => l.includes('warning'))) {
-		console.log('\nSee CAPACITOR.md for the steps marked as warning.');
+		console.log('\nSee documentation/CAPACITOR.md in the Acoustic-Mobile-Push-Cordova repository for the steps marked as warning.');
 	}
 }
 
