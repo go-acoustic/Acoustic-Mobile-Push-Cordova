@@ -139,8 +139,12 @@ function managePlugins(currentAppWorkingDirectory, pluginPath, configData) {
 			androidAppkey      = configData.android.appKey.prod;
 			iOSAppkey          = configData.iOS.appKey.dev;
 			iOSProdkey         = configData.iOS.appKey.prod;
-			serverUrl          = configData.iOS.baseUrl;
-			logLevel           = configData.iOS.loglevel;
+			// SERVER_URL and LOGLEVEL are one variable for both platforms and are read from the iOS section. A project
+			// with only the Android platform does not use that section, so it would keep the placeholder base URL
+			// and the iOS log level there.
+			const hasIos       = hasIosPlatform(currentAppWorkingDirectory);
+			serverUrl          = hasIos ? configData.iOS.baseUrl : configData.android.baseUrl;
+			logLevel           = hasIos ? configData.iOS.loglevel : (configData.android.loglevel || configData.iOS.loglevel);
 			mceCanSyncOverride = configData.mceCanSyncOverride;
 			logMessageTitle(`cd "${currentAppWorkingDirectory}" && cordova plugin add ${pluginName} --variable CUSTOM_ACTIONS="${customAction}" --variable ANDROID_APPKEY="${androidAppkey}" --variable IOS_DEV_APPKEY="${iOSAppkey}" --variable IOS_PROD_APPKEY="${iOSProdkey}" --variable SERVER_URL="${serverUrl}" --variable LOGLEVEL="${logLevel}" --variable MCE_CAN_SYNC_OVERRIDE="${mceCanSyncOverride}" --force`);
 			execSync(`cd "${currentAppWorkingDirectory}" && cordova plugin add ${pluginName} --variable CUSTOM_ACTIONS="${customAction}" --variable ANDROID_APPKEY="${androidAppkey}" --variable IOS_DEV_APPKEY="${iOSAppkey}" --variable IOS_PROD_APPKEY="${iOSProdkey}" --variable SERVER_URL="${serverUrl}" --variable LOGLEVEL="${logLevel}" --variable MCE_CAN_SYNC_OVERRIDE="${mceCanSyncOverride}" --force`, { stdio: 'inherit', cwd: process.cwd() });
