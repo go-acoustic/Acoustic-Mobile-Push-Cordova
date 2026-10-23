@@ -112,6 +112,8 @@
          Logger.d(TAG, "Callbacks Registration: Inbox Update - " + state);
          if (state) {
              inboxMessagesUpdateCallback = callback;
+             // like iOS: report the messages already stored, because a sync that comes too soon after the last one reports nothing
+             sendLocalInboxMessages(context);
              syncInboxMessages(context);
          } else {
              inboxMessagesUpdateCallback = null;
@@ -122,22 +124,8 @@
          MessageSync.syncMessages(context, new OperationCallback<MessageSync.SyncReport>() {
              @Override
              public void onSuccess(MessageSync.SyncReport syncReport, OperationResult result) {
-                 try {
-                     JSONArray messages = new JSONArray();
-                     Logger.d(TAG, "Accessug message cursor from RichContentDataBaseHelper... RUNTIME ERROR prone ");
-                     MessageCursor messageCursor = RichContentDatabaseHelper.getRichContentDatabaseHelper(context).getMessages();
-                     while (messageCursor.moveToNext()) {
-                         RichContent message = messageCursor.getRichContent();
-                         messages.put(packageInboxMessage(message));
-                     }
-                     if (inboxMessagesUpdateCallback != null) {
-                         synchronized (SEND_MESSAGES_NAME) {
-                             callbackSuccess(inboxMessagesUpdateCallback, messages);
-                         }
-                     }
-                 } catch (JSONException jsone) {
-                     Logger.e(TAG, "Failed to generate sync JSON", jsone);
-                 }
+                 // second delivery after a registration: see sendLocalInboxMessages
+                 sendLocalInboxMessages(context);
              }
  
              @Override
@@ -147,6 +135,37 @@
          });
      }
  
+     /**
+      * Reports the stored inbox messages (the ones that are not deleted) to the update callback.
+      * It runs when the callback is registered and again when a sync completes, so the callback can be
+      * called twice for one registration; the JS side replaces its whole list on every call.
+      */
+     private static void sendLocalInboxMessages(Context context) {
+         MessageCursor messageCursor = null;
+         try {
+             JSONArray messages = new JSONArray();
+             Logger.d(TAG, "Accessug message cursor from RichContentDataBaseHelper... RUNTIME ERROR prone ");
+             messageCursor = RichContentDatabaseHelper.getRichContentDatabaseHelper(context).getMessages();
+             while (messageCursor.moveToNext()) {
+                 RichContent message = messageCursor.getRichContent();
+                 messages.put(packageInboxMessage(message));
+             }
+             JsonCallback callback = inboxMessagesUpdateCallback;
+             if (callback != null) {
+                 synchronized (SEND_MESSAGES_NAME) {
+                     callbackSuccess(callback, messages);
+                 }
+             }
+         } catch (JSONException | RuntimeException e) {
+             // Do not let a failure here stop the registration before the sync starts, or reach the SDK callback thread
+             Logger.e(TAG, "Failed to generate sync JSON", e);
+         } finally {
+             if (messageCursor != null) {
+                 messageCursor.close();
+             }
+         }
+     }
+
      public static void fetchRichContentId(Context context, JsonCallback callback, JSONArray parameters) throws JSONException {
          String richContentId = parameters.getString(Methods.FetchRichContentId.RICH_CONTENT_ID_INDEX);
  
