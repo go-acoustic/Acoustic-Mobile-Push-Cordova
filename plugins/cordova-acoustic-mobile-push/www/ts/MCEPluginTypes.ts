@@ -90,6 +90,30 @@ export interface AttributeQueueResult {
 export type AttributeQueueCallback = (result: AttributeQueueResult) => void;
 
 /**
+A push message that reached the application. Silent data pushes arrive here too.
+*/
+export interface ReceivedMessage {
+    /** The "type" of the "alert" part of the push, for example "simple-notification-action" or a custom type. */
+    type: string;
+    /** The "payload" of the push. For a custom data push this is the data the sender put there, usually a JSON string. */
+    payload: string;
+    /** The subject of the notification, if the push has one. */
+    subject?: string;
+    /** The text of the notification, if the push has one. */
+    message?: string;
+    /** Attribution of the push, used for reporting. */
+    attribution?: string;
+    /** Mailing id of the push, used for reporting. */
+    mailingId?: string;
+}
+
+/**
+@callback MessageReceivedCallback
+@param {ReceivedMessage} message
+*/
+export type MessageReceivedCallback = (message: ReceivedMessage) => void;
+
+/**
  @callback GetBadgeCallback
 @param {number} badgeCount
 */

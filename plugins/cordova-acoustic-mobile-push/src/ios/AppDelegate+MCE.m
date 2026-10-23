@@ -405,12 +405,50 @@ static void mceSetDelegate(id application, SEL cmd, id delegate)
     }
 }
 
+// Hands the push to the JavaScript callback, or keeps it until JavaScript registers one
+-(void)messageReceived:(NSDictionary*)userInfo
+{
+    // Apps that never registered a message received callback keep nothing and pay nothing per push
+    MCEPlugin * registeredPlugin = self.plugin;
+    if(!(registeredPlugin && registeredPlugin.receivedMessageCallbackId) && ![[NSUserDefaults standardUserDefaults] boolForKey:@"co.acoustic.mobile.push.messageReceivedUsed"]) {
+        return;
+    }
+    
+    NSDictionary * action = [userInfo[@"notification-action"] isKindOfClass:NSDictionary.class] ? userInfo[@"notification-action"] : @{};
+    NSDictionary * mce = [userInfo[@"mce"] isKindOfClass:NSDictionary.class] ? userInfo[@"mce"] : @{};
+    NSDictionary * aps = [userInfo[@"aps"] isKindOfClass:NSDictionary.class] ? userInfo[@"aps"] : @{};
+    id alert = aps[@"alert"];
+    
+    NSMutableDictionary * details = [NSMutableDictionary dictionary];
+    details[@"type"] = action[@"type"] ?: @"";
+    details[@"payload"] = action[@"value"] ?: @"";
+    if([alert isKindOfClass:NSString.class]) {
+        details[@"message"] = alert;
+    } else if([alert isKindOfClass:NSDictionary.class]) {
+        if(alert[@"title"]) details[@"subject"] = alert[@"title"];
+        if(alert[@"body"]) details[@"message"] = alert[@"body"];
+    }
+    if(mce[@"attribution"]) details[@"attribution"] = mce[@"attribution"];
+    if(mce[@"mailingId"]) details[@"mailingId"] = [NSString stringWithFormat:@"%@", mce[@"mailingId"]];
+    
+    MCEPlugin * plugin = self.plugin;
+    if(plugin && plugin.receivedMessageCallbackId)
+    {
+        [plugin sendMessageReceived: details];
+    }
+    else
+    {
+        [[MCECallbackDatabaseManager sharedInstance] insertCallback: @"messageReceived" dictionary: details];
+    }
+}
+
 // This is where the silent notifications get delivered OR when notifications are delievered when app is open.
 - (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo fetchCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler
 {
     [[MCEInAppManager sharedInstance] processPayload: userInfo];
     
     NSLog(@"This is where remote notifications get delivered for iOS when didReceiveRemoteNotification:fetchCompletionHandler: is defined.");
+    [self messageReceived: userInfo];
     [[MCESdk sharedInstance] presentDynamicCategoryNotification: userInfo];
     completionHandler(UIBackgroundFetchResultNewData);
 }

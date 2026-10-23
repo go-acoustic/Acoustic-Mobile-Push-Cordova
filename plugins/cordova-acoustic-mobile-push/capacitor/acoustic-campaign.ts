@@ -63,6 +63,16 @@ export interface AttributeQueueResult {
     error?: string;
 }
 
+/** A push message that reached the app. Silent data pushes arrive here too. */
+export interface ReceivedMessage {
+    type: string;
+    payload: string;
+    subject?: string;
+    message?: string;
+    attribution?: string;
+    mailingId?: string;
+}
+
 export interface InboxMessage {
     inboxMessageId: string;
     richContentId: string;
@@ -214,6 +224,8 @@ export const AcousticCampaign = {
         onSuccess: (result: AttributeQueueResult) => void,
         onFailure: (result: AttributeQueueResult) => void
     ) => send("MCEPlugin", "setAttributeQueueCallbacks", onSuccess, onFailure),
+    setMessageReceivedCallback: (cb: (message: ReceivedMessage) => void) =>
+        send("MCEPlugin", "setMessageReceivedCallback", cb),
 
     // --- Inbox (cordova-acoustic-mobile-push-plugin-inbox) ---
     syncInboxMessages: () => send("MCEInboxPlugin", "syncInboxMessages"),

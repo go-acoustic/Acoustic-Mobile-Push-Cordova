@@ -62,6 +62,8 @@
                  setEventQueueCallbacks(context, callback, parameters);
              } else if (Methods.SetAttributeQueueCallbacks.NAME.equals(action)) {
                  setAttributeQueueCallbacks(context, callback, parameters);
+             } else if (Methods.SetMessageReceivedCallback.NAME.equals(action)) {
+                 setMessageReceivedCallback(context, callback, parameters);
              } else if (Methods.UnregisterActionCallback.NAME.equals(action)) {
                  unregisterActionCallback(context, callback, parameters);
              } else if (Methods.SetActionCallback.NAME.equals(action)) {
@@ -184,6 +186,16 @@
          }
      }
  
+     public static void setMessageReceivedCallback(Context context, JsonCallback callback, JSONArray parameters) throws JSONException {
+         boolean state = parameters.getBoolean(Methods.SetMessageReceivedCallback.STATE_INDEX);
+         Logger.d(TAG, "Callbacks Registration: Message received registration - " + state);
+         if(state) {
+             JsonMceBroadcastReceiver.setMessageReceivedCallback(context, callback);
+         } else {
+             JsonMceBroadcastReceiver.setMessageReceivedCallback(context, null);
+         }
+     }
+
      public static void unregisterActionCallback(Context context, JsonCallback callback, JSONArray parameters) throws JSONException {
          String type = parameters.getString(Methods.UnregisterActionCallback.TYPE_INDEX);
          Logger.d(TAG, "Callbacks Registration: Action registration: " + type + " setting to null");
@@ -463,6 +475,11 @@
              int STATE_INDEX = 0;
          }
  
+         interface SetMessageReceivedCallback {
+             String NAME = "setMessageReceivedCallback";
+             int STATE_INDEX = 0;
+         }
+
          interface UnregisterActionCallback {
              String NAME = "unregisterActionCallback";
              int TYPE_INDEX = 0;

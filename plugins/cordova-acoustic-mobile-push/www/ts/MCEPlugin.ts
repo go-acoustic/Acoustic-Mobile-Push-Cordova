@@ -17,6 +17,7 @@ import {
     Event,
     AppKeyCallback,
     AttributeQueueCallback,
+    MessageReceivedCallback,
     BooleanCallback,
     CategoryCallback,
     CordovaCallback,
@@ -45,7 +46,7 @@ namespace MCEPlugin {
   @param {SdkVersionCallback} callback The callback that handles the response
   */
     export const getPluginVersion = function (callback: SdkVersionCallback) {
-        callback("3.9.154");
+        callback("3.9.155");
     };
 
     /**
@@ -300,6 +301,25 @@ namespace MCEPlugin {
                     "setAttributeQueueCallbacks",
                     [true]
                 );
+            }
+        );
+    };
+
+    /**
+    Allow Cordova developer to receive the push messages that reach the application, including
+    silent data pushes. If a message arrives while the application is not active, it will be
+    queued until the next time this method is called to register a callback handler
+    @param {MessageReceivedCallback} callback The callback that handles the message
+    */
+    export const setMessageReceivedCallback = function (
+        callback: MessageReceivedCallback
+    ) {
+        pauseResumeCallback(
+            function () {
+                cordova.exec(callback, function () {}, "MCEPlugin", "setMessageReceivedCallback", [false]);
+            },
+            function () {
+                cordova.exec(callback, function () {}, "MCEPlugin", "setMessageReceivedCallback", [true]);
             }
         );
     };

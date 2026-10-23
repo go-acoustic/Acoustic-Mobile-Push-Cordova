@@ -36,7 +36,7 @@ var MCEPlugin;
   @param {SdkVersionCallback} callback The callback that handles the response
   */
     MCEPlugin.getPluginVersion = function (callback) {
-        callback("3.9.154");
+        callback("3.9.155");
     };
     /**
   Allow Cordova developer to know when registration occurs.
@@ -159,6 +159,19 @@ var MCEPlugin;
             cordova.exec(successCallbackWrapper, errorCallbackWrapper, "MCEPlugin", "setAttributeQueueCallbacks", [false]);
         }, function () {
             cordova.exec(successCallbackWrapper, errorCallbackWrapper, "MCEPlugin", "setAttributeQueueCallbacks", [true]);
+        });
+    };
+    /**
+    Allow Cordova developer to receive the push messages that reach the application, including
+    silent data pushes. If a message arrives while the application is not active, it will be
+    queued until the next time this method is called to register a callback handler
+    @param {MessageReceivedCallback} callback The callback that handles the message
+    */
+    MCEPlugin.setMessageReceivedCallback = function (callback) {
+        MCEPlugin.pauseResumeCallback(function () {
+            cordova.exec(callback, function () { }, "MCEPlugin", "setMessageReceivedCallback", [false]);
+        }, function () {
+            cordova.exec(callback, function () { }, "MCEPlugin", "setMessageReceivedCallback", [true]);
         });
     };
     /**

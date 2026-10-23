@@ -367,6 +367,15 @@ AcousticCampaign.setRegisteredActionCallback('myType', (action, payload) => { /*
   `executeInboxAction(action, inboxMessageId)`; the SDK performs the action and reports the click event.
   The links of a template message are `<a action='{json}'>` (or `href="actionid:<key>"`), and the default Inbox
   screen listens for them with jQuery, which an Ionic/Angular app does not have.
+- Silent data pushes and every other push that reaches the app are delivered to
+  `setMessageReceivedCallback(cb)` (`MCEPlugin.setMessageReceivedCallback(cb)` in Cordova) as
+  `{type, payload, subject?, message?, attribution?, mailingId?}`. On Android a push with an `alert` that has `type`
+  and `payload` and no text is a data push: nothing is shown and the app gets the callback. A push that arrives while
+  the app is not running is kept and delivered when the callback is registered. Nothing is kept, and nothing is
+  built per push, until the app has registered the callback once, so apps that do not use it are not affected. On iOS
+  the values are read from the `notification-action` (`type`, `value`) and `mce` (`attribution`, `mailingId`) parts of
+  the push. Checked on an Android device and on the iOS simulator (the simulator does not deliver a silent push to the
+  app, so the delegate method was called directly); not checked with a push delivered through APNs to an iPhone.
 - Checked: the file compiles with `tsc --strict`, and its calls were run against mocked plugin
   objects. Not run in an app on a device.
 - Not wrapped: inbox and in-app display helpers (`MCEInbox`, `MCEInAppImage` and similar), icon and

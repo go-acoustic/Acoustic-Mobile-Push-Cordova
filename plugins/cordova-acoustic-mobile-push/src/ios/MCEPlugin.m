@@ -86,6 +86,13 @@
     [self.commandDelegate sendPluginResult:result callbackId:self.attributeCallback];
 }
 
+-(void)sendMessageReceived:(NSDictionary*)dictionary
+{
+    CDVPluginResult * result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:dictionary];
+    result.keepCallback = @TRUE;
+    [self.commandDelegate sendPluginResult:result callbackId:self.receivedMessageCallbackId];
+}
+
 -(void)sendAttributeFailure: (NSDictionary*)dictionary
 {
     NSMutableDictionary * mutableDict = [dictionary mutableCopy];
@@ -366,6 +373,30 @@
         }];
     } else {
         self.attributeCallback = nil;
+    }
+}
+
+// Arguments: state
+- (void)setMessageReceivedCallback:(CDVInvokedUrlCommand*)command
+{
+    NSNumber * state = [command argumentAtIndex:0];
+    if([state boolValue]) {
+        self.receivedMessageCallbackId = command.callbackId;
+        [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"co.acoustic.mobile.push.messageReceivedUsed"];
+        
+        [[MCECallbackDatabaseManager sharedInstance] selectCallbacks: @"messageReceived" withBlock:^(NSArray*dictionaries, NSArray*ids){
+            if([dictionaries count])
+            {
+                for (NSDictionary * dictionary in dictionaries) {
+                    [self sendMessageReceived: dictionary];
+                }
+                dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+                    [[MCECallbackDatabaseManager sharedInstance] deleteCallbacksById:ids];
+                });
+            }
+        }];
+    } else {
+        self.receivedMessageCallbackId = nil;
     }
 }
 
