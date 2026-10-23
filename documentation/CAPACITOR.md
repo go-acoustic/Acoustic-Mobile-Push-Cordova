@@ -11,7 +11,7 @@ to the native projects by hand. This guide lists them.
 |---|---|
 | Capacitor | 8.5 (CLI, core, Android, iOS) |
 | Node.js | 22 or newer (the Capacitor 8 CLI refuses to run on Node 20) |
-| Android | JDK 21, Android Gradle plugin 8.13, `compileSdk` 36, emulator API 36 |
+| Android | JDK 21, Android Gradle plugin 8.13, `compileSdk` 37, emulator API 36 |
 | iOS | Xcode 26.5, iOS simulator, **CocoaPods** package manager |
 | Plugins | `cordova-acoustic-mobile-push`, `-plugin-inapp`, `-plugin-inbox`, `-plugin-location`, `-plugin-geofence`, `-plugin-beacon`, `-plugin-snooze`, `-plugin-calendar`, `-plugin-displayweb` (3.9.148); `-plugin-passbook` and `-plugin-action-menu` (iOS only) |
 | Native SDKs | Android 3.11.3, iOS `AcousticMobilePushDebug` 3.10.12 |
