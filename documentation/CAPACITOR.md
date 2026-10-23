@@ -323,11 +323,12 @@ When that plugin is in `package.json`, `capacitorSetup.js` does the Xcode work f
   both `App.entitlements` and the extension entitlements. The SDK shares its data between the app
   and the extension through them;
 - adds a `target 'NotificationService'` block with `AcousticMobilePushNotificationDebug` and
-  `AcousticMobilePushDebug` to the Podfile. Run `npx cap sync` afterwards.
+  `AcousticMobilePushDebug` to the Podfile, both pinned to the same native iOS SDK version as the app
+  (see the table at the top). Run `npx cap sync` afterwards.
 
 For a release build switch both pods in the Podfile to the non-Debug names
-(`AcousticMobilePushNotification`, `AcousticMobilePush`). The pod versions of the app and the
-extension must match. For a real device, register the app group for both App IDs in your Apple
+(`AcousticMobilePushNotification`, `AcousticMobilePush`) and keep the version. The pod versions of
+the app and the extension must match. For a real device, register the app group for both App IDs in your Apple
 developer account and enable **App Groups** and **Keychain Sharing** for both targets in Xcode.
 
 Verified: the project builds with the extension, the extension is embedded in `PlugIns/`, links the
