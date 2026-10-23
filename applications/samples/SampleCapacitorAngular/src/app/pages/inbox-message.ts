@@ -39,7 +39,12 @@ import { InboxMessage } from '../acoustic/acoustic-campaign';
             </ion-toolbar>
         </ion-header>
         <ion-content [scrollY]="false">
-            <iframe sandbox="allow-same-origin" [srcdoc]="html()" style="border: 0; width: 100%; height: 100%"></iframe>
+            <iframe
+                sandbox="allow-same-origin"
+                [srcdoc]="html()"
+                (load)="bindActions($event)"
+                style="border: 0; width: 100%; height: 100%"
+            ></iframe>
         </ion-content>
     `,
 })
@@ -76,6 +81,46 @@ export class InboxMessagePage implements OnInit {
                 mailingId: this.message.mailingId,
             },
         });
+    }
+
+    /**
+     * The message is drawn in a sandboxed iframe, so scripts of the message cannot run. The default Inbox screen
+     * of the plugin listens for taps on the action links with jQuery; this page does the same from the outside:
+     * the iframe has the origin of the app (`allow-same-origin`), so a click listener on its document is allowed.
+     */
+    protected bindActions(event: Event) {
+        const frame = event.target as HTMLIFrameElement;
+        frame.contentDocument?.addEventListener('click', (click) => void this.runAction(click));
+    }
+
+    private async runAction(click: Event) {
+        const link = (click.target as Element | null)?.closest('a');
+        if (!link || !this.message) {
+            return;
+        }
+        click.preventDefault();
+        const action = this.actionOf(link);
+        if (action) {
+            try {
+                await this.acoustic.api.executeInboxAction(action, this.id());
+            } catch (error) {
+                console.error('executeInboxAction failed', error);
+            }
+        }
+    }
+
+    /** Template messages carry the action as JSON in `action`; the default template uses `href="actionid:<key>"`. */
+    private actionOf(link: Element): { [key: string]: any } | undefined {
+        const json = link.getAttribute('action');
+        if (json) {
+            try {
+                return JSON.parse(json);
+            } catch {
+                return undefined;
+            }
+        }
+        const key = /^actionid:(.+)$/i.exec(link.getAttribute('href') ?? '')?.[1];
+        return key ? this.message?.['content']?.actions?.[key] : undefined;
     }
 
     protected async delete() {

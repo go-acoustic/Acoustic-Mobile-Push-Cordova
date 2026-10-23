@@ -11,7 +11,7 @@ The Cordova plugins work in a Capacitor app (up to Capacitor 8) through Capacito
 This package has a setup script, `scripts/capacitorSetup.js`, and an optional typed, Promise-based wrapper,
 `capacitor/acoustic-campaign.ts`.
 
-- Guide: https://github.com/go-acoustic/Acoustic-Mobile-Push-Cordova/blob/master/documentation/CAPACITOR.md
+- Guide: https://github.com/go-acoustic/Acoustic-Mobile-Push-Cordova/blob/beta/documentation/CAPACITOR.md
 - Setup script: `node node_modules/<this package>/scripts/capacitorSetup.js --help`
 - Wrapper to copy into your app: `node_modules/<this package>/capacitor/acoustic-campaign.ts`
 

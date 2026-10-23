@@ -363,6 +363,10 @@ AcousticCampaign.setRegisteredActionCallback('myType', (action, payload) => { /*
 - Calls with no result return a Promise that resolves at once. Listeners stay callbacks, because they
   can fire many times.
 - A function of a plugin that is not installed rejects with a message naming the plugin.
+- An app that draws an inbox message itself runs the action links of the message with
+  `executeInboxAction(action, inboxMessageId)`; the SDK performs the action and reports the click event.
+  The links of a template message are `<a action='{json}'>` (or `href="actionid:<key>"`), and the default Inbox
+  screen listens for them with jQuery, which an Ionic/Angular app does not have.
 - Checked: the file compiles with `tsc --strict`, and its calls were run against mocked plugin
   objects. Not run in an app on a device.
 - Not wrapped: inbox and in-app display helpers (`MCEInbox`, `MCEInAppImage` and similar), icon and

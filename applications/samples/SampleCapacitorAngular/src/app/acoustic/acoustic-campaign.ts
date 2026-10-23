@@ -226,6 +226,13 @@ export const AcousticCampaign = {
     deleteInboxMessage: (inboxMessageId: string) =>
         send("MCEInboxPlugin", "deleteMessageId", inboxMessageId),
     clearExpiredInboxMessages: () => send("MCEInboxPlugin", "clearExpiredMessages"),
+    /**
+     * Runs an action of an inbox message, for example `{ type: "url", value: "https://..." }` from the `actions`
+     * of the message. The SDK performs the action and reports the click event. An app that draws the message
+     * itself calls this when the user taps an action link.
+     */
+    executeInboxAction: (action: { [key: string]: any }, inboxMessageId: string) =>
+        send("MCEInboxPlugin", "executeInboxAction", action, inboxMessageId),
     setInboxMessagesUpdateCallback: (cb: (messages: InboxMessage[]) => void) =>
         send("MCEInboxPlugin", "setInboxMessagesUpdateCallback", cb),
 
