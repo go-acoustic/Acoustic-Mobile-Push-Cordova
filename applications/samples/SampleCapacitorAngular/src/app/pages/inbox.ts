@@ -27,6 +27,7 @@ import { addIcons } from 'ionicons';
 import { refreshOutline } from 'ionicons/icons';
 import { AcousticService } from '../acoustic/acoustic.service';
 import { InboxMessage } from '../acoustic/acoustic-campaign';
+import { inboxPreview, inboxSubject } from '../acoustic/inbox-template';
 
 @Component({
     selector: 'app-inbox',
@@ -105,11 +106,11 @@ export class InboxPage implements OnInit {
     }
 
     protected subject(message: InboxMessage): string {
-        return message['content']?.messagePreview?.subject ?? message['subject'] ?? '';
+        return inboxSubject(message);
     }
 
     protected preview(message: InboxMessage): string {
-        return message['content']?.messagePreview?.previewContent ?? message['preview'] ?? '';
+        return inboxPreview(message);
     }
 
     protected date(message: InboxMessage): string {

@@ -9,6 +9,7 @@
  */
 
 import { Component, OnInit, inject, input, signal } from '@angular/core';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import {
     IonBackButton,
     IonButton,
@@ -24,6 +25,7 @@ import { addIcons } from 'ionicons';
 import { trashOutline } from 'ionicons/icons';
 import { AcousticService } from '../acoustic/acoustic.service';
 import { InboxMessage } from '../acoustic/acoustic-campaign';
+import { inboxHtml, inboxSubject } from '../acoustic/inbox-template';
 
 @Component({
     selector: 'app-inbox-message',
@@ -51,9 +53,10 @@ import { InboxMessage } from '../acoustic/acoustic-campaign';
 export class InboxMessagePage implements OnInit {
     private readonly acoustic = inject(AcousticService);
     private readonly nav = inject(NavController);
+    private readonly sanitizer = inject(DomSanitizer);
     /** Bound from the route parameter `:id`. */
     readonly id = input.required<string>();
-    protected readonly html = signal('');
+    protected readonly html = signal<SafeHtml>('');
     protected readonly title = signal('');
     private message?: InboxMessage;
 
@@ -67,8 +70,10 @@ export class InboxMessagePage implements OnInit {
         }
         const api = this.acoustic.api;
         this.message = await api.fetchInboxMessageId(this.id());
-        this.title.set(this.message['content']?.messagePreview?.subject ?? '');
-        this.html.set(this.message['content']?.messageDetails?.richContent ?? '');
+        this.title.set(inboxSubject(this.message));
+        // Angular would clean the markup bound to [srcdoc] and drop the style and the action attributes of the links.
+        // The frame is sandboxed without scripts, so the markup cannot run code, and the template text is escaped.
+        this.html.set(this.sanitizer.bypassSecurityTrustHtml(inboxHtml(this.message)));
         await api.readInboxMessage(this.id());
         await api.queueAddEvent({
             type: 'inbox',
