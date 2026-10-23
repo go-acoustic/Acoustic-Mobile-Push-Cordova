@@ -31,7 +31,7 @@ task clean(type: Delete) {
 // acoustic-mobile-push: version properties
 allprojects {
     project.ext {
-        mobilePushVersion = "3.10.126"
+        mobilePushVersion = "3.11.3"
         androidxLibVersion = "1.6.0"
         playServicesBaseVersion = "18.3.0"
         playServicesLocationVersion = "21.0.1"

@@ -23,7 +23,7 @@ const { spawnSync } = require('child_process');
 
 // Keep in sync with the version block in installPlugins.js
 const ANDROID_VERSIONS = {
-	mobilePushVersion: '3.10.126',
+	mobilePushVersion: '3.11.3',
 	androidxLibVersion: '1.6.0',
 	playServicesBaseVersion: '18.3.0',
 	playServicesLocationVersion: '21.0.1',
@@ -320,7 +320,7 @@ function setupNotificationService(opts, appDir, target, projectFile) {
 	const podfile = path.join(appDir, 'Podfile');
 	const podText = readOr(podfile, '');
 	if (podText && !/target 'NotificationService'/.test(podText)) {
-		const block = "\ntarget 'NotificationService' do\n  pod 'AcousticMobilePushNotificationDebug'\n  pod 'AcousticMobilePushDebug'\nend\n";
+		const block = "\ntarget 'NotificationService' do\n  pod 'AcousticMobilePushNotificationDebug', '3.10.12'\n  pod 'AcousticMobilePushDebug', '3.10.12'\nend\n";
 		const updated = podText.includes('post_install') ? podText.replace(/\npost_install/, `${block}\npost_install`) : podText + block;
 		writeIfChanged(opts, podfile, updated, 'ios', 'Podfile (NotificationService pods; use the non-Debug pods for release)');
 	} else if (podText) {

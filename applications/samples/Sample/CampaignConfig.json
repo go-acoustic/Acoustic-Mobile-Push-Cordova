@@ -1,10 +1,10 @@
 {
   "Please note": "<true/false>, for native SDK build.  True for release build, false for beta build",
   "useRelease": false,
-  "iOS Version": "<x.xx.xxx>, native iOS SDK version, empty value will retrieve lastest version",
-  "iOSVersion": "",
+  "iOS Version": "<x.xx.xxx>, native iOS SDK version. Pinned to the validated version; empty value will retrieve the latest version.",
+  "iOSVersion": "3.10.12",
   "Android Version": "<x.xx.xxx>, native Android SDK version. Pinned to the validated version; empty value will retrieve the latest version.",
-  "androidVersion": "3.10.126",
+  "androidVersion": "3.11.3",
   "Add Google Services to Android": "<true/false>",
   "addGoogleServicesToAndroid": true,
   "com.google.gms:google-services version used": "<x.xx.xxx>",

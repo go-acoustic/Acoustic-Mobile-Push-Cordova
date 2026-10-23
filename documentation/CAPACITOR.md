@@ -14,7 +14,7 @@ to the native projects by hand. This guide lists them.
 | Android | JDK 21, Android Gradle plugin 8.13, `compileSdk` 36, emulator API 36 |
 | iOS | Xcode 26.5, iOS simulator, **CocoaPods** package manager |
 | Plugins | `cordova-acoustic-mobile-push`, `-plugin-inapp`, `-plugin-inbox`, `-plugin-location`, `-plugin-geofence`, `-plugin-beacon`, `-plugin-snooze`, `-plugin-calendar`, `-plugin-displayweb` (3.9.148); `-plugin-passbook` and `-plugin-action-menu` (iOS only) |
-| Native SDKs | Android 3.10.126, iOS `AcousticMobilePushDebug` 3.10.10 |
+| Native SDKs | Android 3.11.3, iOS `AcousticMobilePushDebug` 3.10.12 |
 
 Verified on an Angular 20 / Ionic 8 sample app: the app builds, the SDK starts, the device registers
 with the Campaign server and receives a push token on both platforms. On the iOS simulator a push
@@ -120,7 +120,7 @@ Cordova hooks normally write into `platforms/android/build.gradle`. Add them to
 ```groovy
 allprojects {
     project.ext {
-        mobilePushVersion = "3.10.126"
+        mobilePushVersion = "3.11.3"
         androidxLibVersion = "1.6.0"
         playServicesBaseVersion = "18.3.0"
         playServicesLocationVersion = "21.0.1"
