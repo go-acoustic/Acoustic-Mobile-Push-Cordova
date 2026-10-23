@@ -45,3 +45,11 @@
     width: 100%;
     height: 40vh;
 }
+
+// In-app banners. The plugin puts them at top: 0 or bottom: 0 of the WebView and on iOS pads them with the safe area
+// it reports. On Android 15 and later the app is drawn behind the system bars (edge-to-edge) and the plugin reports
+// no inset, so the top banner sits under the status bar, where taps do not reach the page. Keep them clear of the bars.
+.plt-android .bannerInApp {
+    margin-top: env(safe-area-inset-top);
+    margin-bottom: env(safe-area-inset-bottom);
+}
