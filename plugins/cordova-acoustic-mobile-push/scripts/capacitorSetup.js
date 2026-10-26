@@ -352,6 +352,40 @@ function setupNotificationService(opts, appDir, target, projectFile) {
 	return true;
 }
 
+// CocoaPods sources. CocoaPods trunk becomes read-only on 2 December 2026 and receives no later
+// versions of the Acoustic pods; they are published to the Acoustic spec repo instead. A pod
+// cannot name its source, so the app's Podfile lists the repo, ahead of the CocoaPods CDN.
+// Declaring any source disables the implicit CDN default, so the CDN is added when the Podfile
+// declares none. CocoaPods merges versions across sources, so versions that exist only on trunk
+// still resolve. `npx cap sync` rewrites only the capacitor_pods block, so the lines stay.
+const PODSPECS_SOURCE = "source 'https://github.com/go-acoustic/PodSpecs.git'";
+const CDN_SOURCE = "source 'https://cdn.cocoapods.org/'";
+
+function podfileWithSources(podText) {
+	if (podText.includes(PODSPECS_SOURCE)) {
+		return podText;
+	}
+	// Directly before the first source the app already declares
+	const firstSource = podText.match(/^[ \t]*source[ \t]+['"].*\n/m);
+	if (firstSource) {
+		return podText.replace(firstSource[0], `${PODSPECS_SOURCE}\n${firstSource[0]}`);
+	}
+	// Otherwise both sources, after the require_relative line Capacitor generates, or at the top
+	const block = `${PODSPECS_SOURCE}\n${CDN_SOURCE}\n`;
+	const require = podText.match(/^require_relative .*\n/m);
+	return require ? podText.replace(require[0], `${require[0]}\n${block}`) : `${block}\n${podText}`;
+}
+
+function setupPodSources(opts, appDir) {
+	const podfile = path.join(appDir, 'Podfile');
+	const podText = readOr(podfile, '');
+	if (!podText) {
+		log('ios', 'warning  Podfile not found (run "npx cap add ios --packagemanager CocoaPods")');
+		return;
+	}
+	writeIfChanged(opts, podfile, podfileWithSources(podText), 'ios', 'Podfile (go-acoustic/PodSpecs source)');
+}
+
 function setupIos(opts) {
 	const appDir = path.join(opts.project, 'ios/App');
 	if (!fs.existsSync(appDir)) {
@@ -425,7 +459,10 @@ function setupIos(opts) {
 	}
 	updatePlist(opts, plistFile, modes, strings);
 
-	// 3. Notification Service Extension files, then the Xcode project
+	// 3. CocoaPods sources
+	setupPodSources(opts, appDir);
+
+	// 4. Notification Service Extension files, then the Xcode project
 	const withExtension = plugins.includes('ios-notification-service') && setupNotificationService(opts, appDir, target, projectFile);
 	if (opts.dryRun) {
 		log('ios', 'skipped  Xcode project update (dry run)');

@@ -125,7 +125,7 @@ function managePlugins(currentAppWorkingDirectory, pluginPath, configData) {
 			updateConfigXMLPreference(currentAppWorkingDirectory, "iOSAppkey", configData.iOS.appKey.dev);
 			updateConfigXMLPreference(currentAppWorkingDirectory, "iOSProdkey", configData.iOS.appKey.prod);
 			updateConfigXMLPreference(currentAppWorkingDirectory, "serverUrl", configData.iOS.baseUrl);
-			updateConfigXMLPreference(currentAppWorkingDirectory, "logLevel", configData.iOS.logLevel);
+			updateConfigXMLPreference(currentAppWorkingDirectory, "logLevel", configData.iOS.loglevel);
 			updatePluginXMLPodName(packagePluginPath, configData.plugins.useRelease, configData);
 		}
 
@@ -134,15 +134,20 @@ function managePlugins(currentAppWorkingDirectory, pluginPath, configData) {
 			updateBuildExtrasGradle(packagePluginPath, configData);
 			addGoogleServices(currentAppWorkingDirectory, configData);
 			updateBuildGradleMobilePushVersion(currentAppWorkingDirectory, configData);
+		}
 
+		// Add the base plugin. This is needed for every platform: a project with only iOS used to get all the other
+		// plugins but not this one.
+		if (hasIosPlatform(currentAppWorkingDirectory) || hasAndroidPlatform(currentAppWorkingDirectory)) {
+			const hasIos       = hasIosPlatform(currentAppWorkingDirectory);
 			customAction       = configData.customAction;
-			androidAppkey      = configData.android.appKey.prod;
+			// ANDROID_APPKEY is a required variable of the plugin, also when the project has no Android platform.
+			androidAppkey      = configData.android.appKey.prod || (hasAndroidPlatform(currentAppWorkingDirectory) ? "" : "NOT_USED");
 			iOSAppkey          = configData.iOS.appKey.dev;
 			iOSProdkey         = configData.iOS.appKey.prod;
 			// SERVER_URL and LOGLEVEL are one variable for both platforms and are read from the iOS section. A project
 			// with only the Android platform does not use that section, so it would keep the placeholder base URL
 			// and the iOS log level there.
-			const hasIos       = hasIosPlatform(currentAppWorkingDirectory);
 			serverUrl          = hasIos ? configData.iOS.baseUrl : configData.android.baseUrl;
 			logLevel           = hasIos ? configData.iOS.loglevel : (configData.android.loglevel || configData.iOS.loglevel);
 			mceCanSyncOverride = configData.mceCanSyncOverride;
@@ -150,7 +155,7 @@ function managePlugins(currentAppWorkingDirectory, pluginPath, configData) {
 			execSync(`cd "${currentAppWorkingDirectory}" && cordova plugin add ${pluginName} --variable CUSTOM_ACTIONS="${customAction}" --variable ANDROID_APPKEY="${androidAppkey}" --variable IOS_DEV_APPKEY="${iOSAppkey}" --variable IOS_PROD_APPKEY="${iOSProdkey}" --variable SERVER_URL="${serverUrl}" --variable LOGLEVEL="${logLevel}" --variable MCE_CAN_SYNC_OVERRIDE="${mceCanSyncOverride}" --force`, { stdio: 'inherit', cwd: process.cwd() });
 		}
 	} catch (error) {
-		console.error(`Failed to manage plugin ${plugin}:`, error);
+		console.error(`Failed to manage plugin ${pluginName}:`, error);
 	} finally {
 		if (!hasIosPlatform(currentAppWorkingDirectory) && !hasAndroidPlatform(currentAppWorkingDirectory)) {
 			logMessageError(`Error not installing any additional plugin until you add a platform iOS or Android.`);
@@ -284,9 +289,10 @@ function updateMceConfig(currentAppWorkingDirectory, pluginPath, configData) {
  * @param {*} platform Use 'android' or 'ios'.
  */
 function updateMceConfigHelper(currentAppWorkingDirectory, pluginPath, configData, platform) {
+	let mceConfigPath;
 	try {
 		// Read the file synchronously
-		const mceConfigPath = path.join(pluginPath, `postinstall/${platform}/MceConfig.json`);
+		mceConfigPath = path.join(pluginPath, `postinstall/${platform}/MceConfig.json`);
 		const fileData = fs.readFileSync(mceConfigPath, 'utf8');
 	  const jsonData = JSON.parse(fileData);
 	  
@@ -319,7 +325,7 @@ function updateMceConfigHelper(currentAppWorkingDirectory, pluginPath, configDat
 		logMessageTitle('Update values in config.xml');
 		const mainConfigXMLData = readXMLToJson(`${currentAppWorkingDirectory}/config.xml`);
 		if (platform == 'ios' && jsonData) {
-			const appConfigPath = `${currentAppWorkingDirectory}/platforms/ios/${mainConfigXMLData.widget.name[0]}/config.xml`;
+			const appConfigPath = iosAppConfigPath(currentAppWorkingDirectory, mainConfigXMLData.widget.name[0]);
 			var xmlData = readXMLToJson(appConfigPath);
 			// update file
 			for (let i = 0; i < xmlData.widget.preference.length; i++) {
@@ -408,6 +414,22 @@ function runExecSync(cmdToRun) {
 }
 
 /**
+ * Path of the config.xml of the iOS app inside the Cordova project. cordova-ios 8 names the app folder "App";
+ * older versions use the app name of config.xml.
+ *
+ * @param {*} currentAppWorkingDirectory Current application directory.
+ * @param {*} appName Name of the app in config.xml.
+ * @returns Absolute path of platforms/ios/<folder>/config.xml.
+ */
+function iosAppConfigPath(currentAppWorkingDirectory, appName) {
+	const folderApp = path.join(currentAppWorkingDirectory, 'platforms/ios/App/config.xml');
+	if (fs.existsSync(folderApp)) {
+		return folderApp;
+	}
+	return path.join(currentAppWorkingDirectory, `platforms/ios/${appName}/config.xml`);
+}
+
+/**
  * Used to update preference values in config.xml file.
  * 
  * @param {*} currentAppWorkingDirectory Current application directory where cordova plugin add or npm install is being ran.
@@ -415,11 +437,11 @@ function runExecSync(cmdToRun) {
  * @param {*} val Value in xml.
  */
 function updateConfigXMLPreference(currentAppWorkingDirectory, nam, val) {
+	let configPath;
 	try {
 		const mainConfigXMLData = readXMLToJson(`${currentAppWorkingDirectory}/config.xml`);
 		let appName = mainConfigXMLData.widget.name[0];
-		let configPathEnd = (`platforms/ios/${appName}/config.xml`);
-		let configPath = path.join(currentAppWorkingDirectory, configPathEnd);
+		configPath = iosAppConfigPath(currentAppWorkingDirectory, appName);
 		let configContent = fs.readFileSync(configPath, 'utf8');
 		const preferenceToAdd = `<preference name="${nam}" value="${val}" />`;
 		const regx = new RegExp(`\\<preference\\s*name="` + nam + `"\\s*value="[\\w\\s\\d\\:\\/\\-\\.]*"\\s*/>`, 'gi');

@@ -52,7 +52,7 @@
         <resource-file src="res/android/values-night/mce-sample-styles.xml" target="/app/src/main/res/values-night/mce-sample-styles.xml" />
     </platform>
     <platform name="ios">
-        <preference name="deployment-target" value="13.0" />
+        <preference name="deployment-target" value="15.1" />
         <preference name="AllowInlineMediaPlayback" value="true"/>
         <preference name="EnableViewportScale" value="true" />
         <splash src="res/ios/Default@2x~iphone~anyany.png" />

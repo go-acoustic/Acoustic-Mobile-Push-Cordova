@@ -54,6 +54,21 @@ npx cap sync
 Use CocoaPods for iOS. The Cordova plugins declare the Acoustic SDK as a CocoaPod, and Capacitor 8
 creates Swift Package Manager projects by default.
 
+### CocoaPods sources
+
+CocoaPods trunk becomes read-only on 2 December 2026 and receives no later versions of the Acoustic
+pods. New versions are published to the Acoustic spec repo, so `ios/App/Podfile` lists it ahead of
+the CocoaPods CDN:
+
+```ruby
+source 'https://github.com/go-acoustic/PodSpecs.git'
+source 'https://cdn.cocoapods.org/'
+```
+
+`scripts/capacitorSetup.js` adds these lines. Keep the CDN line: declaring any source turns off the
+CocoaPods default, and the other pods resolve from it. `npx cap sync` rewrites only the
+`capacitor_pods` block, so the lines stay.
+
 SPM does not work with these plugins as they are. Checked with Capacitor 8.5 and Xcode 26:
 
 - Capacitor generates one `Package.swift` per plugin from `plugin.xml`. It ignores the `<pod>`
@@ -93,7 +108,8 @@ the Xcode project with the `xcodeproj` Ruby gem, which CocoaPods installs.
 
 It does: Gradle version properties and the release resource check, `appkey`/`senderid`, the manifest
 (application class, server, log level), R8 rules, `MceConfig.json` and `App.entitlements` added to
-the App target, `UIBackgroundModes`, and `ios.handleApplicationNotifications: false` in
+the App target, `UIBackgroundModes`, the Acoustic spec repo as a `Podfile` source (see
+[CocoaPods sources](#cocoapods-sources)), and `ios.handleApplicationNotifications: false` in
 `capacitor.config`. It also reads `package.json` for the plugins you installed: for location,
 geofence or beacon it adds the `location` section to `MceConfig.json`, the location usage strings
 and the `fetch`, `location` and Bluetooth background modes to `Info.plist` (pass
