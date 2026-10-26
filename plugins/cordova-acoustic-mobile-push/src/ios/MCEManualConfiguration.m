@@ -67,6 +67,14 @@
 
     NSMutableDictionary * config = [@{@"invalidateExistingUser":invalidateExistingUser, @"autoReinitialize": autoReinitialize, @"loglevel":loglevel,@"baseUrl":baseUrl, @"appKey":@{ @"prod":prodAppKey, @"dev":devAppKey}, @"autoInitialize":autoInitialize, @"location": [NSMutableDictionary dictionary] } mutableCopy];
 
+    // App group shared with the Notification Service Extension. Optional: without it the SDK takes the group from the
+    // provisioning profile, which a simulator build does not have.
+    NSString * appGroup = [self settingForKey:@"appGroup"];
+    if([appGroup isKindOfClass:[NSString class]] && appGroup.length > 0)
+    {
+        config[@"appGroup"] = appGroup;
+    }
+
     if([self settingForKey:@"geofence"] && [[self settingForKey:@"geofence"] caseInsensitiveCompare: @"true"] == NSOrderedSame)
     {
         config[@"location"][@"geofence"] = [NSMutableDictionary dictionary];

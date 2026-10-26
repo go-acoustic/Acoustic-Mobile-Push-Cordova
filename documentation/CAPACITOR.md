@@ -319,6 +319,9 @@ When that plugin is in `package.json`, `capacitorSetup.js` does the Xcode work f
   `-ObjC`, same deployment target) and embeds it in the app;
 - writes `NotificationService.h/.m` (an empty subclass of `MCENotificationService`, as in
   Acoustic's sample app), `Info.plist` and `NotificationService.entitlements`;
+- adds `MceConfig.json` to the extension target too. The SDK reads the app key from the config of the
+  bundle it runs in; without it the extension crashes on every push and no `push/received` event is
+  reported. Running the script again repairs a project made before this;
 - adds the app group `group.<app id>` and the keychain group `$(AppIdentifierPrefix)<app id>` to
   both `App.entitlements` and the extension entitlements. The SDK shares its data between the app
   and the extension through them;

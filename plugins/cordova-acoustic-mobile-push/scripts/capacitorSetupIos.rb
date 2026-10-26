@@ -8,6 +8,7 @@
 
 # Called by capacitorSetup.js: adds MceConfig.json and App.entitlements to the App target
 # of a Capacitor iOS project and points CODE_SIGN_ENTITLEMENTS at the entitlements file.
+# With --notification-service it also creates the NotificationService target and gives it MceConfig.json.
 require 'xcodeproj'
 
 project = Xcodeproj::Project.open(ARGV[0])
@@ -80,6 +81,16 @@ if ARGV[1] == '--notification-service'
     build_file.settings = { 'ATTRIBUTES' => ['RemoveHeadersOnCopy'] }
     target.add_dependency(ext)
     puts 'updated  App.xcodeproj (NotificationService target created and embedded)'
+  end
+
+  # The SDK reads the app key from the MceConfig.json of the bundle it runs in. Without it in the extension the
+  # SDK has no keychain service, and the extension crashes on every push. Also repairs an extension made earlier.
+  extension = project.targets.find { |t| t.name == ext_name } or abort('target NotificationService not found')
+  if extension.resources_build_phase.files_references.include?(config)
+    puts 'ok       App.xcodeproj (MceConfig.json in the NotificationService Resources)'
+  else
+    extension.resources_build_phase.add_file_reference(config)
+    puts 'updated  App.xcodeproj (MceConfig.json in the NotificationService Resources)'
   end
 end
 
