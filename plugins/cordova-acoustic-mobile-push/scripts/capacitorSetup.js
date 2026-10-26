@@ -376,6 +376,30 @@ function podfileWithSources(podText) {
 	return require ? podText.replace(require[0], `${require[0]}\n${block}`) : `${block}\n${podText}`;
 }
 
+// `pod install` stops when Podfile.lock holds another version of an Acoustic pod than the Podfile pins. This happens
+// in the usual order: the first `npx cap sync` resolves the unpinned pod of the Cordova plugin to the latest version,
+// then this script pins the Notification Service pods to the validated one. Only a pod update clears it, and `pod
+// install` then fails with "could not find compatible versions", so say so here.
+function warnStalePodLock(opts, appDir) {
+	const iosVersion = nativeSdkVersions(opts).ios;
+	const lock = readOr(path.join(appDir, 'Podfile.lock'), '');
+	if (!iosVersion || !lock) {
+		return;
+	}
+	const stale = [];
+	const entry = /^  - (AcousticMobilePush(?:Notification)?(?:Debug)?) \(([^)=][^)]*)\)/gm;
+	let match;
+	while ((match = entry.exec(lock)) !== null) {
+		if (match[2] !== iosVersion) {
+			stale.push(`${match[1]} ${match[2]}`);
+		}
+	}
+	if (stale.length > 0) {
+		const pods = [...new Set(stale.map(s => s.split(' ')[0]))];
+		log('ios', `warning  Podfile.lock holds ${stale.join(', ')} but iOSVersion is ${iosVersion}: run "pod update ${pods.join(' ')}" in ios/App, otherwise "pod install" stops on the conflict`);
+	}
+}
+
 function setupPodSources(opts, appDir) {
 	const podfile = path.join(appDir, 'Podfile');
 	const podText = readOr(podfile, '');
@@ -478,6 +502,7 @@ function setupIos(opts) {
 		}
 	}
 
+	warnStalePodLock(opts, appDir);
 	setupCapacitorConfig(opts);
 }
 

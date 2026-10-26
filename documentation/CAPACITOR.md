@@ -343,7 +343,11 @@ When that plugin is in `package.json`, `capacitorSetup.js` does the Xcode work f
   and the extension through them;
 - adds a `target 'NotificationService'` block with `AcousticMobilePushNotificationDebug` and
   `AcousticMobilePushDebug` to the Podfile, both pinned to the same native iOS SDK version as the app
-  (see the table at the top). Run `npx cap sync` afterwards.
+  (see the table at the top). Then run `pod update AcousticMobilePushNotificationDebug AcousticMobilePushDebug` in
+  `ios/App`, not only `npx cap sync` or `pod install`: the first `npx cap sync` has already locked the Notification
+  pod of the Cordova plugin at the latest version in `Podfile.lock`, and `pod install` stops with "could not find
+  compatible versions" while the lock and the pin differ. The script prints a warning with this command when it finds
+  such a lock.
 
 For a release build switch both pods in the Podfile to the non-Debug names
 (`AcousticMobilePushNotification`, `AcousticMobilePush`) and keep the version. The pod versions of
@@ -408,7 +412,8 @@ To try another version without editing files:
 
 - Android: `./gradlew -PmobilePushVersion=<version> ...` (or `mobilePushVersion=<version>` in
   `gradle.properties`);
-- iOS: `ACOUSTIC_IOS_SDK_VERSION=<version> pod update AcousticMobilePushDebug` in `ios/App`.
+- iOS: `ACOUSTIC_IOS_SDK_VERSION=<version> pod update AcousticMobilePushDebug AcousticMobilePushNotificationDebug`
+  in `ios/App` (the second pod is only in the lock when the Notification Service Extension is set up).
 
 `scripts/capacitorSetup.js` takes the versions it writes (the Android version property and the Notification
 Service pods) from `androidVersion` and `iOSVersion` of the `CampaignConfig.json` in your project, as
@@ -417,7 +422,8 @@ the Cordova hooks do. An empty value means the latest version (Android `+`, iOS 
 To move every pin of the repository (plugins, samples, this table) to one version, run
 `node scripts/updateNativeSdkVersions.js --android <version|latest> --ios <version|latest>`
 (add `--dry-run` to only list the changes), then run `pod update AcousticMobilePushDebug` in the
-`ios/App` folder of the Capacitor samples to refresh `Podfile.lock`.
+`ios/App` folder of the Capacitor samples to refresh `Podfile.lock` (add `AcousticMobilePushNotificationDebug` for a
+project with the Notification Service Extension).
 
 ## Known limitations
 
