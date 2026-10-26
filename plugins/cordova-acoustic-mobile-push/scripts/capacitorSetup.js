@@ -21,9 +21,13 @@ const fs = require('fs');
 const path = require('path');
 const { spawnSync } = require('child_process');
 
+// The native SDK versions come from CampaignConfig.json (see nativeSdkVersions below);
+// the values here are used only when no CampaignConfig.json can be read.
+const DEFAULT_NATIVE_SDK = { android: '3.11.3', ios: '3.10.12' };
+
 // Keep in sync with the version block in installPlugins.js
 const ANDROID_VERSIONS = {
-	mobilePushVersion: '3.11.3',
+	mobilePushVersion: DEFAULT_NATIVE_SDK.android,
 	androidxLibVersion: '1.6.0',
 	playServicesBaseVersion: '18.3.0',
 	playServicesLocationVersion: '21.0.1',
@@ -49,6 +53,22 @@ const FLAGS = {
 	'--project': 'project', '--server-url': 'serverUrl', '--android-app-key': 'androidAppKey',
 	'--ios-dev-key': 'iosDevKey', '--ios-prod-key': 'iosProdKey', '--log-level': 'logLevel'
 };
+
+// Native SDK versions: androidVersion and iOSVersion of the CampaignConfig.json in the project
+// (the one the plugin copies there), else of the one shipped with the plugin, else DEFAULT_NATIVE_SDK.
+// An empty value in the file means "latest": Android "+", iOS no version in the Podfile.
+function nativeSdkVersions(opts) {
+	const candidates = [path.join(opts.project, 'CampaignConfig.json'), path.join(__dirname, '..', 'CampaignConfig.json')];
+	for (const file of candidates) {
+		try {
+			const config = JSON.parse(fs.readFileSync(file, 'utf8'));
+			return { android: config.androidVersion || '+', ios: config.iOSVersion || '' };
+		} catch (e) {
+			// not there or not valid JSON: try the next one
+		}
+	}
+	return { ...DEFAULT_NATIVE_SDK };
+}
 
 function parseArgs(argv) {
 	const opts = { project: process.cwd(), logLevel: 'error', dryRun: false };
@@ -110,7 +130,8 @@ function setupAndroid(opts) {
 	const gradleFile = path.join(root, 'build.gradle');
 	let gradle = readOr(gradleFile, '');
 	if (!gradle.includes(MARK_EXT) && !/mobilePushVersion\s*=/.test(gradle)) {
-		const props = Object.keys(ANDROID_VERSIONS).map(k => `        ${k} = "${ANDROID_VERSIONS[k]}"`).join('\n');
+		const versions = { ...ANDROID_VERSIONS, mobilePushVersion: nativeSdkVersions(opts).android };
+		const props = Object.keys(versions).map(k => `        ${k} = "${versions[k]}"`).join('\n');
 		gradle += `\n${MARK_EXT}\nallprojects {\n    project.ext {\n${props}\n    }\n}\n`;
 	}
 	if (!gradle.includes(MARK_VERIFY)) {
@@ -320,7 +341,9 @@ function setupNotificationService(opts, appDir, target, projectFile) {
 	const podfile = path.join(appDir, 'Podfile');
 	const podText = readOr(podfile, '');
 	if (podText && !/target 'NotificationService'/.test(podText)) {
-		const block = "\ntarget 'NotificationService' do\n  pod 'AcousticMobilePushNotificationDebug', '3.10.12'\n  pod 'AcousticMobilePushDebug', '3.10.12'\nend\n";
+		const iosVersion = nativeSdkVersions(opts).ios;
+		const podVersion = iosVersion ? `, '${iosVersion}'` : '';
+		const block = `\ntarget 'NotificationService' do\n  pod 'AcousticMobilePushNotificationDebug'${podVersion}\n  pod 'AcousticMobilePushDebug'${podVersion}\nend\n`;
 		const updated = podText.includes('post_install') ? podText.replace(/\npost_install/, `${block}\npost_install`) : podText + block;
 		writeIfChanged(opts, podfile, updated, 'ios', 'Podfile (NotificationService pods; use the non-Debug pods for release)');
 	} else if (podText) {

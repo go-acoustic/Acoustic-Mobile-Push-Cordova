@@ -53,7 +53,7 @@ function readAndSaveMceConfig(currentAppWorkingDirectory, pluginPath, campaignCo
 	try {
 	  if (campaignConfigFile.android && campaignConfigFile.iOS) {
 			if (campaignConfigFile.android && hasAndroidPlatform(currentAppWorkingDirectory)) {
-				addGradlePropertiesToApp(currentAppWorkingDirectory);
+				addGradlePropertiesToApp(currentAppWorkingDirectory, campaignConfigFile);
 
 				const androidConfig = JSON.stringify(campaignConfigFile.android, null, 2);
 				const androidDestinationPath = path.join(pluginPath, 'postinstall/android/MceConfig.json');
@@ -581,12 +581,14 @@ function getInstallDirectory() {
  * Used to add default versions used for plugins in gradle.build.
  * 
  * @param {*} appPath Path of the application being integrated.
+ * @param {*} configData CampaignConfig.json file data, the source of the native Android SDK version.
  */
-function addGradlePropertiesToApp(appPath) {
+function addGradlePropertiesToApp(appPath, configData) {
 	try {
 		let appGradlePath = path.join(appPath, "platforms/android/build.gradle");
 		let gradleContent = fs.readFileSync(appGradlePath, 'utf8');
 		const mobilePushVersionRegex = /mobilePushVersion/;
+		const mobilePushVersion = (configData && configData.androidVersion) || "+";
 
 		const libraryVersions = 
 `allprojects {
@@ -594,7 +596,7 @@ function addGradlePropertiesToApp(appPath) {
 	project.ext {
 		// The following are only a few examples of the types of properties you can define.
 		// Sdk and tools
-		mobilePushVersion = "3.11.3"
+		mobilePushVersion = "${mobilePushVersion}"
 		androidxLibVersion = "1.6.0"
 		playServicesBaseVersion = "18.3.0"
 		playServicesLocationVersion = "21.0.1"

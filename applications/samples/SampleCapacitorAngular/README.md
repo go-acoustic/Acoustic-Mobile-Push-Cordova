@@ -49,7 +49,8 @@ node node_modules/cordova-acoustic-mobile-push-beta/scripts/capacitorSetup.js \
   `MCEInboxPlugin`. The plugin wires its default screen only when jQuery Mobile is present.
 - The message page draws the message in a sandboxed iframe and forwards taps on its action links to
   `executeInboxAction`, as the default screen does with jQuery. Without it the links do nothing and no click event is
-  reported.
+  reported. The frame is sandboxed with `allow-scripts` (iOS does not deliver the taps to the page otherwise) and the
+  message starts with a content security policy that blocks its scripts.
 - The geofences screen lists the geofences around the device. The other samples also draw them on a Google map, which
   needs a Google Maps API key.
 - The in-app templates are drawn by the plugin with jQuery on top of the Ionic pages. They need `jquery` in `scripts` and

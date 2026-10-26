@@ -18,8 +18,9 @@ end
 target 'App' do
   capacitor_pods
   # Add your Pods here
-  # The native iOS SDK is pinned to the validated version (the plugins ask for the latest)
-  pod 'AcousticMobilePushDebug', '3.10.12'
+  # The native iOS SDK is pinned to the validated version (the plugins ask for the latest).
+  # ACOUSTIC_IOS_SDK_VERSION=<version> overrides it (for example in an e2e run)
+  pod 'AcousticMobilePushDebug', ENV['ACOUSTIC_IOS_SDK_VERSION'] || '3.10.12'
 end
 
 post_install do |installer|

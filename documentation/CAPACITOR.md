@@ -382,6 +382,24 @@ AcousticCampaign.setRegisteredActionCallback('myType', (action, payload) => { /*
 - Not wrapped: inbox and in-app display helpers (`MCEInbox`, `MCEInAppImage` and similar), icon and
   sound setters (Android), `setCategoryCallbacks`, `registerInAppTemplate`, `executeInAppRule`.
 
+## Changing the native SDK versions
+
+The versions in the table at the top are the validated ones and are pinned in the Capacitor samples.
+To try another version without editing files:
+
+- Android: `./gradlew -PmobilePushVersion=<version> ...` (or `mobilePushVersion=<version>` in
+  `gradle.properties`);
+- iOS: `ACOUSTIC_IOS_SDK_VERSION=<version> pod update AcousticMobilePushDebug` in `ios/App`.
+
+`scripts/capacitorSetup.js` takes the versions it writes (the Android version property and the Notification
+Service pods) from `androidVersion` and `iOSVersion` of the `CampaignConfig.json` in your project, as
+the Cordova hooks do. An empty value means the latest version (Android `+`, iOS no version in the Podfile).
+
+To move every pin of the repository (plugins, samples, this table) to one version, run
+`node scripts/updateNativeSdkVersions.js --android <version|latest> --ios <version|latest>`
+(add `--dry-run` to only list the changes), then run `pod update AcousticMobilePushDebug` in the
+`ios/App` folder of the Capacitor samples to refresh `Podfile.lock`.
+
 ## Known limitations
 
 - iOS works with CocoaPods only (see section 1).

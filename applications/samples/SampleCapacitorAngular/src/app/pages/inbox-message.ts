@@ -27,6 +27,10 @@ import { AcousticService } from '../acoustic/acoustic.service';
 import { InboxMessage } from '../acoustic/acoustic-campaign';
 import { inboxHtml, inboxSubject } from '../acoustic/inbox-template';
 
+/** Content security policy put in front of every message: no script of the message can run. */
+const NO_SCRIPTS =
+    '<meta http-equiv="Content-Security-Policy" content="script-src \'none\'; object-src \'none\'; base-uri \'none\'; form-action \'none\'">';
+
 @Component({
     selector: 'app-inbox-message',
     imports: [IonBackButton, IonButton, IonButtons, IonContent, IonHeader, IonIcon, IonTitle, IonToolbar],
@@ -42,7 +46,7 @@ import { inboxHtml, inboxSubject } from '../acoustic/inbox-template';
         </ion-header>
         <ion-content [scrollY]="false">
             <iframe
-                sandbox="allow-same-origin"
+                sandbox="allow-same-origin allow-scripts"
                 [srcdoc]="html()"
                 (load)="bindActions($event)"
                 style="border: 0; width: 100%; height: 100%"
@@ -72,8 +76,9 @@ export class InboxMessagePage implements OnInit {
         this.message = await api.fetchInboxMessageId(this.id());
         this.title.set(inboxSubject(this.message));
         // Angular would clean the markup bound to [srcdoc] and drop the style and the action attributes of the links.
-        // The frame is sandboxed without scripts, so the markup cannot run code, and the template text is escaped.
-        this.html.set(this.sanitizer.bypassSecurityTrustHtml(inboxHtml(this.message)));
+        // The markup cannot run code: the policy in front of it forbids scripts (including inline handlers) and the
+        // template text is escaped. The frame still has `allow-scripts`, see bindActions.
+        this.html.set(this.sanitizer.bypassSecurityTrustHtml(NO_SCRIPTS + inboxHtml(this.message)));
         await api.readInboxMessage(this.id());
         await api.queueAddEvent({
             type: 'inbox',
@@ -89,9 +94,13 @@ export class InboxMessagePage implements OnInit {
     }
 
     /**
-     * The message is drawn in a sandboxed iframe, so scripts of the message cannot run. The default Inbox screen
-     * of the plugin listens for taps on the action links with jQuery; this page does the same from the outside:
-     * the iframe has the origin of the app (`allow-same-origin`), so a click listener on its document is allowed.
+     * The message is drawn in a sandboxed iframe. The default Inbox screen of the plugin listens for taps on the action
+     * links with jQuery; this page does the same from the outside: the iframe has the origin of the app
+     * (`allow-same-origin`), so a click listener on its document is allowed.
+     *
+     * The sandbox has `allow-scripts` although the message must not run scripts: on iOS WebKit does not deliver events
+     * of a frame sandboxed without scripts to listeners added from the page, so the links did nothing there. The
+     * `NO_SCRIPTS` policy at the start of the message keeps its own scripts, inline handlers and plugins blocked.
      */
     protected bindActions(event: Event) {
         const frame = event.target as HTMLIFrameElement;
