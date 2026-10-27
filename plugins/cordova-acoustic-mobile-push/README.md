@@ -5,6 +5,19 @@
 [Add-the-cordova-sdk-to-your-app](https://developer.goacoustic.com/acoustic-campaign/docs/add-the-cordova-sdk-to-your-app)
 
 
+## Android requirements
+
+The Android SDK 3.11.3 that these plugins pull in needs `compileSdk` 37. With cordova-android, set it in the `config.xml` of your app:
+
+```xml
+<platform name="android">
+    <preference name="android-compileSdkVersion" value="37" />
+    <preference name="android-targetSdkVersion" value="37" />
+</platform>
+```
+
+A project that compiles against 36 or lower fails in `checkDebugAarMetadata` with "requires libraries and applications that depend on it to compile against version 37 or later". The samples in `applications/samples` already set this.
+
 ## Using the plugins with Capacitor
 
 The Cordova plugins work in a Capacitor app (up to Capacitor 8) through Capacitor's Cordova compatibility layer.

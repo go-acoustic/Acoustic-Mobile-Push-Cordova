@@ -361,19 +361,33 @@ function setupNotificationService(opts, appDir, target, projectFile) {
 const PODSPECS_SOURCE = "source 'https://github.com/go-acoustic/PodSpecs.git'";
 const CDN_SOURCE = "source 'https://cdn.cocoapods.org/'";
 
+// Only active lines count: a commented-out source names nothing. Either quote style, with or without .git.
+const PODSPECS_LINE = /^[ \t]*source[ \t]+(['"])https:\/\/github\.com\/go-acoustic\/PodSpecs(?:\.git)?\1/m;
+const FIRST_SOURCE = /^[ \t]*source[ \t]+['"]/m;
+const REQUIRE_LINE = /^require_relative .*(?:\n|$)/m;
+
+// Inserts by position, not by replacing text, so a commented-out copy of the line is never the one edited.
+function insertAt(text, index, insertion) {
+	return text.slice(0, index) + insertion + text.slice(index);
+}
+
 function podfileWithSources(podText) {
-	if (podText.includes(PODSPECS_SOURCE)) {
+	if (PODSPECS_LINE.test(podText)) {
 		return podText;
 	}
-	// Directly before the first source the app already declares
-	const firstSource = podText.match(/^[ \t]*source[ \t]+['"].*\n/m);
+	// Directly before the first active source the app already declares
+	const firstSource = FIRST_SOURCE.exec(podText);
 	if (firstSource) {
-		return podText.replace(firstSource[0], `${PODSPECS_SOURCE}\n${firstSource[0]}`);
+		return insertAt(podText, firstSource.index, `${PODSPECS_SOURCE}\n`);
 	}
 	// Otherwise both sources, after the require_relative line Capacitor generates, or at the top
 	const block = `${PODSPECS_SOURCE}\n${CDN_SOURCE}\n`;
-	const require = podText.match(/^require_relative .*\n/m);
-	return require ? podText.replace(require[0], `${require[0]}\n${block}`) : `${block}\n${podText}`;
+	const require = REQUIRE_LINE.exec(podText);
+	if (!require) {
+		return `${block}\n${podText}`;
+	}
+	const end = require.index + require[0].length;
+	return insertAt(podText, end, (require[0].endsWith('\n') ? '' : '\n') + `\n${block}`);
 }
 
 // `pod install` stops when Podfile.lock holds another version of an Acoustic pod than the Podfile pins. This happens
@@ -524,9 +538,13 @@ function main() {
 	}
 }
 
-try {
-	main();
-} catch (e) {
-	console.error(e.message);
-	process.exit(1);
+if (require.main === module) {
+	try {
+		main();
+	} catch (e) {
+		console.error(e.message);
+		process.exit(1);
+	}
 }
+
+module.exports = { podfileWithSources };
