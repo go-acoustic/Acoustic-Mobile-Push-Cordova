@@ -1,0 +1,2 @@
+# Keep the test sources and their node_modules out of the published package.
+tests/

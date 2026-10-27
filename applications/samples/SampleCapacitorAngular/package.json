@@ -1,0 +1,40 @@
+{
+  "name": "sample-capacitor-angular",
+  "version": "0.0.0",
+  "scripts": {
+    "ng": "ng",
+    "start": "ng serve",
+    "build": "ng build",
+    "sync": "ng build && cap sync",
+    "sync-wrapper": "cp node_modules/cordova-acoustic-mobile-push/capacitor/acoustic-campaign.ts src/app/acoustic/acoustic-campaign.ts"
+  },
+  "private": true,
+  "dependencies": {
+    "@angular/common": "^20.3.34",
+    "@angular/compiler": "^20.3.34",
+    "@angular/core": "^20.3.34",
+    "@angular/forms": "^20.3.34",
+    "@angular/platform-browser": "^20.3.34",
+    "@angular/router": "^20.3.34",
+    "@capacitor/android": "^8.5.3",
+    "@capacitor/cli": "^8.5.3",
+    "@capacitor/core": "^8.5.3",
+    "@capacitor/ios": "^8.5.3",
+    "@capacitor/local-notifications": "^8.3.1",
+    "@ionic/angular": "^8.8.19",
+    "cordova-acoustic-mobile-push": "3.9.167",
+    "cordova-acoustic-mobile-push-plugin-geofence": "3.9.167",
+    "cordova-acoustic-mobile-push-plugin-inapp": "3.9.167",
+    "cordova-acoustic-mobile-push-plugin-inbox": "3.9.167",
+    "cordova-acoustic-mobile-push-plugin-location": "3.9.167",
+    "rxjs": "~7.8.2",
+    "tslib": "^2.8.1",
+    "zone.js": "~0.15.1"
+  },
+  "devDependencies": {
+    "@angular/build": "^20.3.40",
+    "@angular/cli": "^20.3.40",
+    "@angular/compiler-cli": "^20.3.34",
+    "typescript": "~5.9.3"
+  }
+}

@@ -62,6 +62,10 @@
                  setEventQueueCallbacks(context, callback, parameters);
              } else if (Methods.SetAttributeQueueCallbacks.NAME.equals(action)) {
                  setAttributeQueueCallbacks(context, callback, parameters);
+             } else if (Methods.SetMessageReceivedCallback.NAME.equals(action)) {
+                 setMessageReceivedCallback(context, callback, parameters);
+             } else if (Methods.RemoveMessageReceivedCallback.NAME.equals(action)) {
+                 removeMessageReceivedCallback(context);
              } else if (Methods.UnregisterActionCallback.NAME.equals(action)) {
                  unregisterActionCallback(context, callback, parameters);
              } else if (Methods.SetActionCallback.NAME.equals(action)) {
@@ -74,7 +78,7 @@
                  getSdkVersion(callback);
              } else if (Methods.IsSdkRegistered.NAME.equals(action)) {
                  isSdkRegistered(context, callback);
-             } else if (Methods.IsChannelRegistered.NAME.equals(action)) {
+             } else if (Methods.IsChannelRegistered.NAME.equals(action) || Methods.IsRegistered.NAME.equals(action)) {
                  isChannelRegistered(context, callback);
              } else if (Methods.QueueUpdateUserAttributes.NAME.equals(action)) {
                  queueUpdateUserAttributes(context, parameters);
@@ -184,6 +188,21 @@
          }
      }
  
+     public static void setMessageReceivedCallback(Context context, JsonCallback callback, JSONArray parameters) throws JSONException {
+         boolean state = parameters.getBoolean(Methods.SetMessageReceivedCallback.STATE_INDEX);
+         Logger.d(TAG, "Callbacks Registration: Message received registration - " + state);
+         if(state) {
+             JsonMceBroadcastReceiver.setMessageReceivedCallback(context, callback);
+         } else {
+             JsonMceBroadcastReceiver.setMessageReceivedCallback(context, null);
+         }
+     }
+
+     public static void removeMessageReceivedCallback(Context context) {
+         Logger.d(TAG, "Callbacks Registration: Message received callback removed");
+         JsonMceBroadcastReceiver.removeMessageReceivedCallback(context);
+     }
+
      public static void unregisterActionCallback(Context context, JsonCallback callback, JSONArray parameters) throws JSONException {
          String type = parameters.getString(Methods.UnregisterActionCallback.TYPE_INDEX);
          Logger.d(TAG, "Callbacks Registration: Action registration: " + type + " setting to null");
@@ -463,6 +482,15 @@
              int STATE_INDEX = 0;
          }
  
+         interface SetMessageReceivedCallback {
+             String NAME = "setMessageReceivedCallback";
+             int STATE_INDEX = 0;
+         }
+
+         interface RemoveMessageReceivedCallback {
+             String NAME = "removeMessageReceivedCallback";
+         }
+
          interface UnregisterActionCallback {
              String NAME = "unregisterActionCallback";
              int TYPE_INDEX = 0;
@@ -492,6 +520,10 @@
  
          interface IsChannelRegistered {
              String NAME = "isChannelRegistered";
+         }
+
+         interface IsRegistered {
+             String NAME = "isRegistered";
          }
  
          interface QueueUpdateUserAttributes {

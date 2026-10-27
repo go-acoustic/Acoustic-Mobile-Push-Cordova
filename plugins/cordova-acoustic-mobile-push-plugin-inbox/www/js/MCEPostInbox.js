@@ -16,21 +16,25 @@ var MCEInbox_1 = __importDefault(require("./MCEInbox"));
 var MCEInboxPlugin_1 = __importDefault(require("./MCEInboxPlugin"));
 /* Inbox Default Template Support */
 document.addEventListener("deviceready", function () {
-    $(document).on("click", ".postInboxMessage .actions a[action]", function () {
-        var action = JSON.parse($(this).attr("action"));
-        MCEInboxPlugin_1.default.executeInboxAction(action, $(this).parents("[inboxMessageId]").attr("inboxMessageId"));
+    // Default inbox UI requires jQuery; apps without it use MCEInboxPlugin directly
+    if (typeof jQuery === "undefined") {
+        return;
+    }
+    jQuery(document).on("click", ".postInboxMessage .actions a[action]", function () {
+        var action = JSON.parse(jQuery(this).attr("action"));
+        MCEInboxPlugin_1.default.executeInboxAction(action, jQuery(this).parents("[inboxMessageId]").attr("inboxMessageId"));
     });
     var imageSizeCache = {};
-    $(document).on("inview", ".postInboxMessage .contentImage", function () {
+    jQuery(document).on("inview", ".postInboxMessage .contentImage", function () {
         var element = this;
-        var source = $(element).attr("source");
+        var source = jQuery(element).attr("source");
         var size = imageSizeCache[source];
         if (size) {
             element.src = source;
             var height = (imageSizeCache[source]["height"] /
                 imageSizeCache[source]["width"]) *
-                $(element).width();
-            $(element).height(height);
+                jQuery(element).width();
+            jQuery(element).height(height);
             console.log("cache resizing image to " + height);
         }
         else {
@@ -42,9 +46,9 @@ document.addEventListener("deviceready", function () {
                     height: contentImage.naturalHeight,
                 };
                 var height = (contentImage.naturalHeight / contentImage.naturalWidth) *
-                    $(element).width();
+                    jQuery(element).width();
                 console.log("fresh resizing image to " + height);
-                $(element).height(height);
+                jQuery(element).height(height);
             };
             contentImage.src = source;
         }

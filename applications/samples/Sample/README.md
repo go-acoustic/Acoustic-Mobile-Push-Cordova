@@ -30,7 +30,7 @@ For production Campaign SDKs, set "useRelease" to true, false uses beta build.  
 ```shell json
   "androidVersion": "x.x.x",
 ```
-2. Copy your `google-services.json` file with your Google-provided FCM credentials to your android project folder: `platforms/android/app/google-services.json`.
+2. Set `android-compileSdkVersion` to 37 or higher in `config.xml` (the Android SDK needs `compileSdk` 37; this sample already sets it). Then copy your `google-services.json` file with your Google-provided FCM credentials to your android project folder: `platforms/android/app/google-services.json`.
 3. Edit `CampaignConfig.json` file in `android` section and fill in the `baseUrl` and `appKey` provided by your account team.
 ```json
 "baseUrl": "https://mobile-sdk-lib-XX-Y.brilliantcollector.com",

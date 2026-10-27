@@ -1,0 +1,31 @@
+{
+  "appDelegateClass": "App.AppDelegate",
+  "baseUrl": "https://mobile-sdk-lib-us-0.brilliantcollector.com",
+  "appKey": {
+    "dev": "YOUR_IOS_APP_KEY",
+    "prod": "YOUR_IOS_APP_KEY"
+  },
+  "invalidateExistingUser": false,
+  "autoReinitialize": true,
+  "autoInitialize": true,
+  "sessionTimeout": 20,
+  "loglevel": "verbose",
+  "logfile": false,
+  "location": {
+    "autoInitialize": true,
+    "geofence": {
+      "search": {
+        "maximumRadius": 2500000,
+        "defaultRadius": 10000,
+        "maximumCount": 100,
+        "maximumQuantity": 20,
+        "minimumQuantity": 1
+      },
+      "accuracy": "3km"
+    },
+    "sync": {
+      "syncRadius": 100000,
+      "syncInterval": 300
+    }
+  }
+}

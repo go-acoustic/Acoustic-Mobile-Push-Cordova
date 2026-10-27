@@ -16,6 +16,7 @@
 @property NSString * eventCallback;
 @property NSString * registrationCallbacks;
 @property NSString * attributeCallback;
+@property NSString * receivedMessageCallbackId;
 @property NSString * actionNotRegistered;
 @property NSString * actionNotYetRegistered;
 
@@ -27,6 +28,9 @@
 - (void) sendRegistration;
 - (void) sendAttributeFailure: (NSDictionary*)dictionary;
 - (void) sendAttributeSuccess:(NSDictionary*)dictionary;
+- (void) sendMessageReceived:(NSDictionary*)dictionary;
+- (void) setMessageReceivedCallback:(CDVInvokedUrlCommand*)command; // Arguments: state
+- (void) removeMessageReceivedCallback:(CDVInvokedUrlCommand*)command;
 - (BOOL) executeActionCallback:(NSDictionary*)action payload: (NSDictionary*)payload;
 - (void) setRegisteredActionCallback:(CDVInvokedUrlCommand*)command;
 - (BOOL) executeCategoryCallback:(NSDictionary*)response;

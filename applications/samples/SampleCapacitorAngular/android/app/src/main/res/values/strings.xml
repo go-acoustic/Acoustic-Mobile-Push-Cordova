@@ -1,0 +1,9 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Sample</string>
+    <string name="title_activity_main">Sample</string>
+    <string name="package_name">co.acoustic.mobile.push.samples.android</string>
+    <string name="custom_url_scheme">co.acoustic.mobile.push.samples.android</string>
+    <string name="appkey">YOUR_ANDROID_APP_KEY</string>
+    <string name="senderid"></string>
+</resources>

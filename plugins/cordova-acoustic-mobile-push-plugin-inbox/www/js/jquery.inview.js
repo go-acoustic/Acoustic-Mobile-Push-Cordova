@@ -3,25 +3,26 @@
  *    - based on the idea of Remy Sharp, http://remysharp.com/2009/01/26/element-in-view-event-plugin/
  *    - forked from http://github.com/zuk/jquery.inview/
  */
-(function ($) {
+(function () {
+  function init(jQuery) {
   var inviewObjects = {}, viewportSize, viewportOffset,
-      d = document, w = window, documentElement = d.documentElement, expando = $.expando, timer;
+      d = document, w = window, documentElement = d.documentElement, expando = jQuery.expando, timer;
 
-  $.event.special.inview = {
+  jQuery.event.special.inview = {
     add: function(data) {
-      inviewObjects[data.guid + "-" + this[expando]] = { data: data, $element: $(this) };
+      inviewObjects[data.guid + "-" + this[expando]] = { data: data, jq_element: jQuery(this) };
 
       // Use setInterval in order to also make sure this captures elements within
       // "overflow:scroll" elements or elements that appeared in the dom tree due to
       // dom manipulation and reflow
-      // old: $(window).scroll(checkInView);
+      // old: jQuery(window).scroll(checkInView);
       //
       // By the way, iOS (iPad, iPhone, ...) seems to not execute, or at least delays
       // intervals while the user scrolls. Therefore the inview event might fire a bit late there
       //
       // Don't waste cycles with an interval until we get at least one element that
       // has bound to the inview event.
-      if (!timer && !$.isEmptyObject(inviewObjects)) {
+      if (!timer && !jQuery.isEmptyObject(inviewObjects)) {
          timer = setInterval(checkInView, 250);
       }
     },
@@ -30,7 +31,7 @@
       try { delete inviewObjects[data.guid + "-" + this[expando]]; } catch(e) {}
 
       // Clear interval when we no longer have any elements listening
-      if ($.isEmptyObject(inviewObjects)) {
+      if (jQuery.isEmptyObject(inviewObjects)) {
          clearInterval(timer);
          timer = null;
       }
@@ -44,7 +45,7 @@
     // go into check clientHeight/clientWidth (which has the wrong value).
     if (!size.height) {
       mode = d.compatMode;
-      if (mode || !$.support.boxModel) { // IE, Gecko
+      if (mode || !jQuery.support.boxModel) { // IE, Gecko
         domObject = mode === 'CSS1Compat' ?
           documentElement : // Standards
           d.body; // Quirks
@@ -66,29 +67,29 @@
   }
 
   function checkInView() {
-    var $elements = [], elementsLength, i = 0;
+    var jq_elements = [], elementsLength, i = 0;
 
-    $.each(inviewObjects, function(i, inviewObject) {
+    jQuery.each(inviewObjects, function(i, inviewObject) {
       var selector  = inviewObject.data.selector,
-          $element  = inviewObject.$element;
-      $elements.push(selector ? $element.find(selector) : $element);
+          jq_element  = inviewObject.jq_element;
+      jq_elements.push(selector ? jq_element.find(selector) : jq_element);
     });
 
-    elementsLength = $elements.length;
+    elementsLength = jq_elements.length;
     if (elementsLength) {
       viewportSize   = viewportSize   || getViewportSize();
       viewportOffset = viewportOffset || getViewportOffset();
 
       for (; i<elementsLength; i++) {
         // Ignore elements that are not in the DOM tree
-        if (!$.contains(documentElement, $elements[i][0])) {
+        if (!jQuery.contains(documentElement, jq_elements[i][0])) {
           continue;
         }
 
-        var $element      = $($elements[i]),
-            elementSize   = { height: $element.height(), width: $element.width() },
-            elementOffset = $element.offset(),
-            inView        = $element.data('inview'),
+        var jq_element      = jQuery(jq_elements[i]),
+            elementSize   = { height: jq_element.height(), width: jq_element.width() },
+            elementOffset = jq_element.offset(),
+            inView        = jq_element.data('inview'),
             visiblePartX,
             visiblePartY,
             visiblePartsMerged;
@@ -114,16 +115,16 @@
             'top' : 'both');
           visiblePartsMerged = visiblePartX + "-" + visiblePartY;
           if (!inView || inView !== visiblePartsMerged) {
-            $element.data('inview', visiblePartsMerged).trigger('inview', [true, visiblePartX, visiblePartY]);
+            jq_element.data('inview', visiblePartsMerged).trigger('inview', [true, visiblePartX, visiblePartY]);
           }
         } else if (inView) {
-          $element.data('inview', false).trigger('inview', [false]);
+          jq_element.data('inview', false).trigger('inview', [false]);
         }
       }
     }
   }
 
-  $(w).bind("scroll resize scrollstop", function() {
+  jQuery(w).bind("scroll resize scrollstop", function() {
     viewportSize = viewportOffset = null;
   });
 
@@ -133,4 +134,7 @@
       viewportOffset = null;
     });
   }
-})(jQuery);
+}
+  if (window.jQuery) { init(window.jQuery); }
+  else { document.addEventListener("DOMContentLoaded", function () { if (window.jQuery) { init(window.jQuery); } }); }
+})();

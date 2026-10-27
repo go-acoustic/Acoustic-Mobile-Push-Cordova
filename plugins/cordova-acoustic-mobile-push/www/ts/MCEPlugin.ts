@@ -17,6 +17,7 @@ import {
     Event,
     AppKeyCallback,
     AttributeQueueCallback,
+    MessageReceivedCallback,
     BooleanCallback,
     CategoryCallback,
     CordovaCallback,
@@ -45,7 +46,7 @@ namespace MCEPlugin {
   @param {SdkVersionCallback} callback The callback that handles the response
   */
     export const getPluginVersion = function (callback: SdkVersionCallback) {
-        callback("3.9.145");
+        callback("3.9.167");
     };
 
     /**
@@ -305,6 +306,34 @@ namespace MCEPlugin {
     };
 
     /**
+    Allow Cordova developer to receive the push messages that reach the application, including
+    silent data pushes. If a message arrives while the application is not active, it will be
+    queued until the next time this method is called to register a callback handler. At most 50 messages are kept,
+    the oldest ones are dropped. Call removeMessageReceivedCallback when the application no longer wants the messages.
+    @param {MessageReceivedCallback} callback The callback that handles the message
+    */
+    export const setMessageReceivedCallback = function (
+        callback: MessageReceivedCallback
+    ) {
+        pauseResumeCallback(
+            function () {
+                cordova.exec(callback, function () {}, "MCEPlugin", "setMessageReceivedCallback", [false]);
+            },
+            function () {
+                cordova.exec(callback, function () {}, "MCEPlugin", "setMessageReceivedCallback", [true]);
+            }
+        );
+    };
+
+    /**
+    Unregisters the callback of setMessageReceivedCallback for good: the messages that were kept are deleted and no
+    message is kept until setMessageReceivedCallback is called again.
+    */
+    export const removeMessageReceivedCallback = function () {
+        cordova.exec(function () {}, function () {}, "MCEPlugin", "removeMessageReceivedCallback", []);
+    };
+
+    /**
      Internal function to translate a dictionary of attributes with dates represented as integers back into JavaScript date objects
      @param {Object[]} attributes Attributes to be converted
      @return {Object[]}
@@ -359,7 +388,19 @@ namespace MCEPlugin {
       */
     export const isRegistered = function (callback: RegisteredCallback) {
         cordova.exec(
-            callback as CordovaCallback,
+            // iOS calls back with (mobilepushRegistered, providerRegistered, providerName). Android calls back with one
+            // object {acousticRegistered, providerRegistered, providerName}, which is unpacked here to match iOS.
+            function (first: any, providerRegistered?: boolean, providerName?: any) {
+                if (first !== null && typeof first === "object") {
+                    callback(
+                        first.acousticRegistered,
+                        first.providerRegistered,
+                        String(first.providerName).toUpperCase() as any
+                    );
+                } else {
+                    callback(first, providerRegistered as boolean, providerName);
+                }
+            } as CordovaCallback,
             MCEPlugin.error,
             "MCEPlugin",
             "isRegistered",
@@ -686,13 +727,13 @@ namespace MCEPlugin {
     };
 
     export const replaceImages = function () {
-        $("img").each(function (index, item) {
+        jQuery("img").each(function (index, item) {
             var replaceImage = item as HTMLImageElement;
             var originalSource =
                 replaceImage.getAttribute("originalSource") || replaceImage.src;
 
             MCEPlugin.bestImage(originalSource, (image) => {
-                $(replaceImage).css(MCEPlugin.imageCSS(image));
+                jQuery(replaceImage).css(MCEPlugin.imageCSS(image));
                 replaceImage.setAttribute("originalSource", originalSource);
                 replaceImage.src = image.src;
             });

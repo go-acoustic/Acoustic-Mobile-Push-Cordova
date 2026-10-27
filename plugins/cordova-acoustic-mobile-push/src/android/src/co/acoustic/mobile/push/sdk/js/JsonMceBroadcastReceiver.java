@@ -22,6 +22,7 @@
  import co.acoustic.mobile.push.sdk.api.attribute.AttributesOperation;
  import co.acoustic.mobile.push.sdk.api.event.Event;
  import co.acoustic.mobile.push.sdk.api.notification.NotificationDetails;
+ import co.acoustic.mobile.push.sdk.api.notification.MceNotificationPayload;
  import co.acoustic.mobile.push.sdk.js.format.AttributesOperationJson;
  import co.acoustic.mobile.push.sdk.js.format.EventJson;
  import co.acoustic.mobile.push.sdk.js.format.RegistrationDetailsJson;
@@ -34,6 +35,8 @@
  import org.json.JSONObject;
 
  import java.text.ParseException;
+ import java.util.ArrayList;
+ import java.util.Collections;
  import java.util.LinkedList;
  import java.util.Date;
  import java.util.List;
@@ -48,11 +51,20 @@
      private static final String SDK_REGISTERED_CALLBACK_NAME = "setSdkRegisteredCallback";
      private static final String ATTRIBUTES_OPERATION_CALLBACK_NAME = "attributesOperationCallback";
      private static final String SEND_EVENT_CALLBACK_NAME = "sendEventCallback";
+     private static final String MESSAGE_RECEIVED_CALLBACK_NAME = "messageReceivedCallback";
+     // Set once the app registers a message received callback. Apps that never do keep nothing and pay nothing per push.
+     private static final String MESSAGE_RECEIVED_PREFERENCES = "co.acoustic.mobile.push.js.messageReceived";
+     private static final String MESSAGE_RECEIVED_USED_KEY = "used";
+     // Messages kept for a callback that is not registered; the oldest ones are dropped beyond this number
+     static final int MESSAGE_RECEIVED_MAX_QUEUED = 50;
  
      private static JsonCallback sdkRegisteredCallback;
      private static JsonCallback messagingServiceRegisteredCallback;
      private static JsonCallback attributesOperationCallback;
      private static JsonCallback sendEventCallback;
+     private static JsonCallback messageReceivedCallback;
+     // The persisted "used" flag, read from the preferences once per process
+     private static volatile Boolean messageReceivedUsed;
      private static JsonCallback actionNotYetRegisteredCallback;
      private static JsonCallback actionNotRegisteredCallback;
  
@@ -190,6 +202,7 @@
          sendSdkRegisteredRegisteredCallbacks(context);
          sendRegisteredAttributeOperationsCallbacks(context);
          sendRegisteredEventCallbacks(context);
+         sendRegisteredMessageReceivedCallbacks(context);
      }
  
      private static void sendRegisteredAttributeOperationsCallbacks(Context context) {
@@ -215,6 +228,70 @@
          }
      }
  
+     public static void setMessageReceivedCallback(Context context, JsonCallback messageReceivedCallback) {
+         JsonMceBroadcastReceiver.messageReceivedCallback = messageReceivedCallback;
+         if(messageReceivedCallback != null && !isMessageReceivedUsed(context)) {
+             context.getSharedPreferences(MESSAGE_RECEIVED_PREFERENCES, Context.MODE_PRIVATE).edit().putBoolean(MESSAGE_RECEIVED_USED_KEY, true).apply();
+             messageReceivedUsed = true;
+         }
+         sendRegisteredMessageReceivedCallbacks(context);
+     }
+
+     /**
+      * Unregisters the message received callback for good: the application no longer wants the messages, so the
+      * "used" flag is cleared and the messages kept so far are deleted. Messages are kept again only after the
+      * next setMessageReceivedCallback call.
+      */
+     public static void removeMessageReceivedCallback(Context context) {
+         messageReceivedCallback = null;
+         synchronized (MESSAGE_RECEIVED_CALLBACK_NAME) {
+             context.getSharedPreferences(MESSAGE_RECEIVED_PREFERENCES, Context.MODE_PRIVATE).edit().putBoolean(MESSAGE_RECEIVED_USED_KEY, false).apply();
+             messageReceivedUsed = false;
+             List<JsonCallbacksRegistry.RegisteredCallback> queued = JsonCallbacksRegistry.getRegisteredCallbacks(context, MESSAGE_RECEIVED_CALLBACK_NAME);
+             if(!queued.isEmpty()) {
+                 JsonCallbacksRegistry.deleteCallbacks(context, queued);
+             }
+         }
+     }
+
+     // Keeps the newest MESSAGE_RECEIVED_MAX_QUEUED messages. Call it inside the MESSAGE_RECEIVED_CALLBACK_NAME lock.
+     private static void trimQueuedMessageReceivedCallbacks(Context context) {
+         List<JsonCallbacksRegistry.RegisteredCallback> queued = new ArrayList<>(JsonCallbacksRegistry.getRegisteredCallbacks(context, MESSAGE_RECEIVED_CALLBACK_NAME));
+         int excess = queued.size() - MESSAGE_RECEIVED_MAX_QUEUED;
+         if(excess > 0) {
+             Collections.sort(queued, (first, second) -> Integer.compare(first.getId(), second.getId()));
+             JsonCallbacksRegistry.deleteCallbacks(context, queued.subList(0, excess));
+         }
+     }
+
+     private static boolean isMessageReceivedUsed(Context context) {
+         Boolean used = messageReceivedUsed;
+         if(used == null) {
+             used = context.getSharedPreferences(MESSAGE_RECEIVED_PREFERENCES, Context.MODE_PRIVATE).getBoolean(MESSAGE_RECEIVED_USED_KEY, false);
+             messageReceivedUsed = used;
+         }
+         return used;
+     }
+
+     private static void sendRegisteredMessageReceivedCallbacks(Context context) {
+         JsonCallback callbackToCall = messageReceivedCallback;
+         if(callbackToCall != null) {
+             synchronized (MESSAGE_RECEIVED_CALLBACK_NAME) {
+                 List<JsonCallbacksRegistry.RegisteredCallback> registeredCallbacks = JsonCallbacksRegistry.getRegisteredCallbacks(context, MESSAGE_RECEIVED_CALLBACK_NAME);
+                 if(!registeredCallbacks.isEmpty()) {
+                     for (JsonCallbacksRegistry.RegisteredCallback callback : registeredCallbacks) {
+                         try {
+                             callbackSuccess(callbackToCall, new JSONObject(callback.getParameterAsString()));
+                         } catch (JSONException jsone) {
+                             Logger.e(TAG, "Failed to generate received message JSON", jsone);
+                         }
+                     }
+                     JsonCallbacksRegistry.deleteCallbacks(context, registeredCallbacks);
+                 }
+             }
+         }
+     }
+
      public static void setSendEventCallback(Context context, JsonCallback sendEventCallback) {
          JsonMceBroadcastReceiver.sendEventCallback = sendEventCallback;
          sendRegisteredEventCallbacks(context);
@@ -292,7 +369,33 @@
  
      @Override
      public void onMessage(Context context, NotificationDetails notificationDetails, Bundle bundle) {
- 
+         // the callback can be unregistered from another thread, so read the field once
+         JsonCallback callbackToCall = messageReceivedCallback;
+         if(callbackToCall == null && !isMessageReceivedUsed(context)) {
+             return;
+         }
+         try {
+             JSONObject message = new JSONObject();
+             message.put("type", notificationDetails.getType());
+             message.put("payload", notificationDetails.getPayload());
+             message.put("subject", notificationDetails.getSubject());
+             message.put("message", notificationDetails.getMessage());
+             MceNotificationPayload mceNotificationPayload = notificationDetails.getMceNotificationPayload();
+             if(mceNotificationPayload != null) {
+                 message.put("attribution", mceNotificationPayload.getAttribution());
+                 message.put("mailingId", mceNotificationPayload.getMailingId());
+             }
+             if(callbackToCall != null && MceJsonApi.getRunning()) {
+                 callbackSuccess(callbackToCall, message);
+             } else {
+                 synchronized (MESSAGE_RECEIVED_CALLBACK_NAME) {
+                     JsonCallbacksRegistry.register(context, MESSAGE_RECEIVED_CALLBACK_NAME, true, message.toString());
+                     trimQueuedMessageReceivedCallbacks(context);
+                 }
+             }
+         } catch (JSONException jsone) {
+             Logger.e(TAG, "Failed to generate received message JSON", jsone);
+         }
      }
  
      @Override

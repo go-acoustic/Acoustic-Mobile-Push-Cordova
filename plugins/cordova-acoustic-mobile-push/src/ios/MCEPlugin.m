@@ -86,6 +86,13 @@
     [self.commandDelegate sendPluginResult:result callbackId:self.attributeCallback];
 }
 
+-(void)sendMessageReceived:(NSDictionary*)dictionary
+{
+    CDVPluginResult * result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:dictionary];
+    result.keepCallback = @TRUE;
+    [self.commandDelegate sendPluginResult:result callbackId:self.receivedMessageCallbackId];
+}
+
 -(void)sendAttributeFailure: (NSDictionary*)dictionary
 {
     NSMutableDictionary * mutableDict = [dictionary mutableCopy];
@@ -369,6 +376,48 @@
     }
 }
 
+// Arguments: state
+- (void)setMessageReceivedCallback:(CDVInvokedUrlCommand*)command
+{
+    NSNumber * state = [command argumentAtIndex:0];
+    if([state boolValue]) {
+        self.receivedMessageCallbackId = command.callbackId;
+        [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"co.acoustic.mobile.push.messageReceivedUsed"];
+        
+        [[MCECallbackDatabaseManager sharedInstance] selectCallbacks: @"messageReceived" withBlock:^(NSArray*dictionaries, NSArray*ids){
+            if([dictionaries count])
+            {
+                for (NSDictionary * dictionary in dictionaries) {
+                    [self sendMessageReceived: dictionary];
+                }
+                dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+                    [[MCECallbackDatabaseManager sharedInstance] deleteCallbacksById:ids];
+                });
+            }
+        }];
+    } else {
+        self.receivedMessageCallbackId = nil;
+    }
+}
+
+// Unregisters the callback for good: the messages kept so far are deleted and no more are kept until the next setMessageReceivedCallback call
+- (void)removeMessageReceivedCallback:(CDVInvokedUrlCommand*)command
+{
+    self.receivedMessageCallbackId = nil;
+    [[NSUserDefaults standardUserDefaults] setBool:NO forKey:@"co.acoustic.mobile.push.messageReceivedUsed"];
+    [[MCECallbackDatabaseManager sharedInstance] selectCallbacks: @"messageReceived" withBlock:^(NSArray*dictionaries, NSArray*ids){
+        if([ids count])
+        {
+            // the block runs on the database queue, which deleteCallbacksById: needs, so delete from another queue
+            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+                [[MCECallbackDatabaseManager sharedInstance] deleteCallbacksById:ids];
+            });
+        }
+    }];
+    CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+    [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+}
+
 - (void)getSdkVersion:(CDVInvokedUrlCommand*)command
 {
     CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:[[MCESdk sharedInstance] sdkVersion]];
@@ -418,7 +467,7 @@
 {
     NSNumber * acousticRegistered = [NSNumber numberWithBool: MCERegistrationDetails.sharedInstance.mceRegistered];
     NSNumber * providerRegistered = [NSNumber numberWithBool: MCERegistrationDetails.sharedInstance.apsRegistered];
-    CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsMultipart:@[ acousticRegistered, providerRegistered, @"APNS"]];
+    CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsMultipart:@[ acousticRegistered, providerRegistered, @"APNS"]];
     [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
 }
 

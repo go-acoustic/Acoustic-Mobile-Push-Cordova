@@ -1,0 +1,16 @@
+# Angular
+/dist
+/.angular
+/out-tsc
+/node_modules
+npm-debug.log*
+
+# The Firebase config of the Android app. Get it from the Firebase project of your Campaign app.
+google-services.json
+
+# IDE
+.idea
+.vscode
+*.iml
+.DS_Store
+*.xcuserdatad

@@ -53,7 +53,7 @@ function readAndSaveMceConfig(currentAppWorkingDirectory, pluginPath, campaignCo
 	try {
 	  if (campaignConfigFile.android && campaignConfigFile.iOS) {
 			if (campaignConfigFile.android && hasAndroidPlatform(currentAppWorkingDirectory)) {
-				addGradlePropertiesToApp(currentAppWorkingDirectory);
+				addGradlePropertiesToApp(currentAppWorkingDirectory, campaignConfigFile);
 
 				const androidConfig = JSON.stringify(campaignConfigFile.android, null, 2);
 				const androidDestinationPath = path.join(pluginPath, 'postinstall/android/MceConfig.json');
@@ -125,7 +125,12 @@ function managePlugins(currentAppWorkingDirectory, pluginPath, configData) {
 			updateConfigXMLPreference(currentAppWorkingDirectory, "iOSAppkey", configData.iOS.appKey.dev);
 			updateConfigXMLPreference(currentAppWorkingDirectory, "iOSProdkey", configData.iOS.appKey.prod);
 			updateConfigXMLPreference(currentAppWorkingDirectory, "serverUrl", configData.iOS.baseUrl);
-			updateConfigXMLPreference(currentAppWorkingDirectory, "logLevel", configData.iOS.logLevel);
+			updateConfigXMLPreference(currentAppWorkingDirectory, "logLevel", configData.iOS.loglevel);
+			// Minutes in the background before the session ends. Without it the native configuration of a Cordova app
+			// has no sessionTimeout and the SDK default of 20 minutes applies.
+			if (Number(configData.iOS.sessionTimeout) > 0) {
+				updateConfigXMLPreference(currentAppWorkingDirectory, "sessionTimeout", configData.iOS.sessionTimeout);
+			}
 			updatePluginXMLPodName(packagePluginPath, configData.plugins.useRelease, configData);
 		}
 
@@ -134,19 +139,28 @@ function managePlugins(currentAppWorkingDirectory, pluginPath, configData) {
 			updateBuildExtrasGradle(packagePluginPath, configData);
 			addGoogleServices(currentAppWorkingDirectory, configData);
 			updateBuildGradleMobilePushVersion(currentAppWorkingDirectory, configData);
+		}
 
+		// Add the base plugin. This is needed for every platform: a project with only iOS used to get all the other
+		// plugins but not this one.
+		if (hasIosPlatform(currentAppWorkingDirectory) || hasAndroidPlatform(currentAppWorkingDirectory)) {
+			const hasIos       = hasIosPlatform(currentAppWorkingDirectory);
 			customAction       = configData.customAction;
-			androidAppkey      = configData.android.appKey.prod;
+			// ANDROID_APPKEY is a required variable of the plugin, also when the project has no Android platform.
+			androidAppkey      = configData.android.appKey.prod || (hasAndroidPlatform(currentAppWorkingDirectory) ? "" : "NOT_USED");
 			iOSAppkey          = configData.iOS.appKey.dev;
 			iOSProdkey         = configData.iOS.appKey.prod;
-			serverUrl          = configData.iOS.baseUrl;
-			logLevel           = configData.iOS.loglevel;
+			// SERVER_URL and LOGLEVEL are one variable for both platforms and are read from the iOS section. A project
+			// with only the Android platform does not use that section, so it would keep the placeholder base URL
+			// and the iOS log level there.
+			serverUrl          = hasIos ? configData.iOS.baseUrl : configData.android.baseUrl;
+			logLevel           = hasIos ? configData.iOS.loglevel : (configData.android.loglevel || configData.iOS.loglevel);
 			mceCanSyncOverride = configData.mceCanSyncOverride;
 			logMessageTitle(`cd "${currentAppWorkingDirectory}" && cordova plugin add ${pluginName} --variable CUSTOM_ACTIONS="${customAction}" --variable ANDROID_APPKEY="${androidAppkey}" --variable IOS_DEV_APPKEY="${iOSAppkey}" --variable IOS_PROD_APPKEY="${iOSProdkey}" --variable SERVER_URL="${serverUrl}" --variable LOGLEVEL="${logLevel}" --variable MCE_CAN_SYNC_OVERRIDE="${mceCanSyncOverride}" --force`);
 			execSync(`cd "${currentAppWorkingDirectory}" && cordova plugin add ${pluginName} --variable CUSTOM_ACTIONS="${customAction}" --variable ANDROID_APPKEY="${androidAppkey}" --variable IOS_DEV_APPKEY="${iOSAppkey}" --variable IOS_PROD_APPKEY="${iOSProdkey}" --variable SERVER_URL="${serverUrl}" --variable LOGLEVEL="${logLevel}" --variable MCE_CAN_SYNC_OVERRIDE="${mceCanSyncOverride}" --force`, { stdio: 'inherit', cwd: process.cwd() });
 		}
 	} catch (error) {
-		console.error(`Failed to manage plugin ${plugin}:`, error);
+		console.error(`Failed to manage plugin ${pluginName}:`, error);
 	} finally {
 		if (!hasIosPlatform(currentAppWorkingDirectory) && !hasAndroidPlatform(currentAppWorkingDirectory)) {
 			logMessageError(`Error not installing any additional plugin until you add a platform iOS or Android.`);
@@ -187,6 +201,7 @@ function managePlugins(currentAppWorkingDirectory, pluginPath, configData) {
 								// runExecSync(`cd "${currentAppWorkingDirectory}" && npm uninstall ${plugin} --ignore-scripts`);
 							}
 							runExecSync(`cd "${currentAppWorkingDirectory}" && npm install ${plugin} --ignore-scripts`);
+							pinPodBeforeAdd(currentAppWorkingDirectory, plugin, configData, true);
 							runExecSync(`cd "${currentAppWorkingDirectory}" && cordova plugin add ${plugin} --variable SYNC_RADIUS="${syncRadius}" --variable SYNC_INTERVAL="${syncInterval}"`);
 							update = true;
 						}
@@ -201,6 +216,7 @@ function managePlugins(currentAppWorkingDirectory, pluginPath, configData) {
 							if (cordovaPluginInstalled) {
 								runExecSync(`cd "${currentAppWorkingDirectory}" && cordova plugin rm ${plugin} --variable UUID="${myUuid}"`);
 							}
+							pinPodBeforeAdd(currentAppWorkingDirectory, plugin, configData);
 							runExecSync(`cd "${currentAppWorkingDirectory}" && cordova plugin add ${plugin} --variable UUID="${myUuid}"`);
 							update = true;
 						}
@@ -208,6 +224,7 @@ function managePlugins(currentAppWorkingDirectory, pluginPath, configData) {
 						if (cordovaPluginInstalled) {
 							runExecSync(`cd "${currentAppWorkingDirectory}" && cordova plugin rm ${plugin}`);
 						}
+						pinPodBeforeAdd(currentAppWorkingDirectory, plugin, configData);
 						runExecSync(`cd "${currentAppWorkingDirectory}" && cordova plugin add ${plugin}`);
 						update = true;
 					}
@@ -280,9 +297,10 @@ function updateMceConfig(currentAppWorkingDirectory, pluginPath, configData) {
  * @param {*} platform Use 'android' or 'ios'.
  */
 function updateMceConfigHelper(currentAppWorkingDirectory, pluginPath, configData, platform) {
+	let mceConfigPath;
 	try {
 		// Read the file synchronously
-		const mceConfigPath = path.join(pluginPath, `postinstall/${platform}/MceConfig.json`);
+		mceConfigPath = path.join(pluginPath, `postinstall/${platform}/MceConfig.json`);
 		const fileData = fs.readFileSync(mceConfigPath, 'utf8');
 	  const jsonData = JSON.parse(fileData);
 	  
@@ -315,7 +333,7 @@ function updateMceConfigHelper(currentAppWorkingDirectory, pluginPath, configDat
 		logMessageTitle('Update values in config.xml');
 		const mainConfigXMLData = readXMLToJson(`${currentAppWorkingDirectory}/config.xml`);
 		if (platform == 'ios' && jsonData) {
-			const appConfigPath = `${currentAppWorkingDirectory}/platforms/ios/${mainConfigXMLData.widget.name[0]}/config.xml`;
+			const appConfigPath = iosAppConfigPath(currentAppWorkingDirectory, mainConfigXMLData.widget.name[0]);
 			var xmlData = readXMLToJson(appConfigPath);
 			// update file
 			for (let i = 0; i < xmlData.widget.preference.length; i++) {
@@ -404,6 +422,22 @@ function runExecSync(cmdToRun) {
 }
 
 /**
+ * Path of the config.xml of the iOS app inside the Cordova project. cordova-ios 8 names the app folder "App";
+ * older versions use the app name of config.xml.
+ *
+ * @param {*} currentAppWorkingDirectory Current application directory.
+ * @param {*} appName Name of the app in config.xml.
+ * @returns Absolute path of platforms/ios/<folder>/config.xml.
+ */
+function iosAppConfigPath(currentAppWorkingDirectory, appName) {
+	const folderApp = path.join(currentAppWorkingDirectory, 'platforms/ios/App/config.xml');
+	if (fs.existsSync(folderApp)) {
+		return folderApp;
+	}
+	return path.join(currentAppWorkingDirectory, `platforms/ios/${appName}/config.xml`);
+}
+
+/**
  * Used to update preference values in config.xml file.
  * 
  * @param {*} currentAppWorkingDirectory Current application directory where cordova plugin add or npm install is being ran.
@@ -411,11 +445,11 @@ function runExecSync(cmdToRun) {
  * @param {*} val Value in xml.
  */
 function updateConfigXMLPreference(currentAppWorkingDirectory, nam, val) {
+	let configPath;
 	try {
 		const mainConfigXMLData = readXMLToJson(`${currentAppWorkingDirectory}/config.xml`);
 		let appName = mainConfigXMLData.widget.name[0];
-		let configPathEnd = (`platforms/ios/${appName}/config.xml`);
-		let configPath = path.join(currentAppWorkingDirectory, configPathEnd);
+		configPath = iosAppConfigPath(currentAppWorkingDirectory, appName);
 		let configContent = fs.readFileSync(configPath, 'utf8');
 		const preferenceToAdd = `<preference name="${nam}" value="${val}" />`;
 		const regx = new RegExp(`\\<preference\\s*name="` + nam + `"\\s*value="[\\w\\s\\d\\:\\/\\-\\.]*"\\s*/>`, 'gi');
@@ -462,6 +496,26 @@ function isPluginInstalled(currentAppWorkingDirectory, pluginName) {
 }
 
 /**
+ * Pins the iOS pod of a plugin before "cordova plugin add". Cordova builds the Podfile from the plugin.xml it copies
+ * while it adds the plugin, so a spec written into node_modules afterwards does not reach the Podfile (the pod of the
+ * notification service plugin then resolved to the newest SDK while the main pod was pinned).
+ *
+ * @param {*} currentAppWorkingDirectory Current application directory.
+ * @param {*} plugin Name of the plugin package.
+ * @param {*} configData CampaignConfig.json file data.
+ * @param {boolean} alreadyInstalled True when the caller has already run npm install for the plugin.
+ */
+function pinPodBeforeAdd(currentAppWorkingDirectory, plugin, configData, alreadyInstalled) {
+	if (!hasIosPlatform(currentAppWorkingDirectory) || !configData.iOSVersion || !configData.plugins) {
+		return;
+	}
+	if (!alreadyInstalled) {
+		runExecSync(`cd "${currentAppWorkingDirectory}" && npm install ${plugin} --ignore-scripts`);
+	}
+	updatePluginXMLPodName(path.join(currentAppWorkingDirectory, 'node_modules', plugin), configData.plugins.useRelease === true, configData);
+}
+
+/**
  * Update the podname to be used in podfile.
  * 
  * @param {*} pluginPath Path to plugin.
@@ -469,8 +523,8 @@ function isPluginInstalled(currentAppWorkingDirectory, pluginName) {
  * @param {*} configData CampaignConfig.json file data.
  */
 function updatePluginXMLPodName(plugPath, isRelease, configData) {
+	let pluginPath = path.join(plugPath, "plugin.xml");
 	try {
-		let pluginPath = path.join(plugPath, "plugin.xml");
 		let pluginContent = fs.readFileSync(pluginPath, 'utf8');
 		let podNameRegex = /<pod name="AcousticMobilePush.*\/>/;
 		let podname = isRelease ? "AcousticMobilePush" : "AcousticMobilePushDebug";
@@ -503,8 +557,8 @@ function updatePluginXMLPodName(plugPath, isRelease, configData) {
  * @param {*} configData CampaignConfig.json file data.
  */
 function updateBuildExtrasGradle(plugPath, configData) {
+	let pluginPath = path.join(plugPath, "src/android/build-extras.gradle");
 	try {
-		let pluginPath = path.join(plugPath, "src/android/build-extras.gradle");
 		let pluginContent = fs.readFileSync(pluginPath, 'utf8');
 		const mavenUrlRegex = /maven\s*{\s*url\s*\"https:\/\/s01\.oss\.sonatype\.org\/content\/repositories\/staging"\s*}/;
 
@@ -577,12 +631,14 @@ function getInstallDirectory() {
  * Used to add default versions used for plugins in gradle.build.
  * 
  * @param {*} appPath Path of the application being integrated.
+ * @param {*} configData CampaignConfig.json file data, the source of the native Android SDK version.
  */
-function addGradlePropertiesToApp(appPath) {
+function addGradlePropertiesToApp(appPath, configData) {
 	try {
 		let appGradlePath = path.join(appPath, "platforms/android/build.gradle");
 		let gradleContent = fs.readFileSync(appGradlePath, 'utf8');
 		const mobilePushVersionRegex = /mobilePushVersion/;
+		const mobilePushVersion = (configData && configData.androidVersion) || "+";
 
 		const libraryVersions = 
 `allprojects {
@@ -590,7 +646,7 @@ function addGradlePropertiesToApp(appPath) {
 	project.ext {
 		// The following are only a few examples of the types of properties you can define.
 		// Sdk and tools
-		mobilePushVersion = "3.10.126"
+		mobilePushVersion = "${mobilePushVersion}"
 		androidxLibVersion = "1.6.0"
 		playServicesBaseVersion = "18.3.0"
 		playServicesLocationVersion = "21.0.1"
