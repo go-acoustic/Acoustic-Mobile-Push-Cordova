@@ -64,6 +64,8 @@
                  setAttributeQueueCallbacks(context, callback, parameters);
              } else if (Methods.SetMessageReceivedCallback.NAME.equals(action)) {
                  setMessageReceivedCallback(context, callback, parameters);
+             } else if (Methods.RemoveMessageReceivedCallback.NAME.equals(action)) {
+                 removeMessageReceivedCallback(context);
              } else if (Methods.UnregisterActionCallback.NAME.equals(action)) {
                  unregisterActionCallback(context, callback, parameters);
              } else if (Methods.SetActionCallback.NAME.equals(action)) {
@@ -194,6 +196,11 @@
          } else {
              JsonMceBroadcastReceiver.setMessageReceivedCallback(context, null);
          }
+     }
+
+     public static void removeMessageReceivedCallback(Context context) {
+         Logger.d(TAG, "Callbacks Registration: Message received callback removed");
+         JsonMceBroadcastReceiver.removeMessageReceivedCallback(context);
      }
 
      public static void unregisterActionCallback(Context context, JsonCallback callback, JSONArray parameters) throws JSONException {
@@ -478,6 +485,10 @@
          interface SetMessageReceivedCallback {
              String NAME = "setMessageReceivedCallback";
              int STATE_INDEX = 0;
+         }
+
+         interface RemoveMessageReceivedCallback {
+             String NAME = "removeMessageReceivedCallback";
          }
 
          interface UnregisterActionCallback {

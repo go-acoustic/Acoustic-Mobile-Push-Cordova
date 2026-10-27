@@ -5,6 +5,18 @@
 [Add-the-cordova-sdk-to-your-app](https://developer.goacoustic.com/acoustic-campaign/docs/add-the-cordova-sdk-to-your-app)
 
 
+## Session timeout on iOS
+
+The SDK ends a session when the app comes back after the session timeout, 20 minutes by default. To change it in a
+Cordova app, set the `sessionTimeout` preference (minutes) in the `config.xml` of the app, or in the `iOS` section of
+`CampaignConfig.json` when you use `installPlugins.js`:
+
+```xml
+<platform name="ios">
+    <preference name="sessionTimeout" value="5" />
+</platform>
+```
+
 ## Android requirements
 
 The Android SDK 3.11.3 that these plugins pull in needs `compileSdk` 37. With cordova-android, set it in the `config.xml` of your app:

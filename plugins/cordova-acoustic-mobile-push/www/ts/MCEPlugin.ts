@@ -46,7 +46,7 @@ namespace MCEPlugin {
   @param {SdkVersionCallback} callback The callback that handles the response
   */
     export const getPluginVersion = function (callback: SdkVersionCallback) {
-        callback("3.9.165");
+        callback("3.9.166");
     };
 
     /**
@@ -308,7 +308,8 @@ namespace MCEPlugin {
     /**
     Allow Cordova developer to receive the push messages that reach the application, including
     silent data pushes. If a message arrives while the application is not active, it will be
-    queued until the next time this method is called to register a callback handler
+    queued until the next time this method is called to register a callback handler. At most 50 messages are kept,
+    the oldest ones are dropped. Call removeMessageReceivedCallback when the application no longer wants the messages.
     @param {MessageReceivedCallback} callback The callback that handles the message
     */
     export const setMessageReceivedCallback = function (
@@ -322,6 +323,14 @@ namespace MCEPlugin {
                 cordova.exec(callback, function () {}, "MCEPlugin", "setMessageReceivedCallback", [true]);
             }
         );
+    };
+
+    /**
+    Unregisters the callback of setMessageReceivedCallback for good: the messages that were kept are deleted and no
+    message is kept until setMessageReceivedCallback is called again.
+    */
+    export const removeMessageReceivedCallback = function () {
+        cordova.exec(function () {}, function () {}, "MCEPlugin", "removeMessageReceivedCallback", []);
     };
 
     /**

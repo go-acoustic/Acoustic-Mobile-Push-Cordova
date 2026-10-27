@@ -395,8 +395,11 @@ AcousticCampaign.setRegisteredActionCallback('myType', (action, payload) => { /*
   `setMessageReceivedCallback(cb)` (`MCEPlugin.setMessageReceivedCallback(cb)` in Cordova) as
   `{type, payload, subject?, message?, attribution?, mailingId?}`. On Android a push with an `alert` that has `type`
   and `payload` and no text is a data push: nothing is shown and the app gets the callback. A push that arrives while
-  the app is not running is kept and delivered when the callback is registered. Nothing is kept, and nothing is
-  built per push, until the app has registered the callback once, so apps that do not use it are not affected. On iOS
+  the app is not running is kept and delivered when the callback is registered; at most 50 messages are kept and
+  the oldest ones are dropped. Nothing is kept, and nothing is built per push, until the app has registered the
+  callback once, so apps that do not use it are not affected. `removeMessageReceivedCallback()` (the same name in
+  Cordova) undoes the registration: the kept messages are deleted and nothing is kept again until the next
+  `setMessageReceivedCallback`. On iOS
   the values are read from the `notification-action` (`type`, `value`) and `mce` (`attribution`, `mailingId`) parts of
   the push. Checked on an Android device and on the iOS simulator (the simulator does not deliver a silent push to the
   app, so the delegate method was called directly); not checked with a push delivered through APNs to an iPhone.

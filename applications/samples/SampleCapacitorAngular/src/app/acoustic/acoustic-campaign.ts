@@ -226,6 +226,8 @@ export const AcousticCampaign = {
     ) => send("MCEPlugin", "setAttributeQueueCallbacks", onSuccess, onFailure),
     setMessageReceivedCallback: (cb: (message: ReceivedMessage) => void) =>
         send("MCEPlugin", "setMessageReceivedCallback", cb),
+    /** Unregisters the message received callback for good: the messages kept so far are deleted and none is kept until setMessageReceivedCallback is called again. */
+    removeMessageReceivedCallback: () => send("MCEPlugin", "removeMessageReceivedCallback"),
 
     // --- Inbox (cordova-acoustic-mobile-push-plugin-inbox) ---
     syncInboxMessages: () => send("MCEInboxPlugin", "syncInboxMessages"),

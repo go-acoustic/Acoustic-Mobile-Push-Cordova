@@ -67,10 +67,16 @@ declare namespace MCEPlugin {
     /**
     Allow Cordova developer to receive the push messages that reach the application, including
     silent data pushes. If a message arrives while the application is not active, it will be
-    queued until the next time this method is called to register a callback handler
+    queued until the next time this method is called to register a callback handler. At most 50 messages are kept,
+    the oldest ones are dropped. Call removeMessageReceivedCallback when the application no longer wants the messages.
     @param {MessageReceivedCallback} callback The callback that handles the message
     */
     const setMessageReceivedCallback: (callback: MessageReceivedCallback) => void;
+    /**
+    Unregisters the callback of setMessageReceivedCallback for good: the messages that were kept are deleted and no
+    message is kept until setMessageReceivedCallback is called again.
+    */
+    const removeMessageReceivedCallback: () => void;
     /**
      Internal function to translate a dictionary of attributes with dates represented as integers back into JavaScript date objects
      @param {Object[]} attributes Attributes to be converted

@@ -75,6 +75,14 @@
         config[@"appGroup"] = appGroup;
     }
 
+    // Minutes in the background after which the SDK ends the session. Optional: without it the SDK default applies.
+    id sessionTimeout = [self settingForKey:@"sessionTimeout"];
+    NSInteger sessionTimeoutMinutes = [sessionTimeout respondsToSelector:@selector(integerValue)] ? [sessionTimeout integerValue] : 0;
+    if(sessionTimeoutMinutes > 0)
+    {
+        config[@"sessionTimeout"] = @(sessionTimeoutMinutes);
+    }
+
     if([self settingForKey:@"geofence"] && [[self settingForKey:@"geofence"] caseInsensitiveCompare: @"true"] == NSOrderedSame)
     {
         config[@"location"][@"geofence"] = [NSMutableDictionary dictionary];

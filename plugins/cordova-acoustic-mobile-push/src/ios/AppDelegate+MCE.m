@@ -405,6 +405,23 @@ static void mceSetDelegate(id application, SEL cmd, id delegate)
     }
 }
 
+// Messages kept for a callback that is not registered; the oldest ones are dropped beyond this number
+static const NSUInteger MCEMaxQueuedReceivedMessages = 50;
+
+static void MCETrimQueuedReceivedMessages(void)
+{
+    [[MCECallbackDatabaseManager sharedInstance] selectCallbacks: @"messageReceived" withBlock:^(NSArray*dictionaries, NSArray*ids){
+        if([ids count] > MCEMaxQueuedReceivedMessages)
+        {
+            NSArray * oldest = [ids subarrayWithRange:NSMakeRange(0, [ids count] - MCEMaxQueuedReceivedMessages)];
+            // the block runs on the database queue, which deleteCallbacksById: needs, so delete from another queue
+            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+                [[MCECallbackDatabaseManager sharedInstance] deleteCallbacksById:oldest];
+            });
+        }
+    }];
+}
+
 // Hands the push to the JavaScript callback, or keeps it until JavaScript registers one
 -(void)messageReceived:(NSDictionary*)userInfo
 {
@@ -439,6 +456,7 @@ static void mceSetDelegate(id application, SEL cmd, id delegate)
     else
     {
         [[MCECallbackDatabaseManager sharedInstance] insertCallback: @"messageReceived" dictionary: details];
+        MCETrimQueuedReceivedMessages();
     }
 }
 

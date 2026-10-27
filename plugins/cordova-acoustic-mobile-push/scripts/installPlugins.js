@@ -126,6 +126,11 @@ function managePlugins(currentAppWorkingDirectory, pluginPath, configData) {
 			updateConfigXMLPreference(currentAppWorkingDirectory, "iOSProdkey", configData.iOS.appKey.prod);
 			updateConfigXMLPreference(currentAppWorkingDirectory, "serverUrl", configData.iOS.baseUrl);
 			updateConfigXMLPreference(currentAppWorkingDirectory, "logLevel", configData.iOS.loglevel);
+			// Minutes in the background before the session ends. Without it the native configuration of a Cordova app
+			// has no sessionTimeout and the SDK default of 20 minutes applies.
+			if (Number(configData.iOS.sessionTimeout) > 0) {
+				updateConfigXMLPreference(currentAppWorkingDirectory, "sessionTimeout", configData.iOS.sessionTimeout);
+			}
 			updatePluginXMLPodName(packagePluginPath, configData.plugins.useRelease, configData);
 		}
 
@@ -196,6 +201,7 @@ function managePlugins(currentAppWorkingDirectory, pluginPath, configData) {
 								// runExecSync(`cd "${currentAppWorkingDirectory}" && npm uninstall ${plugin} --ignore-scripts`);
 							}
 							runExecSync(`cd "${currentAppWorkingDirectory}" && npm install ${plugin} --ignore-scripts`);
+							pinPodBeforeAdd(currentAppWorkingDirectory, plugin, configData, true);
 							runExecSync(`cd "${currentAppWorkingDirectory}" && cordova plugin add ${plugin} --variable SYNC_RADIUS="${syncRadius}" --variable SYNC_INTERVAL="${syncInterval}"`);
 							update = true;
 						}
@@ -210,6 +216,7 @@ function managePlugins(currentAppWorkingDirectory, pluginPath, configData) {
 							if (cordovaPluginInstalled) {
 								runExecSync(`cd "${currentAppWorkingDirectory}" && cordova plugin rm ${plugin} --variable UUID="${myUuid}"`);
 							}
+							pinPodBeforeAdd(currentAppWorkingDirectory, plugin, configData);
 							runExecSync(`cd "${currentAppWorkingDirectory}" && cordova plugin add ${plugin} --variable UUID="${myUuid}"`);
 							update = true;
 						}
@@ -217,6 +224,7 @@ function managePlugins(currentAppWorkingDirectory, pluginPath, configData) {
 						if (cordovaPluginInstalled) {
 							runExecSync(`cd "${currentAppWorkingDirectory}" && cordova plugin rm ${plugin}`);
 						}
+						pinPodBeforeAdd(currentAppWorkingDirectory, plugin, configData);
 						runExecSync(`cd "${currentAppWorkingDirectory}" && cordova plugin add ${plugin}`);
 						update = true;
 					}
@@ -488,6 +496,26 @@ function isPluginInstalled(currentAppWorkingDirectory, pluginName) {
 }
 
 /**
+ * Pins the iOS pod of a plugin before "cordova plugin add". Cordova builds the Podfile from the plugin.xml it copies
+ * while it adds the plugin, so a spec written into node_modules afterwards does not reach the Podfile (the pod of the
+ * notification service plugin then resolved to the newest SDK while the main pod was pinned).
+ *
+ * @param {*} currentAppWorkingDirectory Current application directory.
+ * @param {*} plugin Name of the plugin package.
+ * @param {*} configData CampaignConfig.json file data.
+ * @param {boolean} alreadyInstalled True when the caller has already run npm install for the plugin.
+ */
+function pinPodBeforeAdd(currentAppWorkingDirectory, plugin, configData, alreadyInstalled) {
+	if (!hasIosPlatform(currentAppWorkingDirectory) || !configData.iOSVersion || !configData.plugins) {
+		return;
+	}
+	if (!alreadyInstalled) {
+		runExecSync(`cd "${currentAppWorkingDirectory}" && npm install ${plugin} --ignore-scripts`);
+	}
+	updatePluginXMLPodName(path.join(currentAppWorkingDirectory, 'node_modules', plugin), configData.plugins.useRelease === true, configData);
+}
+
+/**
  * Update the podname to be used in podfile.
  * 
  * @param {*} pluginPath Path to plugin.
@@ -495,8 +523,8 @@ function isPluginInstalled(currentAppWorkingDirectory, pluginName) {
  * @param {*} configData CampaignConfig.json file data.
  */
 function updatePluginXMLPodName(plugPath, isRelease, configData) {
+	let pluginPath = path.join(plugPath, "plugin.xml");
 	try {
-		let pluginPath = path.join(plugPath, "plugin.xml");
 		let pluginContent = fs.readFileSync(pluginPath, 'utf8');
 		let podNameRegex = /<pod name="AcousticMobilePush.*\/>/;
 		let podname = isRelease ? "AcousticMobilePush" : "AcousticMobilePushDebug";
@@ -529,8 +557,8 @@ function updatePluginXMLPodName(plugPath, isRelease, configData) {
  * @param {*} configData CampaignConfig.json file data.
  */
 function updateBuildExtrasGradle(plugPath, configData) {
+	let pluginPath = path.join(plugPath, "src/android/build-extras.gradle");
 	try {
-		let pluginPath = path.join(plugPath, "src/android/build-extras.gradle");
 		let pluginContent = fs.readFileSync(pluginPath, 'utf8');
 		const mavenUrlRegex = /maven\s*{\s*url\s*\"https:\/\/s01\.oss\.sonatype\.org\/content\/repositories\/staging"\s*}/;
 

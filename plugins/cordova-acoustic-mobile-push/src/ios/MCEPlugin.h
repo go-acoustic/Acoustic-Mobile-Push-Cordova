@@ -30,6 +30,7 @@
 - (void) sendAttributeSuccess:(NSDictionary*)dictionary;
 - (void) sendMessageReceived:(NSDictionary*)dictionary;
 - (void) setMessageReceivedCallback:(CDVInvokedUrlCommand*)command; // Arguments: state
+- (void) removeMessageReceivedCallback:(CDVInvokedUrlCommand*)command;
 - (BOOL) executeActionCallback:(NSDictionary*)action payload: (NSDictionary*)payload;
 - (void) setRegisteredActionCallback:(CDVInvokedUrlCommand*)command;
 - (BOOL) executeCategoryCallback:(NSDictionary*)response;
